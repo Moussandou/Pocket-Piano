@@ -54,6 +54,15 @@ export const Studio: React.FC = () => {
         return () => clearInterval(interval);
     }, [isRecording]);
 
+    // Format time for display (MM:SS)
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
+
+    const [lastActionTime, setLastActionTime] = useState(Date.now());
+
     // Handle combo depletion
     useEffect(() => {
         const interval = setInterval(() => {
@@ -65,26 +74,18 @@ export const Studio: React.FC = () => {
                     }
                     return 0;
                 }
-                return Math.max(0, prev - 1.5); // Deplete at 1.5% per tick (sub-second)
+                return Math.max(0, prev - 2.5); // Deplete slightly faster (2.5% per 100ms)
             });
+
+            // Score Reset logic: if no activity for 30s, reset score
+            if (Date.now() - lastActionTime > 30000 && comboScore > 0) {
+                setComboScore(0);
+                setMultiplier(1);
+            }
         }, 100);
 
         return () => clearInterval(interval);
-    }, [multiplier]);
-
-    // Reset score when progress hits zero for too long? No, score should persist until reset manually or session end
-    useEffect(() => {
-        if (comboProgress <= 0 && multiplier > 1) {
-            setMultiplier(1);
-        }
-    }, [comboProgress, multiplier]);
-
-    // Format time for display (MM:SS)
-    const formatTime = (seconds: number) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
-    };
+    }, [multiplier, lastActionTime, comboScore]);
 
     const handleNoteEvent = useCallback((note: string, type: 'press' | 'release', velocity: number = 0.8) => {
         if (!isLoaded && type === 'press') {
@@ -92,6 +93,7 @@ export const Studio: React.FC = () => {
         }
 
         if (type === 'press') {
+            setLastActionTime(Date.now());
             setActiveKeys(prev => Array.from(new Set([...prev, note])));
             setNoteHistory(prev => [note, ...prev].slice(0, 10));
 
@@ -100,12 +102,11 @@ export const Studio: React.FC = () => {
             setComboScore(prev => prev + (10 * multiplier));
 
             // Tiered multiplier
-            setComboScore(prevScore => {
-                const newScore = prevScore;
-                if (newScore > multiplier * multiplier * 1000) {
-                    setMultiplier(m => Math.min(8, m + 1));
-                }
-                return newScore;
+            setMultiplier(m => {
+                if (comboScore > 5000) return 8;
+                if (comboScore > 2000) return 4;
+                if (comboScore > 500) return 2;
+                return m;
             });
 
             recordNote(note, velocity);
@@ -113,7 +114,7 @@ export const Studio: React.FC = () => {
         } else {
             setActiveKeys(prev => prev.filter(k => k !== note));
         }
-    }, [recordNote, trackNote, isLoaded]);
+    }, [recordNote, trackNote, isLoaded, multiplier, comboScore]);
 
     return (
         <main className="app-main">

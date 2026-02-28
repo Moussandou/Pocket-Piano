@@ -549,23 +549,41 @@ body {
   inset: 0;
   display: flex;
   align-items: flex-end;
-  justify-content: center;
-  padding: 0 2.5rem 2.5rem;
-  gap: 0.25rem;
-  opacity: 0.8;
+  justify-content: space-around;
+  padding: 0 10%;
   pointer-events: none;
+  z-index: 1;
+  opacity: 0.6;
 }
 
 .vis-bar {
-  width: 2rem;
-  background: var(--neutral-dark);
-  opacity: 0.1;
-  transition: height 0.1s;
+  width: 12px;
+  background: var(--neutral-light);
+  border-radius: 6px 6px 0 0;
+  transition: height 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .vis-bar.primary {
-  background: var(--primary);
-  opacity: 0.9;
+  background: linear-gradient(to top, var(--primary), rgba(13, 89, 242, 0.2));
+  box-shadow: 0 0 20px var(--primary);
+  animation: bar-glow 2s infinite ease-in-out;
+}
+
+@keyframes bar-glow {
+  0% {
+    filter: brightness(1);
+    transform: scaleX(1);
+  }
+
+  50% {
+    filter: brightness(1.2);
+    transform: scaleX(1.1);
+  }
+
+  100% {
+    filter: brightness(1);
+    transform: scaleX(1);
+  }
 }
 
 .stage-status-left {
@@ -623,15 +641,16 @@ body {
   transition: all 0.2s;
 }
 
-.note-history-item:nth-last-child(2) {
-  opacity: 0.7;
-}
-
-.note-history-item:last-child {
+.note-history-item:first-child {
   opacity: 1;
   color: var(--primary);
-  font-weight: 700;
-  transform: scale(1.1);
+  font-weight: 800;
+  transform: scale(1.2);
+  text-shadow: 0 0 10px rgba(13, 89, 242, 0.3);
+}
+
+.note-history-item:not(:first-child) {
+  opacity: 0.5;
 }
 
 .streak-container {
@@ -651,6 +670,61 @@ body {
   font-family: 'Space Mono', monospace;
   color: var(--neutral-mid);
   text-transform: uppercase;
+}
+
+/* Combo System */
+.combo-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 120px;
+}
+
+.combo-value-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.multiplier-badge {
+  background: var(--primary);
+  color: white;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  border-radius: 2px;
+  animation: pulse-small 2s infinite;
+}
+
+.combo-bar-container {
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 0.25rem;
+}
+
+.combo-bar-fill {
+  height: 100%;
+  background: var(--primary);
+  transition: width 0.1s linear;
+  box-shadow: 0 0 8px var(--primary);
+}
+
+@keyframes pulse-small {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Piano Keyboard */
