@@ -1,22 +1,24 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Piano } from './components/Piano/Piano';
 import { audioEngine } from './engine/audio';
 import { useRecorder } from './hooks/useRecorder';
 import { useSettings } from './hooks/useSettings';
-import { Play, Volume2, Waves, Sliders, Palette } from 'lucide-react';
+import { Volume2, Waves, Sliders, Palette, Settings, Music } from 'lucide-react';
 import { AuthManager } from './infra/AuthManager';
 import { RecordingGallery } from './components/Gallery/RecordingGallery';
+import PianoVisualizer from './components/View/PianoVisualizer';
 
 const App: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const { settings, updateSetting } = useSettings();
-  const { isRecording, recordings, startRecording, stopRecording, recordNote, playRecording } = useRecorder();
-  const [activeKeys, setActiveKeys] = useState<string[]>([]);
+  const { isRecording, startRecording, stopRecording, recordNote } = useRecorder();
+  const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
+  const [lastVelocity, setLastVelocity] = useState(0.8);
+  const [showGallery, setShowGallery] = useState(false);
 
   // Dropdown states
-  const [activeMenu, setActiveMenu] = useState<'sound' | 'styles' | null>(null);
-  const menuRef = useRef<HTMLElement>(null);
+  const [activeMenu, setActiveMenu] = useState<'sound' | 'styles' | 'settings' | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -42,105 +44,137 @@ const App: React.FC = () => {
     }
 
     if (type === 'press') {
-      setActiveKeys(prev => Array.from(new Set([...prev, note])));
+      setActiveKeys(prev => {
+        const next = new Set(prev);
+        next.add(note);
+        return next;
+      });
+      setLastVelocity(0.7 + Math.random() * 0.3);
       recordNote(note);
     } else {
-      setActiveKeys(prev => prev.filter(k => k !== note));
+      setActiveKeys(prev => {
+        const next = new Set(prev);
+        next.delete(note);
+        return next;
+      });
     }
   }, [recordNote, isLoaded]);
 
   return (
     <div className="app-container">
-      <AuthManager />
-
-      <div className="hud-container">
-        <div className="speaker-grille"></div>
-        <div className="hud-center" style={{ justifyContent: 'center' }}>
-          <h1 style={{ fontSize: '1.5rem', color: '#fff', letterSpacing: '2px', fontWeight: 300 }}>POCKET PIANO</h1>
-        </div>
-        <div className="speaker-grille"></div>
-      </div>
-
-      <nav className="menu-bar" ref={menuRef}>
-        <div className={`menu-item ${isRecording ? 'active' : ''}`} onClick={isRecording ? () => stopRecording() : startRecording}>
-          {isRecording ? 'Stop' : 'Record'}
+      {/* HEADER */}
+      <header className="app-header">
+        <div className="header-left">
+          <div className="app-logo">
+            <Music size={20} />
+            POCKET PIANO
+          </div>
+          <span className="version-tag">v0.8.4</span>
         </div>
 
-        <div className="menu-item" onClick={() => setActiveMenu(activeMenu === 'sound' ? null : 'sound')}>
-          Sound
-          {activeMenu === 'sound' && (
-            <div className="dropdown-menu" onClick={e => e.stopPropagation()}>
-              <div className="setting-group">
-                <div className="setting-label"><Volume2 size={16} /> Volume</div>
-                <input type="range" min="-60" max="0" value={settings.volume} onChange={(e) => updateSetting('volume', parseInt(e.target.value))} />
-                <span className="value-display">{settings.volume} dB</span>
-              </div>
-              <div className="setting-group">
-                <div className="setting-label"><Waves size={16} /> Sustain</div>
-                <input type="range" min="0.1" max="10" step="0.1" value={settings.sustain} onChange={(e) => updateSetting('sustain', parseFloat(e.target.value))} />
-                <span className="value-display">x{settings.sustain}</span>
-              </div>
-              <div className="setting-group">
-                <div className="setting-label"><Sliders size={16} /> Transpose</div>
-                <div className="transpose-controls">
-                  <button onClick={() => updateSetting('transpose', settings.transpose - 1)}>-</button>
-                  <div className="transpose-value">{settings.transpose > 0 ? `+${settings.transpose}` : settings.transpose}</div>
-                  <button onClick={() => updateSetting('transpose', settings.transpose + 1)}>+</button>
+        <div className="header-center" ref={menuRef}>
+          <div className="nav-link" onClick={() => setActiveMenu(activeMenu === 'sound' ? null : 'sound')}>
+            Sound
+            {activeMenu === 'sound' && (
+              <div className="dropdown-menu" onClick={e => e.stopPropagation()}>
+                <div className="setting-group">
+                  <div className="setting-label"><Volume2 size={16} /> Volume</div>
+                  <input type="range" min="-60" max="0" value={settings.volume} onChange={(e) => updateSetting('volume', parseInt(e.target.value))} />
+                </div>
+                <div className="setting-group">
+                  <div className="setting-label"><Waves size={16} /> Sustain</div>
+                  <input type="range" min="0.1" max="10" step="0.1" value={settings.sustain} onChange={(e) => updateSetting('sustain', parseFloat(e.target.value))} />
+                </div>
+                <div className="setting-group">
+                  <div className="setting-label"><Sliders size={16} /> Transpose</div>
+                  <div className="transpose-controls">
+                    <button onClick={() => updateSetting('transpose', settings.transpose - 1)}>-</button>
+                    <span className="transpose-value">{settings.transpose > 0 ? `+${settings.transpose}` : settings.transpose}</span>
+                    <button onClick={() => updateSetting('transpose', settings.transpose + 1)}>+</button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        <div className="menu-item" onClick={() => setActiveMenu(activeMenu === 'styles' ? null : 'styles')}>
-          Styles
-          {activeMenu === 'styles' && (
-            <div className="dropdown-menu" onClick={e => e.stopPropagation()}>
-              <div className="setting-group">
-                <div className="setting-label"><Palette size={16} /> Accent Color</div>
-                <div className="color-presets">
-                  {['#4a9eff', '#ff4a4a', '#4aff4a', '#ff8c00', '#ff4aff'].map(color => (
-                    <div key={color} className={`color-swatch ${settings.pianoColor === color ? 'active' : ''}`} style={{ backgroundColor: color }} onClick={() => updateSetting('pianoColor', color)} />
-                  ))}
+          <div className="nav-link" onClick={() => setActiveMenu(activeMenu === 'styles' ? null : 'styles')}>
+            Styles
+            {activeMenu === 'styles' && (
+              <div className="dropdown-menu" onClick={e => e.stopPropagation()}>
+                <div className="setting-group">
+                  <div className="setting-label"><Palette size={16} /> Accent Color</div>
+                  <div className="color-presets" style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                    {['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'].map(color => (
+                      <div
+                        key={color}
+                        style={{ width: '24px', height: '24px', borderRadius: '50%', background: color, cursor: 'pointer', border: settings.pianoColor === color ? '2px solid #000' : 'none' }}
+                        onClick={() => updateSetting('pianoColor', color)}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        <div className="menu-item">Key Assist</div>
-        <div className="menu-item">Save</div>
-        <div className="menu-item">More</div>
-      </nav>
+          <div className="nav-link" onClick={() => setShowGallery(!showGallery)}>
+            Cloud
+          </div>
 
-      <div className="key-display" style={{ minHeight: '30px' }}>
-        {!isLoaded ? "Appuyez sur une touche pour commencer" : (activeKeys.length > 0 ? activeKeys.join(' • ') : '---')}
-      </div>
-
-      <main className="main-content">
-        <div className="piano-view">
-          <div className="piano-wrapper">
-            <Piano onNotePlayed={(note) => handleNoteEvent(note, 'press')} onNoteReleased={(note) => handleNoteEvent(note, 'release')} />
+          <div className="nav-link" onClick={() => (isRecording ? stopRecording() : startRecording())}>
+            {isRecording ? 'Stop Rec' : 'Record'}
           </div>
         </div>
 
-        {recordings.length > 0 && (
-          <aside className="recordings-panel">
-            <div className="recordings-list">
-              {recordings.map(rec => (
-                <div key={rec.uuid} className="recording-item">
-                  <span className="recording-name">{rec.name}</span>
-                  <button onClick={() => playRecording(rec)}><Play size={12} /></button>
-                </div>
-              ))}
-            </div>
-          </aside>
-        )}
+        <div className="header-right">
+          <button className="btn-midi">
+            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }} />
+            CONNECT MIDI
+          </button>
+
+          <button className="btn-icon">
+            <Settings size={18} />
+          </button>
+
+          <AuthManager />
+        </div>
+      </header>
+
+      {/* MAIN CONTENT */}
+      <main className="display-area">
+        <PianoVisualizer activeNotes={activeKeys} lastVelocity={lastVelocity} />
       </main>
 
-      <section className="gallery-section">
-        <RecordingGallery />
+      {/* PIANO SECTION */}
+      <section className="piano-section">
+        <Piano
+          onNotePlayed={(note) => handleNoteEvent(note, 'press')}
+          onNoteReleased={(note) => handleNoteEvent(note, 'release')}
+        />
       </section>
+
+      {/* OVERLAYS */}
+      {showGallery && (
+        <div className="gallery-overlay" style={{ position: 'fixed', top: '60px', left: 0, right: 0, bottom: 0, background: '#fff', zIndex: 200, overflowY: 'auto' }}>
+          <div style={{ padding: '20px', display: 'flex', justifyContent: 'flex-end', borderBottom: '1px solid #eee' }}>
+            <button onClick={() => setShowGallery(false)}>Back to Piano</button>
+          </div>
+          <RecordingGallery />
+        </div>
+      )}
+
+      {/* Initial load prompt */}
+      {!isLoaded && (
+        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'rgba(0,0,0,0.8)', color: '#fff', padding: '12px 24px', borderRadius: '30px', pointerEvents: 'none', zIndex: 100, fontWeight: 600 }}>
+          Press any key to start playing
+        </div>
+      )}
+
+      {/* Bottom info bar */}
+      <div style={{ position: 'absolute', bottom: '12px', right: '24px', fontSize: '0.7rem', color: '#a1a1aa', pointerEvents: 'none', fontWeight: 600, letterSpacing: '0.5px' }}>
+        {isRecording && <span style={{ color: '#ef4444', marginRight: '12px' }}>● RECORDING</span>}
+        {activeKeys.size} ACTIVE NOTES
+      </div>
     </div>
   );
 };
