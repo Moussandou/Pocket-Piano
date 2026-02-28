@@ -7,6 +7,7 @@ class AudioEngine {
     private isInitializing: boolean = false;
     private transposeOffset: number = 0;
     private sustainMultiplier: number = 1;
+    private volumeDb: number = 0;
 
     constructor() { }
 
@@ -34,6 +35,9 @@ class AudioEngine {
 
             await Tone.loaded();
             this.isLoaded = true;
+            if (this.sampler) {
+                this.sampler.volume.value = this.volumeDb;
+            }
             console.log("Piano samples loaded");
         } catch (error) {
             console.error("Failed to initialize audio engine", error);
@@ -69,11 +73,9 @@ class AudioEngine {
     }
 
     public setVolume(db: number) {
+        this.volumeDb = db;
         if (this.sampler) {
             this.sampler.volume.value = db;
-        } else {
-            // Buffer the volume change if sampler is not ready yet
-            Tone.Destination.volume.value = db;
         }
     }
 

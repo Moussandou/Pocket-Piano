@@ -113,7 +113,7 @@ export const Library: React.FC = () => {
                 {/* Grid */}
                 <div className="sheets-grid">
                     {/* New Sheet Card */}
-                    <button className="sheet-card new-sheet" onClick={() => navigate('/studio')}>
+                    <button className="sheet-card new-sheet" onClick={() => navigate('/app')}>
                         <div className="add-icon-wrapper">
                             <span className="material-symbols-outlined text-4xl">add</span>
                         </div>
