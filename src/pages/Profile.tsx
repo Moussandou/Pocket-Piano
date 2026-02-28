@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { auth, googleProvider, db } from '../infra/firebase';
+import { auth, googleProvider, discordProvider, db } from '../infra/firebase';
 import { signInWithPopup, signOut, updateProfile } from 'firebase/auth';
+import type { AuthProvider } from 'firebase/auth';
 import { collection, query, where, onSnapshot, Timestamp, doc } from 'firebase/firestore';
 import { useAuth } from '../hooks/useAuth';
 import { useSettings } from '../hooks/useSettings';
@@ -14,6 +15,7 @@ export const Profile: React.FC = () => {
     const { settings, updateSetting } = useSettings();
     const [isEditing, setIsEditing] = useState(false);
     const [newName, setNewName] = useState('');
+    const configRef = React.useRef<HTMLDivElement>(null);
     const [stats, setStats] = useState({
         totalPlaytime: 0,
         totalNotes: 0,
@@ -98,9 +100,9 @@ export const Profile: React.FC = () => {
         }
     }, [user]);
 
-    const handleLogin = async () => {
+    const handleLogin = async (provider: AuthProvider = googleProvider) => {
         try {
-            await signInWithPopup(auth, googleProvider);
+            await signInWithPopup(auth, provider);
         } catch (error) {
             console.error("Login failed", error);
         }
@@ -112,6 +114,10 @@ export const Profile: React.FC = () => {
         } catch (error) {
             console.error("Logout failed", error);
         }
+    };
+
+    const handleConfigClick = () => {
+        configRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
     const handleSaveName = async () => {
@@ -152,7 +158,7 @@ export const Profile: React.FC = () => {
                             <img
                                 alt={t('profile.avatarAlt', { name: user?.displayName || 'User' })}
                                 className="profile-avatar-img"
-                                src={user?.photoURL || "https://lh3.googleusercontent.com/aida-public/AB6AXuCBiF0_QcQXA0GYX1l-TNPu0JAk1sRMWlQgqQPzrSEFRyTQcWMyY0E77wrSb1rybE2BtKHwJJZIqw0ALG7Kmgi4hKl5mseIE-wHsA72bzwMuSp6o9eZAZtvzWecww__e0prkFSA7e9aatFhLNfqLGkqGQvngUc-lVYFN23H1hlhgl4ok4cF7iFVv7Id6Ri5y_Ai1QReKDLrST_XNu58PNESZp0W6D_jugsKcFcw4nE_yOSJ6TRVsZzuW4p2GJZuZxXe9DXWmOPYa9I"}
+                                src={user?.photoURL || "https://api.dicebear.com/7.x/shapes/svg?seed=" + (user?.uid || 'guest')}
                             />
                             <div className="avatar-edit-icon">
                                 <span className="material-symbols-outlined text-white text-sm">edit</span>
@@ -189,12 +195,12 @@ export const Profile: React.FC = () => {
                             </div>
                             <div className="profile-meta">
                                 <p>{t('profile.emailLabel')} <span className="highlight-text">{user?.email || t('profile.notSignedIn')}</span></p>
-                                <p>{t('profile.planLabel')} <span className="highlight-primary">{t('profile.planValue')}</span></p>
+                                <p>{t('profile.planLabel')} <span className="highlight-primary">{user ? t('profile.planValue') : 'FREE TIER'}</span></p>
                             </div>
                         </div>
                     </div>
                     <div className="profile-actions">
-                        <button className="btn-config">
+                        <button className="btn-config" onClick={handleConfigClick}>
                             <span className="material-symbols-outlined text-lg">settings</span>
                             {t('profile.config')}
                         </button>
@@ -204,10 +210,16 @@ export const Profile: React.FC = () => {
                                 {t('profile.signOut')}
                             </button>
                         ) : (
-                            <button className="btn-export" onClick={handleLogin}>
-                                <span className="material-symbols-outlined text-lg">login</span>
-                                {t('profile.signIn')}
-                            </button>
+                            <div className="flex gap-2">
+                                <button className="btn-export" onClick={() => handleLogin(googleProvider)}>
+                                    <span className="material-symbols-outlined text-lg">login</span>
+                                    Google
+                                </button>
+                                <button className="btn-export btn-discord" onClick={() => handleLogin(discordProvider)}>
+                                    <span className="material-symbols-outlined text-lg">login</span>
+                                    Discord
+                                </button>
+                            </div>
                         )}
                     </div>
                 </section>
@@ -215,7 +227,7 @@ export const Profile: React.FC = () => {
                 {/* Asymmetric Layout Grid */}
                 <div className="profile-dashboard-grid">
                     {/* Left Panel: Settings & Tech Preferences */}
-                    <div className="panel-left">
+                    <div className="panel-left" ref={configRef}>
                         {/* Technical Preferences */}
                         <div className="tech-preferences-box">
                             <div className="box-header">

@@ -99,7 +99,7 @@ export const Auth: React.FC = () => {
                         <div className="auth-system-label">{t('auth.sidebar.status')}</div>
                         <div className="auth-system-title">
                             <div className="auth-status-dot"></div>
-                            <span>{t('auth.sidebar.version')}</span>
+                            <span>{t('auth.sidebar.version', { version })}</span>
                         </div>
                         <p className="auth-system-desc">
                             {t('auth.sidebar.description', { version })}

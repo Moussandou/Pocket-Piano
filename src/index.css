@@ -607,6 +607,52 @@ body {
   color: var(--primary);
 }
 
+.note-history-list {
+  display: flex;
+  gap: 0.75rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 1.25rem;
+  color: var(--neutral-dark);
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+  min-height: 1.5rem;
+}
+
+.note-history-item {
+  opacity: 0.4;
+  transition: all 0.2s;
+}
+
+.note-history-item:nth-last-child(2) {
+  opacity: 0.7;
+}
+
+.note-history-item:last-child {
+  opacity: 1;
+  color: var(--primary);
+  font-weight: 700;
+  transform: scale(1.1);
+}
+
+.streak-container {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.streak-value {
+  font-size: 1.25rem;
+  font-family: 'Space Mono', monospace;
+  color: var(--primary);
+}
+
+.streak-label {
+  font-size: 0.625rem;
+  font-family: 'Space Mono', monospace;
+  color: var(--neutral-mid);
+  text-transform: uppercase;
+}
+
 /* Piano Keyboard */
 .piano-stage {
   /* Use a max-height to prevent it from taking up too much vertical space on small screens */
@@ -705,8 +751,11 @@ body {
   pointer-events: none;
 }
 
-.black .key-label {
-  display: none;
+.key.black .key-label {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.625rem;
+  bottom: 10%;
+  position: absolute;
 }
 
 /* Right Sidebar */

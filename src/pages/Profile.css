@@ -188,6 +188,14 @@
     /* blue-700 */
 }
 
+.btn-discord {
+    background-color: #5865f2 !important;
+}
+
+.btn-discord:hover {
+    background-color: #4752c4 !important;
+}
+
 /* Dashboard Grid */
 .profile-dashboard-grid {
     display: grid;

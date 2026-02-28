@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 import { RecordingGallery } from '../components/Gallery/RecordingGallery';
 import { SaveRecordingModal } from '../components/Modals/SaveRecordingModal';
+import { KEYBOARD_MAP } from '../domain/constants';
 
 export const Studio: React.FC = () => {
     const { t } = useTranslation();
@@ -18,9 +19,21 @@ export const Studio: React.FC = () => {
     const { isRecording, startRecording, stopRecording, saveRecording, discardRecording, recordNote } = useRecorder();
     const { trackNote } = useAnalytics();
     const [activeKeys, setActiveKeys] = useState<string[]>([]);
+    const [noteHistory, setNoteHistory] = useState<string[]>([]);
+    const [comboScore, setComboScore] = useState(0);
+    const [multiplier, setMultiplier] = useState(1);
+    const [comboProgress, setComboProgress] = useState(0);
     const [showGallery, setShowGallery] = useState(false);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
+
+    const getDisplayNote = useCallback((note: string) => {
+        if (settings.historyDisplayMode === 'keys') {
+            const found = Object.entries(KEYBOARD_MAP).find((entry) => entry[1] === note);
+            return found ? found[0].toUpperCase() : note;
+        }
+        return note;
+    }, [settings.historyDisplayMode]);
 
     // Sync settings with audio engine
     useEffect(() => {
@@ -37,11 +50,34 @@ export const Studio: React.FC = () => {
             interval = setInterval(() => {
                 setRecordingTime(prev => prev + 1);
             }, 1000);
-        } else {
-            // Do not reset here, let it hold the final time until modal is closed or new recording starts
         }
         return () => clearInterval(interval);
     }, [isRecording]);
+
+    // Handle combo depletion
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setComboProgress(prev => {
+                if (prev <= 0) {
+                    if (multiplier > 1) {
+                        setMultiplier(1);
+                        return 0;
+                    }
+                    return 0;
+                }
+                return Math.max(0, prev - 1.5); // Deplete at 1.5% per tick (sub-second)
+            });
+        }, 100);
+
+        return () => clearInterval(interval);
+    }, [multiplier]);
+
+    // Reset score when progress hits zero for too long? No, score should persist until reset manually or session end
+    useEffect(() => {
+        if (comboProgress <= 0 && multiplier > 1) {
+            setMultiplier(1);
+        }
+    }, [comboProgress, multiplier]);
 
     // Format time for display (MM:SS)
     const formatTime = (seconds: number) => {
@@ -57,6 +93,21 @@ export const Studio: React.FC = () => {
 
         if (type === 'press') {
             setActiveKeys(prev => Array.from(new Set([...prev, note])));
+            setNoteHistory(prev => [note, ...prev].slice(0, 10));
+
+            // Combo Logic
+            setComboProgress(prev => Math.min(100, prev + 15));
+            setComboScore(prev => prev + (10 * multiplier));
+
+            // Tiered multiplier
+            setComboScore(prevScore => {
+                const newScore = prevScore;
+                if (newScore > multiplier * multiplier * 1000) {
+                    setMultiplier(m => Math.min(8, m + 1));
+                }
+                return newScore;
+            });
+
             recordNote(note, velocity);
             trackNote(note, velocity);
         } else {
@@ -194,8 +245,30 @@ export const Studio: React.FC = () => {
                     </div>
 
                     <div className="stage-status-left">
-                        <span className="status-label">{t('studio.activeKeys')}</span>
-                        <span className="status-value-large">{activeKeys.length > 0 ? activeKeys.length : '0'}</span>
+                        <div className="status-block">
+                            <span className="status-label">{t('studio.activeKeys')}</span>
+                            <span className="status-value-large">{activeKeys.length > 0 ? activeKeys.length : '0'}</span>
+                        </div>
+                        <div className="status-block combo-block">
+                            <span className="status-label">{t('studio.score')}</span>
+                            <div className="combo-value-row">
+                                <span className="status-value-med">{comboScore.toLocaleString()}</span>
+                                {multiplier > 1 && <span className="multiplier-badge">x{multiplier}</span>}
+                            </div>
+                            <div className="combo-bar-container">
+                                <div className="combo-bar-fill" style={{ width: `${comboProgress}%` }}></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="stage-history">
+                        <div className="status-label">{t('studio.history')}</div>
+                        <div className="note-history-list">
+                            {noteHistory.map((note, idx) => (
+                                <span key={idx} className="note-history-item">{getDisplayNote(note)}</span>
+                            ))}
+                            {noteHistory.length === 0 && <span className="note-history-item">--</span>}
+                        </div>
                     </div>
 
                     <div className="stage-status-right">
@@ -245,6 +318,16 @@ export const Studio: React.FC = () => {
                 </div>
 
                 <div className="tool-group bottom">
+                    <button
+                        className={`btn-tool ${settings.historyDisplayMode === 'notes' ? 'active' : ''}`}
+                        title={t('studio.viewMode')}
+                        onClick={() => updateSetting('historyDisplayMode', settings.historyDisplayMode === 'notes' ? 'keys' : 'notes')}
+                    >
+                        <span className="material-symbols-outlined">
+                            {settings.historyDisplayMode === 'notes' ? 'music_note' : 'keyboard'}
+                        </span>
+                    </button>
+
                     <button className="btn-tool" title={t('studio.help')}>
                         <span className="material-symbols-outlined">help</span>
                     </button>
