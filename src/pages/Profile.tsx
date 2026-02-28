@@ -1,7 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { auth, googleProvider } from '../infra/firebase';
+import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 import './Profile.css';
 
 export const Profile: React.FC = () => {
+    const [user, setUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+        });
+        return () => unsubscribe();
+    }, []);
+
+    const handleLogin = async () => {
+        try {
+            await signInWithPopup(auth, googleProvider);
+        } catch (error) {
+            console.error("Login failed", error);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error("Logout failed", error);
+        }
+    };
     return (
         <div className="profile-container">
             <main className="profile-main">
@@ -10,9 +37,9 @@ export const Profile: React.FC = () => {
                     <div className="profile-info-group">
                         <div className="profile-avatar-wrapper">
                             <img
-                                alt="Abstract black and white geometric pattern"
+                                alt={user?.displayName || "Profile avatar"}
                                 className="profile-avatar-img"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBiF0_QcQXA0GYX1l-TNPu0JAk1sRMWlQgqQPzrSEFRyTQcWMyY0E77wrSb1rybE2BtKHwJJZIqw0ALG7Kmgi4hKl5mseIE-wHsA72bzwMuSp6o9eZAZtvzWecww__e0prkFSA7e9aatFhLNfqLGkqGQvngUc-lVYFN23H1hlhgl4ok4cF7iFVv7Id6Ri5y_Ai1QReKDLrST_XNu58PNESZp0W6D_jugsKcFcw4nE_yOSJ6TRVsZzuW4p2GJZuZxXe9DXWmOPYa9I"
+                                src={user?.photoURL || "https://lh3.googleusercontent.com/aida-public/AB6AXuCBiF0_QcQXA0GYX1l-TNPu0JAk1sRMWlQgqQPzrSEFRyTQcWMyY0E77wrSb1rybE2BtKHwJJZIqw0ALG7Kmgi4hKl5mseIE-wHsA72bzwMuSp6o9eZAZtvzWecww__e0prkFSA7e9aatFhLNfqLGkqGQvngUc-lVYFN23H1hlhgl4ok4cF7iFVv7Id6Ri5y_Ai1QReKDLrST_XNu58PNESZp0W6D_jugsKcFcw4nE_yOSJ6TRVsZzuW4p2GJZuZxXe9DXWmOPYa9I"}
                             />
                             <div className="avatar-edit-icon">
                                 <span className="material-symbols-outlined text-white text-sm">edit</span>
@@ -20,15 +47,15 @@ export const Profile: React.FC = () => {
                         </div>
                         <div className="profile-details">
                             <div>
-                                <h2 className="profile-username">Alex_R</h2>
+                                <h2 className="profile-username">{user?.displayName || "Guest Profile"}</h2>
                                 <div className="status-indicator">
                                     <span className="status-dot"></span>
-                                    <span className="status-text">Online Now</span>
+                                    <span className="status-text">{user ? 'Online Now' : 'Offline'}</span>
                                 </div>
                             </div>
                             <div className="profile-meta">
-                                <p>Hardware ID: <span className="highlight-text">PP-88-MK2-04X</span></p>
-                                <p>Plan: <span className="highlight-primary">Pro Member</span></p>
+                                <p>Email: <span className="highlight-text">{user?.email || "Not signed in"}</span></p>
+                                <p>Plan: <span className="highlight-primary">Basic Tier</span></p>
                             </div>
                         </div>
                     </div>
@@ -37,10 +64,17 @@ export const Profile: React.FC = () => {
                             <span className="material-symbols-outlined text-lg">settings</span>
                             Config
                         </button>
-                        <button className="btn-export">
-                            <span className="material-symbols-outlined text-lg">download</span>
-                            Export Data
-                        </button>
+                        {user ? (
+                            <button className="btn-export" onClick={handleLogout}>
+                                <span className="material-symbols-outlined text-lg">logout</span>
+                                Sign Out
+                            </button>
+                        ) : (
+                            <button className="btn-export" onClick={handleLogin}>
+                                <span className="material-symbols-outlined text-lg">login</span>
+                                Sign In
+                            </button>
+                        )}
                     </div>
                 </section>
 

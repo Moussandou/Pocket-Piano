@@ -75,6 +75,46 @@ export const Landing: React.FC = () => {
                 </div>
             </section>
 
+            {/* CTA Section */}
+            <section className="cta-section border-bottom">
+                <div className="grid-2-cols">
+                    {/* Image Side */}
+                    <div className="cta-visual group hover-effect">
+                        <div className="visual-overlay"></div>
+                        <img
+                            alt="High contrast overhead view of piano keys"
+                            className="keys-img hover-scale"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuACC8x9v6vnmOXefrwUpnABQDUHxW4OBezN1kA5_3qUHx8dikSmPQmfKAKWpP20CV5cqmorNLsetxkr9MbyUJNmzhdRaMqmvAILXydBiATFpud-jiFd7epz2SZFf5RL2Di5ertG0FvQZT6o5DlQnofOssB5gFNJdhrh4Q27m49r-sFyhlWlKKjFQIjAh7_kaimzhCTvKkRRV_0GLLvg4DlkyVA0Qu5hD2_TYYlXbCH0IIprIQJpzdpvwIBSNzA4ksv3JB7WvV9O2rk"
+                        />
+                        <div className="cam-label">CAM_01: TOP_DOWN</div>
+                    </div>
+                    {/* Content Side */}
+                    <div className="cta-content relative-box">
+                        <div className="decor-grid"></div>
+                        <h2 className="cta-title">
+                            Ready to<br />Play?
+                        </h2>
+                        <p className="cta-desc">
+                            Launch the interface now. Zero setup required. Pure performance.
+                        </p>
+                        <Link to="/app" className="btn-cta group hover-primary">
+                            <span>Initialize Interface</span>
+                            <span className="material-symbols-outlined slide-on-hover">arrow_forward</span>
+                        </Link>
+                        <div className="cta-checks">
+                            <div className="check-item">
+                                <span className="material-symbols-outlined">check_circle</span>
+                                <span>No Install</span>
+                            </div>
+                            <div className="check-item">
+                                <span className="material-symbols-outlined">check_circle</span>
+                                <span>Free Access</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Features Grid */}
             <section className="features-section border-bottom">
                 <div className="features-header">
@@ -120,46 +160,6 @@ export const Landing: React.FC = () => {
                             Real-time frequency analysis and key-press tracking. Visual feedback loop for precise performance monitoring.
                         </p>
                         <div className="feature-meta">Refresh: 60/120/144 Hz</div>
-                    </div>
-                </div>
-            </section>
-
-            {/* CTA Section */}
-            <section className="cta-section border-bottom">
-                <div className="grid-2-cols">
-                    {/* Image Side */}
-                    <div className="cta-visual group hover-effect">
-                        <div className="visual-overlay"></div>
-                        <img
-                            alt="High contrast overhead view of piano keys"
-                            className="keys-img hover-scale"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuACC8x9v6vnmOXefrwUpnABQDUHxW4OBezN1kA5_3qUHx8dikSmPQmfKAKWpP20CV5cqmorNLsetxkr9MbyUJNmzhdRaMqmvAILXydBiATFpud-jiFd7epz2SZFf5RL2Di5ertG0FvQZT6o5DlQnofOssB5gFNJdhrh4Q27m49r-sFyhlWlKKjFQIjAh7_kaimzhCTvKkRRV_0GLLvg4DlkyVA0Qu5hD2_TYYlXbCH0IIprIQJpzdpvwIBSNzA4ksv3JB7WvV9O2rk"
-                        />
-                        <div className="cam-label">CAM_01: TOP_DOWN</div>
-                    </div>
-                    {/* Content Side */}
-                    <div className="cta-content relative-box">
-                        <div className="decor-grid"></div>
-                        <h2 className="cta-title">
-                            Ready to<br />Play?
-                        </h2>
-                        <p className="cta-desc">
-                            Launch the interface now. Zero setup required. Pure performance.
-                        </p>
-                        <Link to="/app" className="btn-cta group hover-primary">
-                            <span>Initialize Interface</span>
-                            <span className="material-symbols-outlined slide-on-hover">arrow_forward</span>
-                        </Link>
-                        <div className="cta-checks">
-                            <div className="check-item">
-                                <span className="material-symbols-outlined">check_circle</span>
-                                <span>No Install</span>
-                            </div>
-                            <div className="check-item">
-                                <span className="material-symbols-outlined">check_circle</span>
-                                <span>Free Access</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </section>
