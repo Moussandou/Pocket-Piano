@@ -64,7 +64,9 @@ body {
   border-bottom: 1px solid var(--neutral-dark);
   padding: 1rem 1.5rem;
   background: var(--bg-light);
-  z-index: 50;
+  z-index: 1000;
+  position: sticky;
+  top: 0;
 }
 
 .header-brand {
