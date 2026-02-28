@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Library.css';
-import { db, auth } from '../infra/firebase';
+import { db } from '../infra/firebase';
 import { collection, query, where, onSnapshot, orderBy, deleteDoc, doc, Timestamp } from 'firebase/firestore';
+import { useAuth } from '../hooks/useAuth';
 
 interface Recording {
     id: string;
@@ -15,36 +16,33 @@ interface Recording {
 export const Library: React.FC = () => {
     const [recordings, setRecordings] = useState<Recording[]>([]);
     const [loading, setLoading] = useState(true);
+    const { user } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
-        const unsubscribeAuth = auth.onAuthStateChanged((user) => {
-            if (!user) {
-                setRecordings([]);
-                setLoading(false);
-                return;
-            }
+        if (!user) {
+            setRecordings([]);
+            setLoading(false);
+            return;
+        }
 
-            const q = query(
-                collection(db, 'recordings'),
-                where('userId', '==', user.uid),
-                orderBy('timestamp', 'desc')
-            );
+        const q = query(
+            collection(db, 'recordings'),
+            where('userId', '==', user.uid),
+            orderBy('timestamp', 'desc')
+        );
 
-            const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
-                const docs = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                })) as Recording[];
-                setRecordings(docs);
-                setLoading(false);
-            });
-
-            return () => unsubscribeSnapshot();
+        const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
+            const docs = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            })) as Recording[];
+            setRecordings(docs);
+            setLoading(false);
         });
 
-        return () => unsubscribeAuth();
-    }, []);
+        return () => unsubscribeSnapshot();
+    }, [user]);
 
     const removeRecording = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -124,7 +122,7 @@ export const Library: React.FC = () => {
                         <div style={{ padding: '2rem', color: '#6b7280' }}>Loading your recordings...</div>
                     ) : recordings.length === 0 ? (
                         <div style={{ padding: '2rem', color: '#6b7280' }}>
-                            {!auth.currentUser
+                            {!user
                                 ? 'Sign in to see your saved recordings.'
                                 : 'You don\'t have any recordings yet. Head to the Studio to create one!'}
                         </div>

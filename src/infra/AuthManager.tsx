@@ -1,21 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { auth, googleProvider } from './firebase';
-import type { User } from 'firebase/auth';
-import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
+import { signInWithPopup, signOut } from 'firebase/auth';
 import { LogIn, LogOut } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 export const AuthManager: React.FC = () => {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
-            setLoading(false);
-        });
-        return () => unsubscribe();
-    }, []);
+    const { user, loading } = useAuth();
 
     const login = async () => {
         try {

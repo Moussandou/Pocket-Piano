@@ -1,18 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { auth, googleProvider } from '../infra/firebase';
-import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
-import type { User } from 'firebase/auth';
+import { signInWithPopup, signOut } from 'firebase/auth';
+import { useAuth } from '../hooks/useAuth';
 import './Profile.css';
 
 export const Profile: React.FC = () => {
-    const [user, setUser] = useState<User | null>(null);
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
-        });
-        return () => unsubscribe();
-    }, []);
+    const { user } = useAuth();
 
     const handleLogin = async () => {
         try {
