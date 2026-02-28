@@ -3,6 +3,7 @@ import { Piano } from '../components/Piano/Piano';
 import { audioEngine } from '../engine/audio';
 import { useRecorder } from '../hooks/useRecorder';
 import { useSettings } from '../hooks/useSettings';
+import { useAnalytics } from '../hooks/useAnalytics';
 
 import { RecordingGallery } from '../components/Gallery/RecordingGallery';
 
@@ -10,6 +11,7 @@ export const Studio: React.FC = () => {
     const [isLoaded, setIsLoaded] = useState(false);
     const { settings, updateSetting } = useSettings();
     const { isRecording, startRecording, stopRecording, recordNote } = useRecorder();
+    const { trackNote } = useAnalytics();
     const [activeKeys, setActiveKeys] = useState<string[]>([]);
     const [showGallery, setShowGallery] = useState(false);
 
@@ -20,18 +22,19 @@ export const Studio: React.FC = () => {
         audioEngine.setSustain(settings.sustain);
     }, [settings]);
 
-    const handleNoteEvent = useCallback((note: string, type: 'press' | 'release') => {
+    const handleNoteEvent = useCallback((note: string, type: 'press' | 'release', velocity: number = 0.8) => {
         if (!isLoaded && type === 'press') {
             audioEngine.init().then(() => setIsLoaded(true));
         }
 
         if (type === 'press') {
             setActiveKeys(prev => Array.from(new Set([...prev, note])));
-            recordNote(note);
+            recordNote(note, velocity);
+            trackNote(note, velocity);
         } else {
             setActiveKeys(prev => prev.filter(k => k !== note));
         }
-    }, [recordNote, isLoaded]);
+    }, [recordNote, trackNote, isLoaded]);
 
     return (
         <main className="app-main">
@@ -46,6 +49,7 @@ export const Studio: React.FC = () => {
                 </div>
 
                 <div className="sidebar-content custom-scrollbar">
+                    {/* Mastery / Gain Section */}
                     <div className="control-section">
                         {/* Volume Slider */}
                         <div className="slider-group">
@@ -69,7 +73,7 @@ export const Studio: React.FC = () => {
                                     <span className="material-symbols-outlined">graphic_eq</span>
                                     Sustain
                                 </label>
-                                <span className="slider-value">{settings.sustain * 10}%</span>
+                                <span className="slider-value">{Math.round(settings.sustain * 10)}%</span>
                             </div>
                             <div className="slider-wrapper">
                                 <div className="slider-fill" style={{ width: `${(settings.sustain / 10) * 100}%` }}></div>
@@ -88,21 +92,56 @@ export const Studio: React.FC = () => {
                             </div>
                             <div className="transpose-stitch">
                                 <button onClick={() => updateSetting('transpose', settings.transpose - 1)}>-</button>
-                                <div className="trans-val">C3</div>
+                                <div className="trans-val">
+                                    {settings.transpose === 0 ? 'C3' :
+                                        settings.transpose > 0 ? `+${settings.transpose}` : settings.transpose}
+                                </div>
                                 <button onClick={() => updateSetting('transpose', settings.transpose + 1)}>+</button>
                             </div>
                         </div>
                     </div>
 
                     <div className="control-divider"></div>
-
-                    {/* Dummy Effects Section to match design */}
-                    <div className="control-section" style={{ opacity: 0.5, pointerEvents: 'none' }}>
+                    <div className="control-section">
                         <div className="slider-header" style={{ marginBottom: '1rem' }}>
-                            <label className="slider-label"><span className="material-symbols-outlined">blur_on</span> Reverb</label>
+                            <label className="slider-label">
+                                <span className="material-symbols-outlined">palette</span>
+                                Piano Accent
+                            </label>
+                            <span className="slider-value" style={{ textTransform: 'uppercase' }}>
+                                {settings.pianoColor === '#0d59f2' ? 'Default' : 'Custom'}
+                            </span>
                         </div>
-                        {/* Placeholders */}
-                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', fontSize: '10px' }}>[ Coming Soon ]</div>
+                        <div className="color-presets-studio">
+                            {['#0d59f2', '#ff4a4a', '#4aff4a', '#ff8c00', '#ff4aff'].map(color => (
+                                <div
+                                    key={color}
+                                    className={`color-swatch ${settings.pianoColor === color ? 'active' : ''}`}
+                                    style={{ backgroundColor: color }}
+                                    onClick={() => updateSetting('pianoColor', color)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="control-divider"></div>
+
+                    {/* Audio Profile Section */}
+                    <div className="control-section">
+                        <div className="slider-header" style={{ marginBottom: '0.5rem' }}>
+                            <label className="slider-label">
+                                <span className="material-symbols-outlined">waves</span>
+                                Engine Profile
+                            </label>
+                        </div>
+                        <div className="engine-status-row">
+                            <div className="engine-label">WAVEFORM</div>
+                            <div className="engine-value">GRAND PIANO</div>
+                        </div>
+                        <div className="engine-status-row">
+                            <div className="engine-label">AUTH MODE</div>
+                            <div className="engine-value">SECURE</div>
+                        </div>
                     </div>
                 </div>
 
@@ -132,8 +171,8 @@ export const Studio: React.FC = () => {
                     </div>
 
                     <div className="stage-status-right">
-                        <span className="status-label">Waveform</span>
-                        <span className="status-value-med">Grand Piano</span>
+                        <span className="status-label">Engine Info</span>
+                        <span className="status-value-med">v2.0 PRO</span>
                     </div>
                 </div>
 

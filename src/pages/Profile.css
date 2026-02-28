@@ -1,8 +1,17 @@
+:root {
+    --industrial-bg: #f8fafc;
+    --industrial-text: #0f172a;
+    --industrial-accent: #3b82f6;
+    --industrial-border: #1e293b;
+    --industrial-card-bg: #ffffff;
+    --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
 .profile-container {
     width: 100%;
     max-width: 1440px;
     margin: 0 auto;
-    font-family: 'Noto Sans', sans-serif;
+    font-family: 'Space Grotesk', sans-serif;
     color: var(--industrial-text);
     background-color: var(--industrial-bg);
     min-height: calc(100vh - 73px);
@@ -212,6 +221,18 @@
     border: 1px solid var(--industrial-border);
     padding: 1.5rem;
     background-color: #fff;
+    position: relative;
+}
+
+.tech-preferences-box::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 10px;
+    height: 10px;
+    border-top: 2px solid var(--industrial-accent);
+    border-left: 2px solid var(--industrial-accent);
 }
 
 .box-header {
@@ -491,11 +512,25 @@
     flex-direction: column;
     justify-content: space-between;
     height: 8rem;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: "DATA_NODE";
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 0.5rem;
+    font-family: monospace;
+    color: #cbd5e1;
+    letter-spacing: 1px;
 }
 
 .stat-card:hover {
     background-color: #f9fafb;
+    border-color: var(--industrial-accent);
 }
 
 .stat-label {
@@ -539,6 +574,18 @@
     border: 1px solid var(--industrial-border);
     background-color: #fff;
     padding: 2rem;
+    position: relative;
+}
+
+.chart-box::after {
+    content: "[ ACCURATE_TELEMETRY ]";
+    position: absolute;
+    bottom: 0.5rem;
+    right: 1rem;
+    font-size: 0.6rem;
+    font-family: monospace;
+    color: #94a3b8;
+    opacity: 0.5;
 }
 
 .chart-header {
@@ -871,6 +918,74 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
     gap: 1rem;
+}
+
+/* Profile name editing */
+.profile-name-input {
+    background: transparent;
+    border: 1px solid var(--industrial-border);
+    color: var(--industrial-text);
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.25rem 0.5rem;
+    width: auto;
+    min-width: 200px;
+}
+
+.btn-save-name,
+.btn-cancel-name {
+    background: transparent;
+    border: 1px solid var(--industrial-border);
+    color: var(--industrial-text);
+    padding: 0.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-save-name:hover {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+}
+
+.btn-cancel-name:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+/* Profile Sliders */
+.profile-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: #e5e7eb;
+    outline: none;
+    margin: 1rem 0;
+}
+
+.profile-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: var(--industrial-accent);
+    cursor: pointer;
+    border-radius: 0;
+}
+
+.profile-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: var(--industrial-accent);
+    cursor: pointer;
+    border-radius: 0;
 }
 
 @media (min-width: 768px) {

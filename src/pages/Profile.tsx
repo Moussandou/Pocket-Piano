@@ -1,11 +1,100 @@
-import React from 'react';
-import { auth, googleProvider } from '../infra/firebase';
-import { signInWithPopup, signOut } from 'firebase/auth';
+import React, { useState, useEffect } from 'react';
+import { auth, googleProvider, db } from '../infra/firebase';
+import { signInWithPopup, signOut, updateProfile } from 'firebase/auth';
+import { collection, query, where, onSnapshot, Timestamp, doc } from 'firebase/firestore';
 import { useAuth } from '../hooks/useAuth';
+import { useSettings } from '../hooks/useSettings';
+import type { Recording } from '../domain/models';
 import './Profile.css';
 
 export const Profile: React.FC = () => {
     const { user } = useAuth();
+    const { settings, updateSetting } = useSettings();
+    const [isEditing, setIsEditing] = useState(false);
+    const [newName, setNewName] = useState('');
+    const [stats, setStats] = useState({
+        totalPlaytime: 0,
+        totalNotes: 0,
+        totalSessions: 0,
+        lastSession: null as Recording | null,
+        avgVelocity: 0,
+        isLoading: true,
+        // Combined with global stats
+        globalPlaytime: 0,
+        globalNotes: 0,
+        globalAvgVelocity: 0,
+        globalSessions: 0
+    });
+
+    useEffect(() => {
+        if (user) {
+            setNewName(user.displayName || '');
+
+            const recordingsQuery = query(collection(db, 'recordings'), where('userId', '==', user.uid));
+            const globalRef = doc(db, 'users', user.uid, 'stats', 'global');
+
+            // Snapshot for recordings
+            const unsubRecordings = onSnapshot(recordingsQuery, (snapshot) => {
+                let playtime = 0;
+                let notesCount = 0;
+                let lastSession: Recording | null = null;
+                let totalVelocity = 0;
+                let noteCountForVelocity = 0;
+
+                snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    playtime += data.duration || 0;
+                    notesCount += (data.notes || []).length;
+
+                    const recNotes = data.notes || [];
+                    recNotes.forEach((n: { velocity?: number }) => {
+                        if (typeof n.velocity === 'number') {
+                            totalVelocity += n.velocity;
+                            noteCountForVelocity++;
+                        }
+                    });
+
+                    const ts = data.timestamp;
+                    const timestamp = (ts && ts instanceof Timestamp) ? ts.toMillis() : (typeof ts === 'number' ? ts : 0);
+
+                    if (!lastSession || timestamp > (lastSession.timestamp instanceof Timestamp ? lastSession.timestamp.toMillis() : 0)) {
+                        lastSession = { ...data, id: doc.id } as Recording;
+                    }
+                });
+
+                setStats(prev => ({
+                    ...prev,
+                    totalPlaytime: playtime,
+                    totalNotes: notesCount,
+                    totalSessions: snapshot.size,
+                    lastSession,
+                    avgVelocity: noteCountForVelocity > 0 ? (totalVelocity / noteCountForVelocity) : 0,
+                    isLoading: false
+                }));
+            });
+
+            // Snapshot for global stats
+            const unsubGlobal = onSnapshot(globalRef, (doc) => {
+                if (doc.exists()) {
+                    const data = doc.data();
+                    setStats(prev => ({
+                        ...prev,
+                        globalNotes: data.totalNotes || 0,
+                        globalPlaytime: data.totalPlaytime || 0,
+                        globalAvgVelocity: (data.noteCountForVelocity > 0)
+                            ? (data.totalVelocity / data.noteCountForVelocity)
+                            : 0,
+                        globalSessions: data.totalSessions || 0
+                    }));
+                }
+            });
+
+            return () => {
+                unsubRecordings();
+                unsubGlobal();
+            };
+        }
+    }, [user]);
 
     const handleLogin = async () => {
         try {
@@ -22,6 +111,35 @@ export const Profile: React.FC = () => {
             console.error("Logout failed", error);
         }
     };
+
+    const handleSaveName = async () => {
+        if (!user) return;
+        try {
+            await updateProfile(user, { displayName: newName });
+            setIsEditing(false);
+        } catch (error) {
+            console.error("Failed to update profile", error);
+        }
+    };
+
+    const formatPlaytime = (ms: number) => {
+        const hours = Math.floor(ms / (1000 * 60 * 60));
+        const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+        return { hours, minutes };
+    };
+
+    const formatNotes = (n: number) => {
+        if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+        if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+        return n.toString();
+    };
+
+    const totalDisplayPlaytime = stats.globalPlaytime || stats.totalPlaytime;
+    const totalDisplayNotes = stats.globalNotes || stats.totalNotes;
+    const totalDisplayAvgVelocity = stats.globalAvgVelocity || stats.avgVelocity;
+    const totalDisplaySessions = stats.globalSessions || stats.totalSessions;
+
+    const { hours, minutes } = formatPlaytime(totalDisplayPlaytime);
     return (
         <div className="profile-container">
             <main className="profile-main">
@@ -40,7 +158,28 @@ export const Profile: React.FC = () => {
                         </div>
                         <div className="profile-details">
                             <div>
-                                <h2 className="profile-username">{user?.displayName || "Guest Profile"}</h2>
+                                {isEditing ? (
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <input
+                                            type="text"
+                                            className="profile-name-input"
+                                            value={newName}
+                                            onChange={(e) => setNewName(e.target.value)}
+                                            autoFocus
+                                        />
+                                        <button onClick={handleSaveName} className="btn-save-name">
+                                            <span className="material-symbols-outlined">check</span>
+                                        </button>
+                                        <button onClick={() => { setIsEditing(false); setNewName(user?.displayName || ''); }} className="btn-cancel-name">
+                                            <span className="material-symbols-outlined">close</span>
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <h2 className="profile-username" onClick={() => user && setIsEditing(true)}>
+                                        {user?.displayName || "Guest Profile"}
+                                        {user && <span className="material-symbols-outlined text-sm ml-2 cursor-pointer opacity-50 hover:opacity-100">edit_note</span>}
+                                    </h2>
+                                )}
                                 <div className="status-indicator">
                                     <span className="status-dot"></span>
                                     <span className="status-text">{user ? 'Online Now' : 'Offline'}</span>
@@ -48,7 +187,7 @@ export const Profile: React.FC = () => {
                             </div>
                             <div className="profile-meta">
                                 <p>Email: <span className="highlight-text">{user?.email || "Not signed in"}</span></p>
-                                <p>Plan: <span className="highlight-primary">Basic Tier</span></p>
+                                <p>Plan: <span className="highlight-primary">Pro Tier</span></p>
                             </div>
                         </div>
                     </div>
@@ -84,38 +223,55 @@ export const Profile: React.FC = () => {
                             <div className="box-content space-y-wide">
                                 <div className="setting-group">
                                     <div className="setting-label-row">
-                                        <label>Buffer Size</label>
-                                        <span>128 Samples</span>
+                                        <label>Master Volume</label>
+                                        <span>{settings.volume} dB</span>
                                     </div>
-                                    <div className="slider-track-bg">
-                                        <div className="slider-track-fill"></div>
-                                    </div>
+                                    <input
+                                        type="range"
+                                        min="-60"
+                                        max="0"
+                                        value={settings.volume}
+                                        onChange={(e) => updateSetting('volume', parseInt(e.target.value))}
+                                        className="profile-slider"
+                                    />
                                     <div className="slider-labels">
-                                        <span>64</span>
-                                        <span>2048</span>
+                                        <span>Silence</span>
+                                        <span>Peak</span>
                                     </div>
                                 </div>
                                 <div className="setting-group">
                                     <div className="setting-label-row">
-                                        <label>Sample Rate</label>
-                                        <span>48 kHz</span>
+                                        <label>Global Transpose</label>
+                                        <span>{settings.transpose > 0 ? `+${settings.transpose}` : settings.transpose} Semitones</span>
                                     </div>
                                     <div className="toggle-group-3">
-                                        <button className="btn-toggle">44.1</button>
-                                        <button className="btn-toggle active">48</button>
-                                        <button className="btn-toggle">96</button>
+                                        <button
+                                            className={`btn-toggle ${settings.transpose === -12 ? 'active' : ''}`}
+                                            onClick={() => updateSetting('transpose', -12)}
+                                        >Oct -</button>
+                                        <button
+                                            className={`btn-toggle ${settings.transpose === 0 ? 'active' : ''}`}
+                                            onClick={() => updateSetting('transpose', 0)}
+                                        >Reset</button>
+                                        <button
+                                            className={`btn-toggle ${settings.transpose === 12 ? 'active' : ''}`}
+                                            onClick={() => updateSetting('transpose', 12)}
+                                        >Oct +</button>
                                     </div>
                                 </div>
                                 <div className="setting-group pt-2">
                                     <div className="switch-row">
-                                        <span className="switch-label">Exclusive Mode</span>
-                                        <div className="switch-track active">
+                                        <span className="switch-label">Auto-Sustain</span>
+                                        <div
+                                            className={`switch-track ${settings.sustain > 0 ? 'active' : ''}`}
+                                            onClick={() => updateSetting('sustain', settings.sustain > 0 ? 0 : 1)}
+                                        >
                                             <div className="switch-thumb"></div>
                                         </div>
                                     </div>
                                     <div className="switch-row">
-                                        <span className="switch-label">Low Latency</span>
-                                        <div className="switch-track">
+                                        <span className="switch-label">Performance Mode</span>
+                                        <div className="switch-track active">
                                             <div className="switch-thumb"></div>
                                         </div>
                                     </div>
@@ -185,24 +341,25 @@ export const Profile: React.FC = () => {
                             <div className="stat-card">
                                 <span className="stat-label">Total Playtime</span>
                                 <div className="stat-val-group">
-                                    <span className="stat-val">142<span className="stat-unit">h</span></span>
-                                    <span className="stat-val">30<span className="stat-unit">m</span></span>
+                                    <span className="stat-val">{hours}<span className="stat-unit">h</span></span>
+                                    <span className="stat-val">{minutes}<span className="stat-unit">m</span></span>
                                 </div>
                             </div>
                             <div className="stat-card">
-                                <span className="stat-label">Keys Pressed</span>
-                                <span className="stat-val">2.4M</span>
+                                <span className="stat-label">Lifetime Notes</span>
+                                <span className="stat-val">{formatNotes(totalDisplayNotes)}</span>
                             </div>
                             <div className="stat-card">
-                                <span className="stat-label">Avg. Latency</span>
+                                <span className="stat-label">Skill Level</span>
                                 <div className="stat-val-group">
-                                    <span className="stat-val primary-color">4</span>
-                                    <span className="stat-unit lower">ms</span>
+                                    <span className="stat-val primary-color">
+                                        {totalDisplaySessions > 50 ? 'PRO' : totalDisplaySessions > 10 ? 'MID' : 'NEW'}
+                                    </span>
                                 </div>
                             </div>
                             <div className="stat-card">
                                 <span className="stat-label">Sessions</span>
-                                <span className="stat-val">88</span>
+                                <span className="stat-val">{totalDisplaySessions}</span>
                             </div>
                         </div>
 
@@ -268,7 +425,7 @@ export const Profile: React.FC = () => {
                                 <div className="velocity-header">
                                     <h4 className="box-title">Dynamic Range</h4>
                                     <div className="velocity-score">
-                                        <span className="score-val">84</span>
+                                        <span className="score-val">{(totalDisplayAvgVelocity * 100).toFixed(0)}</span>
                                         <span className="score-unit">avg</span>
                                     </div>
                                 </div>
@@ -288,20 +445,34 @@ export const Profile: React.FC = () => {
                             <div className="session-box">
                                 <h4 className="box-title mb-4">Last Session</h4>
                                 <div className="session-content">
-                                    <div className="session-item">
-                                        <span className="material-symbols-outlined text-primary">schedule</span>
-                                        <div>
-                                            <p className="session-name">Oct 24, 2023</p>
-                                            <p className="session-detail">20:45 - 21:30</p>
-                                        </div>
-                                    </div>
-                                    <div className="session-item">
-                                        <span className="material-symbols-outlined text-primary">music_note</span>
-                                        <div>
-                                            <p className="session-name">Nocturne No. 2</p>
-                                            <p className="session-detail">Chopin • 92% Accuracy</p>
-                                        </div>
-                                    </div>
+                                    {stats.lastSession ? (
+                                        <>
+                                            <div className="session-item">
+                                                <span className="material-symbols-outlined text-primary">schedule</span>
+                                                <div>
+                                                    <p className="session-name">
+                                                        {stats.lastSession.timestamp ? (
+                                                            stats.lastSession.timestamp instanceof Timestamp
+                                                                ? stats.lastSession.timestamp.toDate().toLocaleDateString()
+                                                                : new Date(stats.lastSession.timestamp).toLocaleDateString()
+                                                        ) : 'Date Unknown'}
+                                                    </p>
+                                                    <p className="session-detail">
+                                                        {((stats.lastSession.duration || 0) / 1000 / 60).toFixed(1)} minutes duration
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="session-item">
+                                                <span className="material-symbols-outlined text-primary">music_note</span>
+                                                <div>
+                                                    <p className="session-name">{stats.lastSession.name}</p>
+                                                    <p className="session-detail">{(stats.lastSession.notes || []).length} notes captured</p>
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <p className="text-gray italic">No sessions recorded yet.</p>
+                                    )}
                                     <div className="session-link-wrapper">
                                         <button className="link-view-analysis">
                                             View Analysis

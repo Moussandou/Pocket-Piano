@@ -1,27 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { useSettings } from '../hooks/useSettings';
 import { useAuth } from '../hooks/useAuth';
-import { Volume2, Waves, Palette } from 'lucide-react';
 import { AuthManager } from '../infra/AuthManager';
 
 export const Layout: React.FC = () => {
-    const { settings, updateSetting } = useSettings();
     const { user } = useAuth();
-    const [activeMenu, setActiveMenu] = useState<'sound' | 'styles' | null>(null);
     const menuRef = useRef<HTMLElement>(null);
     const location = useLocation();
 
-    // Close dropdowns when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                setActiveMenu(null);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+
 
     // Determine if we should show the full header navigation
     // On the landing page, we might want a simpler header
@@ -29,7 +16,7 @@ export const Layout: React.FC = () => {
     const isStudioPage = location.pathname === '/app';
 
     return (
-        <div className="app-container">
+        <div className={`app-container ${isStudioPage ? 'layout-viewport-locked' : ''}`}>
             <header className="app-header" ref={menuRef}>
                 <div className="header-brand">
                     <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'inherit' }}>
@@ -41,44 +28,7 @@ export const Layout: React.FC = () => {
 
                 <nav className="header-nav">
                     <div className="header-links">
-                        {/* Context menus - ONLY ON STUDIO PAGE */}
-                        {isStudioPage && (
-                            <>
-                                <div className="menu-item" onClick={() => setActiveMenu(activeMenu === 'sound' ? null : 'sound')}>
-                                    <a href="#">Sound</a>
-                                    {activeMenu === 'sound' && (
-                                        <div className="dropdown-menu" onClick={e => e.stopPropagation()}>
-                                            <div className="setting-group">
-                                                <div className="setting-label"><Volume2 size={16} /> Volume</div>
-                                                <input type="range" min="-60" max="0" value={settings.volume} onChange={(e) => updateSetting('volume', parseInt(e.target.value))} />
-                                                <span className="value-display">{settings.volume} dB</span>
-                                            </div>
-                                            <div className="setting-group">
-                                                <div className="setting-label"><Waves size={16} /> Sustain</div>
-                                                <input type="range" min="0.1" max="10" step="0.1" value={settings.sustain} onChange={(e) => updateSetting('sustain', parseFloat(e.target.value))} />
-                                                <span className="value-display">x{settings.sustain}</span>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
 
-                                <div className="menu-item" onClick={() => setActiveMenu(activeMenu === 'styles' ? null : 'styles')}>
-                                    <a href="#">Styles</a>
-                                    {activeMenu === 'styles' && (
-                                        <div className="dropdown-menu" onClick={e => e.stopPropagation()}>
-                                            <div className="setting-group">
-                                                <div className="setting-label"><Palette size={16} /> Accent Color</div>
-                                                <div className="color-presets">
-                                                    {['#0d59f2', '#ff4a4a', '#4aff4a', '#ff8c00', '#ff4aff'].map(color => (
-                                                        <div key={color} className={`color-swatch ${settings.pianoColor === color ? 'active' : ''}`} style={{ backgroundColor: color }} onClick={() => updateSetting('pianoColor', color)} />
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </>
-                        )}
 
                         {/* Navigation links - conditional on auth */}
                         {user ? (

@@ -5,13 +5,7 @@ import { db } from '../infra/firebase';
 import { collection, query, where, onSnapshot, orderBy, deleteDoc, doc, Timestamp } from 'firebase/firestore';
 import { useAuth } from '../hooks/useAuth';
 
-interface Recording {
-    id: string;
-    name: string;
-    notes: unknown[];
-    timestamp: Timestamp;
-    duration: number;
-}
+import type { Recording } from '../domain/models';
 
 export const Library: React.FC = () => {
     const [recordings, setRecordings] = useState<Recording[]>([]);
@@ -21,8 +15,10 @@ export const Library: React.FC = () => {
 
     useEffect(() => {
         if (!user) {
-            setRecordings([]);
-            setLoading(false);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setRecordings(prev => prev.length > 0 ? [] : prev);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setLoading(prev => prev ? false : prev);
             return;
         }
 
@@ -143,10 +139,16 @@ export const Library: React.FC = () => {
                                     <div className="sheet-titles" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                         <div>
                                             <h3 className="sheet-title">{rec.name || 'Untitled Recording'}</h3>
-                                            <p className="sheet-composer">{rec.timestamp?.toDate().toLocaleDateString()}</p>
+                                            <p className="sheet-composer">
+                                                {rec.timestamp ? (
+                                                    rec.timestamp instanceof Timestamp
+                                                        ? rec.timestamp.toDate().toLocaleDateString()
+                                                        : new Date(rec.timestamp).toLocaleDateString()
+                                                ) : 'Date Unknown'}
+                                            </p>
                                         </div>
                                         <button
-                                            onClick={(e) => removeRecording(rec.id, e)}
+                                            onClick={(e) => rec.id && removeRecording(rec.id, e)}
                                             style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
                                             title="Delete recording"
                                         >
@@ -160,7 +162,7 @@ export const Library: React.FC = () => {
                                         </div>
                                         <div className="meta-col border-left">
                                             <span className="meta-label">Dur</span>
-                                            <span className="meta-val">{formatDuration(rec.duration)}</span>
+                                            <span className="meta-val">{formatDuration(rec.duration || 0)}</span>
                                         </div>
                                     </div>
                                 </div>

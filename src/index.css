@@ -50,6 +50,12 @@ body {
   width: 100%;
 }
 
+.layout-viewport-locked {
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
 /* Header */
 .app-header {
   display: flex;
@@ -434,6 +440,34 @@ body {
   height: 1px;
   width: 100%;
   background: var(--neutral-dark);
+  margin: 0.5rem 0;
+}
+
+.color-presets-studio {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.engine-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0;
+}
+
+.engine-label {
+  font-size: 0.625rem;
+  font-family: 'Space Mono', monospace;
+  color: var(--neutral-mid);
+  letter-spacing: 0.05em;
+}
+
+.engine-value {
+  font-size: 0.625rem;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  color: var(--neutral-dark);
 }
 
 .sidebar-footer {
@@ -467,6 +501,7 @@ body {
   position: relative;
   background-image: linear-gradient(var(--neutral-light) 1px, transparent 1px), linear-gradient(90deg, var(--neutral-light) 1px, transparent 1px);
   background-size: 40px 40px;
+  overflow: hidden;
 }
 
 .stage-content {
@@ -553,6 +588,7 @@ body {
   display: flex;
   justify-content: center;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .piano-container {
@@ -574,8 +610,8 @@ body {
   flex-shrink: 0;
   flex-basis: 56px;
   height: 240px;
-  background: #F6F6F4;
-  border: 1px solid #111111;
+  background: var(--bg-light);
+  border: 1px solid var(--neutral-dark);
   border-top: none;
   margin-left: -1px;
   z-index: 1;
@@ -591,14 +627,14 @@ body {
 
 .key.white:active,
 .key.white.active {
-  background: #E5E5E5;
+  background: var(--neutral-light);
 }
 
 .key.black {
   width: 32px;
   flex-shrink: 0;
   height: 140px;
-  background: #111111;
+  background: var(--neutral-dark);
   margin-left: -16px;
   margin-right: -16px;
   z-index: 2;
@@ -881,82 +917,6 @@ button {
   text-align: center;
 }
 
-/* Piano Keyboard */
-.piano-stage {
-  height: 240px;
-  width: 100%;
-  background: white;
-  border-top: 1px solid var(--neutral-dark);
-  position: relative;
-  display: flex;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.piano-container {
-  display: flex;
-  height: 100%;
-  position: relative;
-  user-select: none;
-  min-width: min-content;
-}
-
-.key {
-  position: relative;
-  cursor: pointer;
-  transition: background-color 0.1s ease;
-}
-
-.key.white {
-  flex-grow: 1;
-  flex-shrink: 0;
-  flex-basis: 56px;
-  height: 240px;
-  background: var(--bg-light);
-  border: 1px solid var(--neutral-dark);
-  border-top: none;
-  margin-left: -1px;
-  z-index: 1;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 1rem;
-}
-
-.key.white:first-child {
-  margin-left: 0;
-}
-
-.key.white:active,
-.key.white.active {
-  background: var(--neutral-light);
-}
-
-.key.black {
-  width: 32px;
-  flex-shrink: 0;
-  height: 140px;
-  background: var(--neutral-dark);
-  margin-left: -16px;
-  margin-right: -16px;
-  z-index: 2;
-}
-
-.key.black:active,
-.key.black.active {
-  background: var(--primary);
-}
-
-.key-label {
-  font-size: 0.75rem;
-  font-family: 'Space Mono', monospace;
-  color: var(--neutral-mid);
-  pointer-events: none;
-}
-
-.black .key-label {
-  display: none;
-}
 
 /* Loaders and other utils */
 .loader-overlay {
