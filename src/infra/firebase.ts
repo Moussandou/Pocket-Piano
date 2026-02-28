@@ -14,6 +14,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
-export const discordProvider = new OAuthProvider('discord.com');
+export const discordProvider = new OAuthProvider('oidc.discord');
 export const db = getFirestore(app);
 export default app;

@@ -18,7 +18,7 @@
 /* Left Sidebar */
 .auth-sidebar {
     width: 100%;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--neutral-dark);
     padding: 2rem;
     display: flex;
     flex-direction: column;
@@ -29,7 +29,7 @@
     .auth-sidebar {
         width: 33.333333%;
         border-bottom: none;
-        border-right: 1px solid var(--border);
+        border-right: 1px solid var(--neutral-dark);
     }
 }
 
@@ -109,7 +109,7 @@
 .auth-stats {
     padding-top: 1rem;
     margin-top: 1rem;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--neutral-light);
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
@@ -156,7 +156,7 @@
 }
 
 .auth-signal-bar.inactive {
-    background-color: var(--border);
+    background-color: var(--neutral-light);
 }
 
 /* Sidebar Bottom */
@@ -167,7 +167,7 @@
 @media (min-width: 768px) {
     .auth-sidebar-bottom {
         display: block;
-        border-top: 1px solid var(--border);
+        border-top: 1px solid var(--neutral-dark);
         padding-top: 1.5rem;
     }
 }
@@ -207,8 +207,8 @@
     display: flex;
     flex-direction: column;
     gap: 4rem;
-    border-left: 1px solid var(--border);
-    border-right: 1px solid var(--border);
+    border-left: 1px solid var(--neutral-light);
+    border-right: 1px solid var(--neutral-light);
     padding: 1rem;
 }
 
@@ -294,7 +294,7 @@
 .auth-divider-line {
     flex: 1;
     height: 1px;
-    background-color: var(--border);
+    background-color: var(--neutral-light);
 }
 
 /* Social Buttons */
@@ -316,7 +316,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    border: 1px solid var(--border);
+    border: 1px solid var(--neutral-dark);
     height: 3.5rem;
     /* 56px */
     background: transparent;
@@ -336,7 +336,7 @@
     left: 0;
     width: 4px;
     height: 100%;
-    background-color: var(--border);
+    background-color: var(--neutral-dark);
     transition: background-color 0.2s;
 }
 
@@ -392,7 +392,7 @@
 .auth-input {
     width: 100%;
     background: transparent;
-    border: 2px solid var(--border);
+    border: 2px solid var(--neutral-dark);
     height: 3.5rem;
     /* 56px */
     padding: 0 1rem;
@@ -505,13 +505,13 @@
 .top-right {
     top: 5rem;
     right: 1.5rem;
-    border-top: 2px solid var(--border);
-    border-right: 2px solid var(--border);
+    border-top: 2px solid var(--neutral-dark);
+    border-right: 2px solid var(--neutral-dark);
 }
 
 .bottom-left {
     bottom: 1.5rem;
     left: 1.5rem;
-    border-bottom: 2px solid var(--border);
-    border-left: 2px solid var(--border);
+    border-bottom: 2px solid var(--neutral-dark);
+    border-left: 2px solid var(--neutral-dark);
 }
