@@ -52,6 +52,17 @@ export const useRecorder = () => {
             } catch (error) {
                 console.error("Cloud save failed", error);
             }
+        } else {
+            // Local download for unauthenticated users
+            const blob = new Blob([JSON.stringify(newRecording, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         currentNotes.current = []; // Clear buffer after saving

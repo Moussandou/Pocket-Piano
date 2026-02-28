@@ -14,7 +14,7 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
     onSave,
     onDiscard
 }) => {
-    const [recordingName, setRecordingName] = useState('My Track');
+    const [recordingName, setRecordingName] = useState('Mon Morceau');
     const isAuthenticated = !!auth.currentUser;
 
     if (!isOpen) return null;
@@ -22,14 +22,14 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
     const handleSave = () => {
         if (recordingName.trim()) {
             onSave(recordingName.trim());
-            setRecordingName('My Track'); // Reset for next time
+            setRecordingName('Mon Morceau'); // Reset for next time
             onClose();
         }
     };
 
     const handleDiscard = () => {
         onDiscard();
-        setRecordingName('My Track');
+        setRecordingName('Mon Morceau');
         onClose();
     };
 
@@ -37,7 +37,7 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
         <div className="gallery-overlay" style={{ zIndex: 1000 }}>
             <div className="gallery-modal" style={{ maxWidth: '400px', height: 'auto', padding: '2rem' }}>
                 <div style={{ marginBottom: '1.5rem' }}>
-                    <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: 'var(--text-dark)' }}>Save Recording</h2>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: 'var(--text-dark)' }}>Sauvegarder l'enregistrement</h2>
 
                     {!isAuthenticated && (
                         <div style={{
@@ -48,21 +48,21 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
                             marginBottom: '1.5rem',
                             fontSize: '0.875rem'
                         }}>
-                            <p style={{ margin: 0, fontWeight: 500 }}>Not logged in</p>
-                            <p style={{ margin: '0.25rem 0 0 0' }}>This recording will only be saved locally to this device. Please log in to sync your recordings across devices.</p>
+                            <p style={{ margin: 0, fontWeight: 500 }}>Non connecté(e)</p>
+                            <p style={{ margin: '0.25rem 0 0 0' }}>Cet enregistrement sera téléchargé sur votre appareil. Connectez-vous pour le sauvegarder dans le cloud et le retrouver sur tous vos appareils.</p>
                         </div>
                     )}
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         <label htmlFor="recording-name" style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-dark)' }}>
-                            Track Name
+                            Nom du morceau
                         </label>
                         <input
                             id="recording-name"
                             type="text"
                             value={recordingName}
                             onChange={(e) => setRecordingName(e.target.value)}
-                            placeholder="Enter track name..."
+                            placeholder="Entrez le nom du morceau..."
                             autoFocus
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') handleSave();
@@ -93,7 +93,7 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
                             cursor: 'pointer'
                         }}
                     >
-                        Discard
+                        Annuler
                     </button>
                     <button
                         onClick={handleSave}
@@ -109,7 +109,7 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
                             opacity: !recordingName.trim() ? 0.5 : 1
                         }}
                     >
-                        Save Recording
+                        Sauvegarder
                     </button>
                 </div>
             </div>
