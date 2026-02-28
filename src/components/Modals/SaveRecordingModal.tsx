@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { auth } from '../../infra/firebase';
+import { LogIn } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface SaveRecordingModalProps {
     isOpen: boolean;
@@ -16,6 +18,8 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
 }) => {
     const [recordingName, setRecordingName] = useState('Mon Morceau');
     const isAuthenticated = !!auth.currentUser;
+    const navigate = useNavigate();
+    const location = useLocation();
 
     if (!isOpen) return null;
 
@@ -31,6 +35,10 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
         onDiscard();
         setRecordingName('Mon Morceau');
         onClose();
+    };
+
+    const handleLogin = () => {
+        navigate('/auth', { state: { from: location } });
     };
 
     return (
@@ -50,6 +58,31 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
                         }}>
                             <p style={{ margin: 0, fontWeight: 500 }}>Non connecté(e)</p>
                             <p style={{ margin: '0.25rem 0 0 0' }}>Cet enregistrement sera téléchargé sur votre appareil. Connectez-vous pour le sauvegarder dans le cloud et le retrouver sur tous vos appareils.</p>
+                            <button
+                                onClick={handleLogin}
+                                style={{
+                                    marginTop: '1rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.5rem',
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '6px',
+                                    background: '#856404',
+                                    color: '#fff3cd',
+                                    border: 'none',
+                                    fontWeight: 500,
+                                    cursor: 'pointer',
+                                    fontSize: '0.875rem',
+                                    width: '100%',
+                                    transition: 'opacity 0.2s',
+                                }}
+                                onMouseOver={(e) => (e.currentTarget.style.opacity = '0.9')}
+                                onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}
+                            >
+                                <LogIn size={16} />
+                                Se connecter avec Google
+                            </button>
                         </div>
                     )}
 

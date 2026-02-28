@@ -1,19 +1,18 @@
-
 import React from 'react';
-import { auth, googleProvider } from './firebase';
-import { signInWithPopup, signOut } from 'firebase/auth';
+import { auth } from './firebase';
+import { signOut } from 'firebase/auth';
 import { LogIn, LogOut } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export const AuthManager: React.FC = () => {
     const { user, loading } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    const login = async () => {
-        try {
-            await signInWithPopup(auth, googleProvider);
-        } catch (error) {
-            console.error("Login failed", error);
-        }
+    const login = () => {
+        // Pass the current location so we can redirect back after login
+        navigate('/auth', { state: { from: location } });
     };
 
     const logout = () => signOut(auth);

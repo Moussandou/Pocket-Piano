@@ -7,6 +7,7 @@ import { Library } from './pages/Library';
 import { Profile } from './pages/Profile';
 import { Legal } from './pages/Legal';
 import { Credits } from './pages/Credits';
+import { Auth } from './pages/Auth';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useLocation } from 'react-router-dom';
 
@@ -28,6 +29,7 @@ const App: React.FC = () => {
         <Route path="/" element={<Layout />}>
           <Route index element={<Landing />} />
           <Route path="app" element={<Studio />} />
+          <Route path="auth" element={<Auth />} />
           <Route path="legal" element={<Legal />} />
           <Route path="credits" element={<Credits />} />
           <Route
