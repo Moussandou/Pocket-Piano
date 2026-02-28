@@ -162,28 +162,6 @@ export const Landing: React.FC = () => {
                 </div>
             </section>
 
-            {/* Footer */}
-            <footer className="landing-footer">
-                <div className="footer-content">
-                    <div className="footer-brand">
-                        <h5>Pocket Piano</h5>
-                        <p>
-                            © 2023 Audio Industries Ltd.<br />
-                            All systems nominal.
-                        </p>
-                    </div>
-                    <div className="footer-links">
-                        <a href="#">Privacy Protocol</a>
-                        <a href="#">Terms of Service</a>
-                        <a href="#">Contact Support</a>
-                    </div>
-                    <div className="footer-social">
-                        <a href="#">Tw</a>
-                        <a href="#">Ig</a>
-                        <a href="#">Gh</a>
-                    </div>
-                </div>
-            </footer>
         </main>
     );
 };

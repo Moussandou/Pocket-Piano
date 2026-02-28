@@ -5,15 +5,31 @@ import { Studio } from './pages/Studio';
 import { Landing } from './pages/Landing';
 import { Library } from './pages/Library';
 import { Profile } from './pages/Profile';
+import { Legal } from './pages/Legal';
+import { Credits } from './pages/Credits';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { useLocation } from 'react-router-dom';
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
 
 const App: React.FC = () => {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Landing />} />
           <Route path="app" element={<Studio />} />
+          <Route path="legal" element={<Legal />} />
+          <Route path="credits" element={<Credits />} />
           <Route
             path="profile"
             element={
