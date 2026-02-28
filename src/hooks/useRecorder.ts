@@ -10,19 +10,27 @@ export const useRecorder = () => {
     const [recordings, setRecordings] = useState<Recording[]>([]);
     const currentNotes = useRef<RecordedNote[]>([]);
     const startTime = useRef<number>(0);
+    const currentAudioBlob = useRef<Blob | null>(null);
 
-    const startRecording = useCallback(() => {
+    const startRecording = useCallback(async () => {
+        if (!audioEngine.getReadyStatus()) {
+            await audioEngine.init();
+        }
+        audioEngine.startRecording();
         setIsRecording(true);
         currentNotes.current = [];
         startTime.current = Date.now();
     }, []);
 
-    const stopRecording = useCallback(() => {
+    const stopRecording = useCallback(async () => {
         setIsRecording(false);
+        currentAudioBlob.current = await audioEngine.stopRecording();
     }, []);
 
     const discardRecording = useCallback(() => {
         currentNotes.current = [];
+        currentAudioBlob.current = null;
+        audioEngine.stopRecording(); // ensure it stops capturing
         setIsRecording(false);
     }, []);
 
@@ -52,17 +60,19 @@ export const useRecorder = () => {
             } catch (error) {
                 console.error("Cloud save failed", error);
             }
-        } else {
-            // Local download for unauthenticated users
-            const blob = new Blob([JSON.stringify(newRecording, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
+        }
+
+        // Always download the audio file for the user
+        if (currentAudioBlob.current) {
+            const url = URL.createObjectURL(currentAudioBlob.current);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+            a.download = `${name.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'enregistrement'}.webm`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            currentAudioBlob.current = null;
         }
 
         currentNotes.current = []; // Clear buffer after saving

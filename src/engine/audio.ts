@@ -9,6 +9,11 @@ class AudioEngine {
     private sustainMultiplier: number = 1;
     private volumeDb: number = 0;
 
+    // Recording components
+    private dest: MediaStreamAudioDestinationNode | null = null;
+    private mediaRecorder: MediaRecorder | null = null;
+    private audioChunks: Blob[] = [];
+
     constructor() { }
 
     public async init() {
@@ -38,6 +43,12 @@ class AudioEngine {
             if (this.sampler) {
                 this.sampler.volume.value = this.volumeDb;
             }
+
+            // Set up recording destination
+            const context = Tone.getContext().rawContext as AudioContext;
+            this.dest = context.createMediaStreamDestination();
+            Tone.Destination.connect(this.dest);
+
             console.log("Piano samples loaded");
         } catch (error) {
             console.error("Failed to initialize audio engine", error);
@@ -81,6 +92,35 @@ class AudioEngine {
 
     public getReadyStatus() {
         return this.isLoaded;
+    }
+
+    public startRecording() {
+        if (!this.dest) return;
+        this.audioChunks = [];
+        this.mediaRecorder = new MediaRecorder(this.dest.stream);
+        this.mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) {
+                this.audioChunks.push(e.data);
+            }
+        };
+        this.mediaRecorder.start();
+    }
+
+    public stopRecording(): Promise<Blob | null> {
+        return new Promise((resolve) => {
+            if (!this.mediaRecorder || this.mediaRecorder.state === 'inactive') {
+                resolve(null);
+                return;
+            }
+
+            this.mediaRecorder.onstop = () => {
+                const blob = new Blob(this.audioChunks, { type: 'audio/webm' });
+                this.audioChunks = [];
+                resolve(blob);
+            };
+
+            this.mediaRecorder.stop();
+        });
     }
 }
 
