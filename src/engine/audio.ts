@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 // @ts-ignore
-import * as lamejs from 'lamejs';
+import * as lamejs from 'lamejs-fixed';
 
 class AudioEngine {
     private sampler: Tone.Sampler | null = null;
@@ -122,12 +122,27 @@ class AudioEngine {
 
         try {
             const webmBlob = await this.recorder.stop();
+            if (webmBlob.size === 0) {
+                console.error("Recording blob is empty");
+                return null;
+            }
 
             // Decode the webm/mp4 blob to extract raw audio data
             const arrayBuffer = await webmBlob.arrayBuffer();
+            if (arrayBuffer.byteLength === 0) {
+                console.error("Recording arrayBuffer is empty");
+                return null;
+            }
+
             const NativeAudioContext = window.AudioContext || (window as any).webkitAudioContext;
             const audioCtx = new NativeAudioContext();
-            const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+            const audioBuffer = await new Promise<AudioBuffer>((resolve, reject) => {
+                const promise = audioCtx.decodeAudioData(arrayBuffer, resolve, reject);
+                if (promise) {
+                    promise.catch(reject);
+                }
+            });
 
             return this.encodeBufferToMP3(audioBuffer);
         } catch (e) {
@@ -138,11 +153,13 @@ class AudioEngine {
 
     private encodeBufferToMP3(audioBuffer: AudioBuffer): Blob {
         const kbps = 128;
-        const mp3encoder = new lamejs.Mp3Encoder(audioBuffer.numberOfChannels, audioBuffer.sampleRate, kbps);
+        const numChannels = audioBuffer.numberOfChannels;
+        const sampleRate = audioBuffer.sampleRate;
+        const mp3encoder = new lamejs.Mp3Encoder(numChannels, sampleRate, kbps);
         const mp3Data: Int8Array[] = [];
 
         const left = audioBuffer.getChannelData(0);
-        const right = audioBuffer.numberOfChannels > 1 ? audioBuffer.getChannelData(1) : left;
+        const right = numChannels > 1 ? audioBuffer.getChannelData(1) : null;
 
         const sampleBlockSize = 1152;
 
@@ -157,12 +174,19 @@ class AudioEngine {
         };
 
         const left16 = floatToInt16(left);
-        const right16 = floatToInt16(right);
+        const right16 = right ? floatToInt16(right) : null;
 
         for (let i = 0; i < left16.length; i += sampleBlockSize) {
             const leftChunk = left16.subarray(i, i + sampleBlockSize);
-            const rightChunk = right16.subarray(i, i + sampleBlockSize);
-            const mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk);
+            let mp3buf;
+
+            if (numChannels === 1) {
+                mp3buf = mp3encoder.encodeBuffer(leftChunk);
+            } else {
+                const rightChunk = right16!.subarray(i, i + sampleBlockSize);
+                mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk);
+            }
+
             if (mp3buf.length > 0) {
                 mp3Data.push(new Int8Array(mp3buf));
             }
