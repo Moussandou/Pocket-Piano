@@ -1,5 +1,7 @@
 {
-  "projects": {},
+  "projects": {
+    "default": "pocket-piano-moussandou"
+  },
   "targets": {},
   "etags": {}
 }
