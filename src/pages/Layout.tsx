@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Github, Instagram, Linkedin } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { AuthManager } from '../infra/AuthManager';
 
@@ -58,7 +59,57 @@ export const Layout: React.FC = () => {
             </header>
 
             {/* Renders the specific page */}
-            <Outlet />
+            {isStudioPage ? (
+                <Outlet />
+            ) : (
+                <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <Outlet />
+                </main>
+            )}
+
+            {/* Global Footer - Hidden in Studio */}
+            {!isStudioPage && (
+                <footer className="app-footer">
+                    <div className="footer-content">
+                        <div className="footer-brand">
+                            <h5>Pocket Piano</h5>
+                            <p>
+                                © 2024 Audio Industries Ltd.<br />
+                                All systems nominal.
+                            </p>
+                        </div>
+                        <div className="footer-links">
+                            <Link to="/legal" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span className="material-symbols-outlined text-sm">gavel</span>
+                                Mentions Légales & RGPD
+                            </Link>
+                            <Link to="/credits" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span className="material-symbols-outlined text-sm">groups</span>
+                                Credits
+                            </Link>
+                            <a href="https://moussandou.github.io/Portfolio/" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span className="material-symbols-outlined text-sm">person</span>
+                                Portfolio
+                            </a>
+                            <a href="https://ko-fi.com/moussandou" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span className="material-symbols-outlined text-sm">volunteer_activism</span>
+                                Ko-fi
+                            </a>
+                        </div>
+                        <div className="footer-social">
+                            <a href="https://www.instagram.com/takaxdev/" target="_blank" rel="noopener noreferrer" title="Instagram">
+                                <Instagram size={20} strokeWidth={1.5} />
+                            </a>
+                            <a href="https://www.linkedin.com/in/moussandou/" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+                                <Linkedin size={20} strokeWidth={1.5} />
+                            </a>
+                            <a href="https://github.com/Moussandou" target="_blank" rel="noopener noreferrer" title="GitHub">
+                                <Github size={20} strokeWidth={1.5} />
+                            </a>
+                        </div>
+                    </div>
+                </footer>
+            )}
         </div>
     );
 };
