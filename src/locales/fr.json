@@ -70,12 +70,16 @@
     "auth": {
         "sidebar": {
             "status": "STATUT SYSTÈME : ACTIF",
-            "version": "TERMINAL SIGNAL v2.4",
-            "description": "Passerelle sécurisée vers le réseau Pocket Piano. Vérification d'identité requise pour la synchronisation cloud.",
+            "version": "Build v{{version}}",
+            "description": "Moteur de station de travail audio numérique de qualité professionnelle. Synthèse haute fidélité et synchronisation cloud.",
             "signal": "SIGNAL",
-            "encryption": "CHIFFREMENT",
-            "encValue": "AES-256-GCM",
-            "latency": "LATENCE"
+            "encryption": "SÉCURITÉ",
+            "encValue": "CHIFFRÉ",
+            "latency": "STATUT",
+            "connected": "CONNECTÉ",
+            "platform": "Plateforme",
+            "env": "Env",
+            "build": "Build"
         },
         "header": {
             "titleLogin": "ACCÈS_IDENTITÉ",
@@ -242,7 +246,7 @@
         "active": "Active",
         "waiting": "En attente...",
         "activeKeys": "Touches Actives",
-        "engineInfo": "Infos Moteur",
+        "engineStatus": "État Moteur",
         "metronome": "Métronome",
         "stopRecording": "Arrêter l'enregistrement",
         "record": "Enregistrer",

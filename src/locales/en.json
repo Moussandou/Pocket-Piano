@@ -70,12 +70,16 @@
     "auth": {
         "sidebar": {
             "status": "SYSTEM STATUS: ACTIVE",
-            "version": "SIGNAL TERMINAL v2.4",
-            "description": "Secure gateway to the Pocket Piano Neural Network. Identity verification required for cloud synchronization.",
+            "version": "Build v{{version}}",
+            "description": "Professional Grade Digital Audio Workstation Engine. High-fidelity synthesis and cloud synchronization.",
             "signal": "SIGNAL",
-            "encryption": "ENCRYPTION",
-            "encValue": "AES-256-GCM",
-            "latency": "LATENCY"
+            "encryption": "SECURITY",
+            "encValue": "ENCRYPTED",
+            "latency": "STATUS",
+            "connected": "CONNECTED",
+            "platform": "Platform",
+            "env": "Env",
+            "build": "Build"
         },
         "header": {
             "titleLogin": "ACCESS_IDENTITY",
@@ -242,7 +246,7 @@
         "active": "Active",
         "waiting": "Waiting...",
         "activeKeys": "Active Keys",
-        "engineInfo": "Engine Info",
+        "engineStatus": "Engine Status",
         "metronome": "Metronome",
         "stopRecording": "Stop Recording",
         "record": "Record",

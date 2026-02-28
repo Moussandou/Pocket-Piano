@@ -8,10 +8,14 @@ import {
 } from 'firebase/auth';
 import { auth, googleProvider, discordProvider } from '../infra/firebase';
 import { Piano } from 'lucide-react';
+import pkg from '../../package.json';
 import './Auth.css';
 
 export const Auth: React.FC = () => {
     const { t } = useTranslation();
+    const version = pkg.version;
+    const platform = window.navigator.platform;
+    const isDev = import.meta.env.DEV;
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -98,7 +102,7 @@ export const Auth: React.FC = () => {
                             <span>{t('auth.sidebar.version')}</span>
                         </div>
                         <p className="auth-system-desc">
-                            {t('auth.sidebar.description')}
+                            {t('auth.sidebar.description', { version })}
                         </p>
 
                         <div className="auth-stats">
@@ -117,7 +121,7 @@ export const Auth: React.FC = () => {
                             </div>
                             <div className="auth-stat-row">
                                 <span className="auth-stat-label">{t('auth.sidebar.latency')}</span>
-                                <span className="auth-stat-value">14ms</span>
+                                <span className="auth-stat-value text-green">{t('auth.sidebar.connected')}</span>
                             </div>
                         </div>
                     </div>
@@ -125,10 +129,10 @@ export const Auth: React.FC = () => {
 
                 <div className="auth-sidebar-bottom">
                     <div className="auth-telemetry">
-                        <div>Ref: PP-X89</div>
-                        <div>Loc: 00.12.92</div>
-                        <div>Enc: TLS_1.3</div>
-                        <div>Mod: AUTH_MODE</div>
+                        <div>{t('auth.sidebar.platform')}: {platform}</div>
+                        <div>{t('auth.sidebar.env')}: {isDev ? 'DEVELOPMENT' : 'PRODUCTION'}</div>
+                        <div>{t('auth.sidebar.build')}: v{version}</div>
+                        <div>ENC: TLS_1.3</div>
                     </div>
                 </div>
             </aside>

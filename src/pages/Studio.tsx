@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import * as Tone from 'tone';
+import pkg from '../../package.json';
 import { Piano } from '../components/Piano/Piano';
 import { audioEngine } from '../engine/audio';
 import { useRecorder } from '../hooks/useRecorder';
@@ -197,8 +199,10 @@ export const Studio: React.FC = () => {
                     </div>
 
                     <div className="stage-status-right">
-                        <span className="status-label">{t('studio.engineInfo')}</span>
-                        <span className="status-value-med">v2.0 PRO</span>
+                        <span className="status-label">{t('studio.engineStatus')}</span>
+                        <span className="status-value-med">
+                            {Tone.getContext()?.sampleRate || '44100'}Hz / v{pkg.version}
+                        </span>
                     </div>
                 </div>
 
