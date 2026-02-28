@@ -1,7 +1,66 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Library.css';
+import { db, auth } from '../infra/firebase';
+import { collection, query, where, onSnapshot, orderBy, deleteDoc, doc, Timestamp } from 'firebase/firestore';
+
+interface Recording {
+    id: string;
+    name: string;
+    notes: unknown[];
+    timestamp: Timestamp;
+    duration: number;
+}
 
 export const Library: React.FC = () => {
+    const [recordings, setRecordings] = useState<Recording[]>([]);
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+            if (!user) {
+                setRecordings([]);
+                setLoading(false);
+                return;
+            }
+
+            const q = query(
+                collection(db, 'recordings'),
+                where('userId', '==', user.uid),
+                orderBy('timestamp', 'desc')
+            );
+
+            const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
+                const docs = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                })) as Recording[];
+                setRecordings(docs);
+                setLoading(false);
+            });
+
+            return () => unsubscribeSnapshot();
+        });
+
+        return () => unsubscribeAuth();
+    }, []);
+
+    const removeRecording = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (confirm('Voulez-vous vraiment supprimer cet enregistrement ?')) {
+            await deleteDoc(doc(db, 'recordings', id));
+        }
+    };
+
+    const formatDuration = (ms: number) => {
+        if (!ms) return '0:00';
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    };
+
     return (
         <div className="library-container">
             {/* Sidebar Navigation */}
@@ -12,49 +71,13 @@ export const Library: React.FC = () => {
                         <li>
                             <button className="nav-link active">
                                 <span className="material-symbols-outlined">library_music</span>
-                                <span>All Sheets</span>
+                                <span>All Recordings</span>
                             </button>
                         </li>
                         <li>
                             <button className="nav-link">
                                 <span className="material-symbols-outlined">favorite</span>
                                 <span>Favorites</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button className="nav-link">
-                                <span className="material-symbols-outlined">schedule</span>
-                                <span>Recent</span>
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-
-                <div className="sidebar-section">
-                    <h3 className="sidebar-heading">Categories</h3>
-                    <ul className="sidebar-nav">
-                        <li>
-                            <button className="nav-link category-link">
-                                <span className="material-symbols-outlined icon">piano</span>
-                                <span>Classical</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button className="nav-link category-link">
-                                <span className="material-symbols-outlined icon">headphones</span>
-                                <span>Contemporary</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button className="nav-link category-link">
-                                <span className="material-symbols-outlined icon">speed</span>
-                                <span>Technical Exercises</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button className="nav-link category-link">
-                                <span className="material-symbols-outlined icon">movie</span>
-                                <span>Soundtracks</span>
                             </button>
                         </li>
                     </ul>
@@ -73,23 +96,11 @@ export const Library: React.FC = () => {
             <main className="library-main">
                 <div className="library-header">
                     <div className="header-text">
-                        <h1 className="page-title">Music Sheets Library</h1>
-                        <p className="page-subtitle">Manage and organize your personal collection.</p>
+                        <h1 className="page-title">My Recordings</h1>
+                        <p className="page-subtitle">Manage and organize your personal piano sessions.</p>
                     </div>
                     {/* Filters */}
                     <div className="filters-group">
-                        <button className="btn-filter">
-                            <span>BPM Range</span>
-                            <span className="material-symbols-outlined text-sm">expand_more</span>
-                        </button>
-                        <button className="btn-filter">
-                            <span>Key Signature</span>
-                            <span className="material-symbols-outlined text-sm">expand_more</span>
-                        </button>
-                        <button className="btn-filter">
-                            <span>Difficulty</span>
-                            <span className="material-symbols-outlined text-sm">expand_more</span>
-                        </button>
                         <button className="btn-icon active">
                             <span className="material-symbols-outlined">grid_view</span>
                         </button>
@@ -102,215 +113,70 @@ export const Library: React.FC = () => {
                 {/* Grid */}
                 <div className="sheets-grid">
                     {/* New Sheet Card */}
-                    <button className="sheet-card new-sheet">
+                    <button className="sheet-card new-sheet" onClick={() => navigate('/studio')}>
                         <div className="add-icon-wrapper">
                             <span className="material-symbols-outlined text-4xl">add</span>
                         </div>
-                        <span className="new-sheet-text">Create New Sheet</span>
+                        <span className="new-sheet-text">New Recording</span>
                     </button>
 
-                    {/* Sheet Card 1 (Active) */}
-                    <article className="sheet-card active-card">
-                        <div className="active-badge">Active</div>
-                        <div className="sheet-preview" data-alt="Sheet music preview showing simple staves">
-                            <img alt="Sheet Music Preview" className="preview-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDxewzInkryk40oXHaVbd8ipj4N96mtMXimKCp_v3fgqXKrz-NFAZn0R5D7brSq8z9cjplNWZ6GBB00Hzi3MeFrJ3fpUHZt-E5-ARRtg-Z6EE3lub4WKLViSMb1acH7wC06BBgs_ZJg9LE73BeVcPGUoAWge_oqCtAxBQnV8475VHnJ8dg-QuxAy33ilfW3HgZ8xhAr3s6VBvQc2Vak2vecEXaFayX12c5Vv2Gr2LSqKkXHMc81WOe2CFB2d7yRsIy8-hoHEc_yFw" />
-                            <div className="preview-overlay">
-                                <div className="play-btn">
-                                    <span className="material-symbols-outlined text-black">play_arrow</span>
-                                </div>
-                            </div>
+                    {loading ? (
+                        <div style={{ padding: '2rem', color: '#6b7280' }}>Loading your recordings...</div>
+                    ) : recordings.length === 0 ? (
+                        <div style={{ padding: '2rem', color: '#6b7280' }}>
+                            {!auth.currentUser
+                                ? 'Sign in to see your saved recordings.'
+                                : 'You don\'t have any recordings yet. Head to the Studio to create one!'}
                         </div>
-                        <div className="sheet-info">
-                            <div className="sheet-titles">
-                                <h3 className="sheet-title">Moonlight Sonata</h3>
-                                <p className="sheet-composer">L.V. Beethoven</p>
-                            </div>
-                            <div className="sheet-meta">
-                                <div className="meta-col">
-                                    <span className="meta-label">BPM</span>
-                                    <span className="meta-val">54</span>
+                    ) : (
+                        recordings.map((rec) => (
+                            <article key={rec.id} className="sheet-card hover-effect">
+                                <div className="sheet-preview">
+                                    <div style={{ width: '100%', height: '100%', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#9ca3af' }}>music_note</span>
+                                    </div>
+                                    <div className="preview-overlay">
+                                        <div className="play-btn" onClick={(e) => { e.stopPropagation(); /* TODO: Implement playback */ }}>
+                                            <span className="material-symbols-outlined text-black">play_arrow</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="meta-col border-left">
-                                    <span className="meta-label">Key</span>
-                                    <span className="meta-val">C#m</span>
+                                <div className="sheet-info">
+                                    <div className="sheet-titles" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                        <div>
+                                            <h3 className="sheet-title">{rec.name || 'Untitled Recording'}</h3>
+                                            <p className="sheet-composer">{rec.timestamp?.toDate().toLocaleDateString()}</p>
+                                        </div>
+                                        <button
+                                            onClick={(e) => removeRecording(rec.id, e)}
+                                            style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
+                                            title="Delete recording"
+                                        >
+                                            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>delete</span>
+                                        </button>
+                                    </div>
+                                    <div className="sheet-meta">
+                                        <div className="meta-col">
+                                            <span className="meta-label">Notes</span>
+                                            <span className="meta-val">{rec.notes?.length || 0}</span>
+                                        </div>
+                                        <div className="meta-col border-left">
+                                            <span className="meta-label">Dur</span>
+                                            <span className="meta-val">{formatDuration(rec.duration)}</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="meta-col border-left">
-                                    <span className="meta-label">Dur</span>
-                                    <span className="meta-val">5:12</span>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
-
-                    {/* Sheet Card 2 */}
-                    <article className="sheet-card hover-effect">
-                        <div className="sheet-preview" data-alt="Sheet music preview">
-                            <img alt="Sheet Music Preview" className="preview-img off-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCAnknuRXe3hEKm9926-2zpcpFWiDwZ_PZaOH9lJhbKx8sMyNk9_n4UqwJb9sNS3oTmi_4nmL7jLL05dr2c4qgBob2ic-nLkwP8ZylfJXIQj5LNiaPy5aIeczaTKd5jDP3y1lrs3kQbC6g535OWoQAcdPB2qMRB5_FrI4zq710I7edU0gxd-6aCnjdIHB9LEjUVW0uwpgZSvOf6Dh4Upd38pxxX8dE9Bgk_T1E8YPb7ch1ZjXmV0DhQBGONmkRRH_3QCi10gD4PYY" />
-                            <div className="preview-overlay">
-                                <div className="play-btn">
-                                    <span className="material-symbols-outlined text-black">edit</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="sheet-info">
-                            <div className="sheet-titles">
-                                <h3 className="sheet-title">Clair de Lune</h3>
-                                <p className="sheet-composer">C. Debussy</p>
-                            </div>
-                            <div className="sheet-meta">
-                                <div className="meta-col">
-                                    <span className="meta-label">BPM</span>
-                                    <span className="meta-val">60</span>
-                                </div>
-                                <div className="meta-col border-left">
-                                    <span className="meta-label">Key</span>
-                                    <span className="meta-val">Db</span>
-                                </div>
-                                <div className="meta-col border-left">
-                                    <span className="meta-label">Dur</span>
-                                    <span className="meta-val">4:30</span>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
-
-                    {/* Sheet Card 3 */}
-                    <article className="sheet-card hover-effect">
-                        <div className="sheet-preview" data-alt="Sheet music preview">
-                            <img alt="Sheet Music Preview" className="preview-img off-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAialkHtF2TmkfVzVQTo8Ygz9ehJOc1P3_PR4CrNfrTltaBphJwjuM4TGOu1T1r-Q3GUrdk4Wav2KoFZe17hk7CrmvXruTLRyNaMaiZSbQijtLh_5NJ4Utn7kCIRuqXfq9fulmJOicJ72-r5DSTPRH7eXZgPcM1OiN30pkPAQ5qGXFssedKPlyQ2D931rYrq_8UyCBDqPk1YAHTLgWXZ2MyN39VmtyxEqhOR9eHjHL7JkK_iXl9g3nqHrdVX-5C5k5VAL1y06sWdg" />
-                            <div className="preview-overlay">
-                                <div className="play-btn">
-                                    <span className="material-symbols-outlined text-black">edit</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="sheet-info">
-                            <div className="sheet-titles">
-                                <h3 className="sheet-title">Gymnopédie No.1</h3>
-                                <p className="sheet-composer">E. Satie</p>
-                            </div>
-                            <div className="sheet-meta">
-                                <div className="meta-col">
-                                    <span className="meta-label">BPM</span>
-                                    <span className="meta-val">48</span>
-                                </div>
-                                <div className="meta-col border-left">
-                                    <span className="meta-label">Key</span>
-                                    <span className="meta-val">D</span>
-                                </div>
-                                <div className="meta-col border-left">
-                                    <span className="meta-label">Dur</span>
-                                    <span className="meta-val">3:15</span>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
-
-                    {/* Sheet Card 4 */}
-                    <article className="sheet-card hover-effect">
-                        <div className="sheet-preview" data-alt="Sheet music preview">
-                            <img alt="Sheet Music Preview" className="preview-img off-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATs3mtgIuYDvEZKh3wuYrvOv_JNqy23vQZy9KQi6wE_4OY261KghGuqZ0Q0AHJ89GnrkYvnZSnrCxyf9LvEpgd2pVaO_GQ8mU5E_Rxb8t9s5MVndhuT5IhPUu-y7vnl1aDMZ6bLRr68chduknOchmZpHJ4vRLIdVqHo_mTLWQdELc-owd0wESZ4bCQ_Kmc6CEee942hYWjCxnfHD8VIbI8K2T5sIz4bH7jsTtOfDNjVBFDyi2ZcKZaSXyP3peNhaakbpIU-7YIgaA" />
-                            <div className="preview-overlay">
-                                <div className="play-btn">
-                                    <span className="material-symbols-outlined text-black">edit</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="sheet-info">
-                            <div className="sheet-titles">
-                                <h3 className="sheet-title">River Flows In You</h3>
-                                <p className="sheet-composer">Yiruma</p>
-                            </div>
-                            <div className="sheet-meta">
-                                <div className="meta-col">
-                                    <span className="meta-label">BPM</span>
-                                    <span className="meta-val">64</span>
-                                </div>
-                                <div className="meta-col border-left">
-                                    <span className="meta-label">Key</span>
-                                    <span className="meta-val">A</span>
-                                </div>
-                                <div className="meta-col border-left">
-                                    <span className="meta-label">Dur</span>
-                                    <span className="meta-val">3:45</span>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
-
-                    {/* Sheet Card 5 */}
-                    <article className="sheet-card hover-effect">
-                        <div className="sheet-preview" data-alt="Sheet music preview">
-                            <img alt="Sheet Music Preview" className="preview-img off-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXQmmxHn7kDhCoMQreslfd2YxH5h7Br196Ufw4VkXfqaLJT74kiIsZ0OhZhTB28ZPCu7KQWkww6N7VJrX59M4MDMH-OXQZJLVROdyc6M7FwSyU3HGvGDo4Bjr4thE8ADn6KmWd4Y4yG70YcJZdK7HCnwxT1af3Olm9VwvxoS5D6qFWUPxwpCEnk8Uq3u9liSmac97I3QslckNCxMAOIcG1Xg3zwBg1S1KfhyYchaQ-d8_V7UJTyXl11gNOBMl3DMi--IXFvYEKUUs" />
-                            <div className="preview-overlay">
-                                <div className="play-btn">
-                                    <span className="material-symbols-outlined text-black">edit</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="sheet-info">
-                            <div className="sheet-titles">
-                                <h3 className="sheet-title">Hanon Exercise No. 1</h3>
-                                <p className="sheet-composer">C.L. Hanon</p>
-                            </div>
-                            <div className="sheet-meta">
-                                <div className="meta-col">
-                                    <span className="meta-label">BPM</span>
-                                    <span className="meta-val">108</span>
-                                </div>
-                                <div className="meta-col border-left">
-                                    <span className="meta-label">Key</span>
-                                    <span className="meta-val">C</span>
-                                </div>
-                                <div className="meta-col border-left">
-                                    <span className="meta-label">Dur</span>
-                                    <span className="meta-val">1:20</span>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
-
-                    {/* Sheet Card 6 */}
-                    <article className="sheet-card hover-effect">
-                        <div className="sheet-preview" data-alt="Sheet music preview">
-                            <img alt="Sheet Music Preview" className="preview-img off-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTB3vvfjtjpgCVfhVdoVv1w1ogOTDAhe_eGj-KB_iYsDs_4Gwh2rvc-uEte1QrOtZ5zh39N0TF1cXIhPpJ5zajhAW5-YPsYkp0KAURzxrw_6Q17Z6AITTRbRHDCfH5YtkO1NMQ3Bp_rcchk1vFS1BmxqmZPcgGFsypN5JLYKljW88pRMXB0kz3O-V6gnGkg3pPeI82qfBiPRr6_H_gHUWQeHOO4TeGYxfFnE4fEIzsqducS0gyEhN7CsrrU-h8I7db7GwBVohlZQE" />
-                            <div className="preview-overlay">
-                                <div className="play-btn">
-                                    <span className="material-symbols-outlined text-black">edit</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="sheet-info">
-                            <div className="sheet-titles">
-                                <h3 className="sheet-title">Nocturne in E Flat</h3>
-                                <p className="sheet-composer">F. Chopin</p>
-                            </div>
-                            <div className="sheet-meta">
-                                <div className="meta-col">
-                                    <span className="meta-label">BPM</span>
-                                    <span className="meta-val">68</span>
-                                </div>
-                                <div className="meta-col border-left">
-                                    <span className="meta-label">Key</span>
-                                    <span className="meta-val">Eb</span>
-                                </div>
-                                <div className="meta-col border-left">
-                                    <span className="meta-label">Dur</span>
-                                    <span className="meta-val">4:10</span>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
+                            </article>
+                        ))
+                    )}
                 </div>
 
                 {/* Pagination */}
-                <div className="library-pagination">
-                    <span className="pagination-info">Showing 6 of 124 sheets</span>
-                    <div className="pagination-controls">
-                        <button className="btn-page" disabled>PREVIOUS</button>
-                        <button className="btn-page">NEXT</button>
+                {!loading && recordings.length > 0 && (
+                    <div className="library-pagination">
+                        <span className="pagination-info">Showing {recordings.length} recordings</span>
                     </div>
-                </div>
+                )}
             </main>
         </div>
     );

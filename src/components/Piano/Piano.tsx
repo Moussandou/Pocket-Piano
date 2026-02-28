@@ -95,7 +95,8 @@ export const Piano: React.FC<PianoProps> = ({ onNotePlayed, onNoteReleased }) =>
 
     // Trouver le label du clavier pour une note donnée
     const getKeyLabel = (note: string) => {
-        return Object.entries(KEYBOARD_MAP).find(([_, n]) => n === note)?.[0];
+        const found = Object.entries(KEYBOARD_MAP).find((entry) => entry[1] === note);
+        return found ? found[0] : undefined;
     };
 
     return (

@@ -121,7 +121,7 @@ export const Studio: React.FC = () => {
                     <div className="stage-visualizer">
                         {/* Map active keys to visual bars */}
                         {activeKeys.slice(0, 10).map((_key, i) => (
-                            <div key={i} className="vis-bar primary" style={{ height: `${20 + Math.random() * 80}%` }}></div>
+                            <div key={i} className="vis-bar primary" style={{ height: `${20 + ((i * 37) % 80)}%` }}></div>
                         ))}
                         {!activeKeys.length && <div className="vis-bar" style={{ height: '30%' }}></div>}
                     </div>

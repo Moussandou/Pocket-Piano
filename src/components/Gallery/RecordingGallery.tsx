@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../infra/firebase';
-import { collection, query, where, onSnapshot, orderBy, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, orderBy, deleteDoc, doc, Timestamp } from 'firebase/firestore';
 import { Play, Trash2, Calendar, Music } from 'lucide-react';
 
 interface Recording {
     id: string;
     name: string;
-    notes: any[];
-    timestamp: any;
+    notes: unknown[];
+    timestamp: Timestamp;
     duration: number;
 }
 
@@ -17,29 +17,33 @@ export const RecordingGallery: React.FC = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!auth.currentUser) {
-            setRecordings([]);
-            setLoading(false);
-            return;
-        }
+        const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+            if (!user) {
+                setRecordings([]);
+                setLoading(false);
+                return;
+            }
 
-        const q = query(
-            collection(db, 'recordings'),
-            where('userId', '==', auth.currentUser.uid),
-            orderBy('timestamp', 'desc')
-        );
+            const q = query(
+                collection(db, 'recordings'),
+                where('userId', '==', user.uid),
+                orderBy('timestamp', 'desc')
+            );
 
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const docs = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Recording[];
-            setRecordings(docs);
-            setLoading(false);
+            const unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
+                const docs = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                })) as Recording[];
+                setRecordings(docs);
+                setLoading(false);
+            });
+
+            return () => unsubscribeSnapshot();
         });
 
-        return () => unsubscribe();
-    }, [auth.currentUser]);
+        return () => unsubscribeAuth();
+    }, []);
 
     const removeRecording = async (id: string) => {
         if (confirm('Voulez-vous vraiment supprimer cet enregistrement ?')) {
