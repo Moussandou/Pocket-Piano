@@ -67,7 +67,7 @@ export const useRecorder = () => {
             const url = URL.createObjectURL(currentAudioBlob.current);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${name.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'enregistrement'}.webm`;
+            a.download = `${name.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'enregistrement'}.mp3`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);

@@ -1,5 +1,6 @@
-
 import * as Tone from 'tone';
+// @ts-ignore
+import * as lamejs from 'lamejs';
 
 class AudioEngine {
     private sampler: Tone.Sampler | null = null;
@@ -10,9 +11,11 @@ class AudioEngine {
     private volumeDb: number = 0;
 
     // Recording components
-    private dest: MediaStreamAudioDestinationNode | null = null;
-    private mediaRecorder: MediaRecorder | null = null;
-    private audioChunks: Blob[] = [];
+    private recordingNode: ScriptProcessorNode | null = null;
+    private isRecordingAudio: boolean = false;
+    private leftChannel: Float32Array[] = [];
+    private rightChannel: Float32Array[] = [];
+    private sampleRate: number = 44100;
 
     constructor() { }
 
@@ -44,10 +47,8 @@ class AudioEngine {
                 this.sampler.volume.value = this.volumeDb;
             }
 
-            // Set up recording destination
-            const context = Tone.getContext().rawContext as AudioContext;
-            this.dest = context.createMediaStreamDestination();
-            Tone.Destination.connect(this.dest);
+            // The recording node will be set up when starting recording
+
 
             console.log("Piano samples loaded");
         } catch (error) {
@@ -95,32 +96,98 @@ class AudioEngine {
     }
 
     public startRecording() {
-        if (!this.dest) return;
-        this.audioChunks = [];
-        this.mediaRecorder = new MediaRecorder(this.dest.stream);
-        this.mediaRecorder.ondataavailable = (e) => {
-            if (e.data.size > 0) {
-                this.audioChunks.push(e.data);
-            }
-        };
-        this.mediaRecorder.start();
+        const context = Tone.getContext().rawContext as AudioContext;
+        this.sampleRate = context.sampleRate;
+        this.leftChannel = [];
+        this.rightChannel = [];
+        this.isRecordingAudio = true;
+
+        if (!this.recordingNode) {
+            this.recordingNode = context.createScriptProcessor(4096, 2, 2);
+            this.recordingNode.onaudioprocess = (e) => {
+                if (!this.isRecordingAudio) return;
+
+                // Copy data to our buffers
+                this.leftChannel.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+                this.rightChannel.push(new Float32Array(e.inputBuffer.getChannelData(1)));
+            };
+
+            // Connect the Master output to the recording node
+            Tone.Destination.connect(this.recordingNode);
+            // ScriptProcessorNode MUST be connected to an output to work
+            this.recordingNode.connect(context.destination);
+        }
     }
 
     public stopRecording(): Promise<Blob | null> {
         return new Promise((resolve) => {
-            if (!this.mediaRecorder || this.mediaRecorder.state === 'inactive') {
+            if (!this.isRecordingAudio) {
                 resolve(null);
                 return;
             }
+            this.isRecordingAudio = false;
 
-            this.mediaRecorder.onstop = () => {
-                const blob = new Blob(this.audioChunks, { type: 'audio/webm' });
-                this.audioChunks = [];
+            // Process MP3 in a short timeout to unblock the UI thread briefly
+            setTimeout(() => {
+                const blob = this.encodeToMP3();
+                this.leftChannel = [];
+                this.rightChannel = [];
                 resolve(blob);
+            }, 10);
+        });
+    }
+
+    private encodeToMP3(): Blob {
+        try {
+            const kbps = 128;
+            const encoder = new lamejs.Mp3Encoder(2, this.sampleRate, kbps);
+            const mp3Data: Int8Array[] = [];
+
+            const totalLength = this.leftChannel.reduce((acc, val) => acc + val.length, 0);
+            const leftBuffer = new Float32Array(totalLength);
+            const rightBuffer = new Float32Array(totalLength);
+
+            let offset = 0;
+            for (let i = 0; i < this.leftChannel.length; i++) {
+                leftBuffer.set(this.leftChannel[i], offset);
+                rightBuffer.set(this.rightChannel[i], offset);
+                offset += this.leftChannel[i].length;
+            }
+
+            const convertBuffer = (buffer: Float32Array) => {
+                const l = buffer.length;
+                const buf = new Int16Array(l);
+                for (let i = 0; i < l; i++) {
+                    let s = Math.max(-1, Math.min(1, buffer[i]));
+                    buf[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+                }
+                return buf;
             };
 
-            this.mediaRecorder.stop();
-        });
+            const leftInt16 = convertBuffer(leftBuffer);
+            const rightInt16 = convertBuffer(rightBuffer);
+
+            const sampleBlockSize = 1152;
+            for (let i = 0; i < leftInt16.length; i += sampleBlockSize) {
+                const leftChunk = leftInt16.subarray(i, i + sampleBlockSize);
+                const rightChunk = rightInt16.subarray(i, i + sampleBlockSize);
+
+                const mp3buf = encoder.encodeBuffer(leftChunk, rightChunk);
+                if (mp3buf.length > 0) {
+                    mp3Data.push(new Int8Array(mp3buf));
+                }
+            }
+
+            const encodeBuffer = encoder.flush();
+            if (encodeBuffer.length > 0) {
+                mp3Data.push(new Int8Array(encodeBuffer));
+            }
+
+            return new Blob(mp3Data as any[], { type: 'audio/mp3' });
+        } catch (e) {
+            console.error("MP3 encoding failed", e);
+            return new Blob([], { type: 'audio/mp3' });
+        }
     }
 }
 
