@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
@@ -10,6 +11,7 @@ import { Piano } from 'lucide-react';
 import './Auth.css';
 
 export const Auth: React.FC = () => {
+    const { t } = useTranslation();
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -38,13 +40,13 @@ export const Auth: React.FC = () => {
             console.error("Auth error:", err);
             // Translate common Firebase errors
             if (err.code === 'auth/email-already-in-use') {
-                setError('Cet email est déjà utilisé.');
+                setError(t('auth.error.emailInUse'));
             } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
-                setError('Email ou mot de passe incorrect.');
+                setError(t('auth.error.invalidCredentials'));
             } else if (err.code === 'auth/weak-password') {
-                setError('Le mot de passe doit contenir au moins 6 caractères.');
+                setError(t('auth.error.weakPassword'));
             } else {
-                setError('Une erreur est survenue lors de l\'authentification.');
+                setError(t('auth.error.generic'));
             }
         } finally {
             setLoading(false);
@@ -59,7 +61,7 @@ export const Auth: React.FC = () => {
         } catch (err: any) {
             console.error("Google Auth error:", err);
             if (err.code !== 'auth/popup-closed-by-user') {
-                setError('Échec de la connexion avec Google.');
+                setError(t('auth.error.google'));
             }
         }
     };
@@ -72,7 +74,7 @@ export const Auth: React.FC = () => {
         } catch (err: any) {
             console.error("Discord Auth error:", err);
             if (err.code !== 'auth/popup-closed-by-user') {
-                setError('Échec de la connexion avec Discord.');
+                setError(t('auth.error.discord'));
             }
         }
     };
@@ -90,18 +92,18 @@ export const Auth: React.FC = () => {
                     </div>
 
                     <div className="auth-system-status">
-                        <div className="auth-system-label">System Status</div>
+                        <div className="auth-system-label">{t('auth.sidebar.status')}</div>
                         <div className="auth-system-title">
                             <div className="auth-status-dot"></div>
-                            <span>Signal Terminal v.04</span>
+                            <span>{t('auth.sidebar.version')}</span>
                         </div>
                         <p className="auth-system-desc">
-                            Interface MIDI haute fidélité. Initialisation du protocole d'authentification pour relier le matériel local à l'architecture cloud.
+                            {t('auth.sidebar.description')}
                         </p>
 
                         <div className="auth-stats">
                             <div className="auth-stat-row">
-                                <span className="auth-stat-label">Signal Strength</span>
+                                <span className="auth-stat-label">{t('auth.sidebar.signal')}</span>
                                 <div className="auth-signal-bars">
                                     <div className="auth-signal-bar active"></div>
                                     <div className="auth-signal-bar active"></div>
@@ -110,11 +112,11 @@ export const Auth: React.FC = () => {
                                 </div>
                             </div>
                             <div className="auth-stat-row">
-                                <span className="auth-stat-label">Encryption</span>
-                                <span className="auth-stat-value text-green">SECURE / AES-256</span>
+                                <span className="auth-stat-label">{t('auth.sidebar.encryption')}</span>
+                                <span className="auth-stat-value text-green">{t('auth.sidebar.encValue')}</span>
                             </div>
                             <div className="auth-stat-row">
-                                <span className="auth-stat-label">Latency</span>
+                                <span className="auth-stat-label">{t('auth.sidebar.latency')}</span>
                                 <span className="auth-stat-value">14ms</span>
                             </div>
                         </div>
@@ -135,15 +137,15 @@ export const Auth: React.FC = () => {
             <main className="auth-main">
                 <div className="auth-form-container">
                     <header className="auth-header-section">
-                        <h2>{isLogin ? 'Access Port' : 'Registration Port'}</h2>
+                        <h2>{isLogin ? t('auth.header.titleLogin') : t('auth.header.titleRegister')}</h2>
                         <div className="auth-header-meta">
-                            <span className="auth-meta-primary">Protocol: SSL/TLS</span>
-                            <span className="auth-meta-secondary">Node: OMEGA-4</span>
+                            <span className="auth-meta-primary">{t('auth.header.protocol')}</span>
+                            <span className="auth-meta-secondary">{t('auth.header.node')}</span>
                         </div>
                         <p className="auth-header-desc">
                             {isLogin
-                                ? 'Entrez vos identifiants pour la synchronisation'
-                                : 'Initialisez un nouveau nœud utilisateur'}
+                                ? t('auth.header.descLogin')
+                                : t('auth.header.descRegister')}
                         </p>
                     </header>
 
@@ -151,7 +153,7 @@ export const Auth: React.FC = () => {
 
                     <section className="auth-methods-section">
                         <div className="auth-section-divider">
-                            <span>External Gateway</span>
+                            <span>{t('auth.header.gateway')}</span>
                             <div className="auth-divider-line"></div>
                         </div>
 
@@ -180,7 +182,7 @@ export const Auth: React.FC = () => {
 
                     <section className="auth-methods-section">
                         <div className="auth-section-divider">
-                            <span>Direct Protocol</span>
+                            <span>{t('auth.header.directProtocol')}</span>
                             <div className="auth-divider-line"></div>
                         </div>
 
@@ -188,14 +190,14 @@ export const Auth: React.FC = () => {
                             <div className="auth-input-group">
                                 <label htmlFor="email">
                                     <span className="auth-input-indicator indicator-green"></span>
-                                    Terminal ID (Email)
+                                    {t('auth.form.emailLabel')}
                                 </label>
                                 <input
                                     id="email"
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="USER@TERMINAL.NET"
+                                    placeholder={t('auth.form.emailPlaceholder')}
                                     required
                                     className="auth-input"
                                 />
@@ -204,7 +206,7 @@ export const Auth: React.FC = () => {
                             <div className="auth-input-group">
                                 <label htmlFor="password">
                                     <span className="auth-input-indicator indicator-neutral"></span>
-                                    Access Code (Password)
+                                    {t('auth.form.passwordLabel')}
                                 </label>
                                 <input
                                     id="password"
@@ -220,18 +222,20 @@ export const Auth: React.FC = () => {
 
                             <div className="auth-form-footer">
                                 <button type="submit" className="auth-primary-btn" disabled={loading}>
-                                    {loading ? 'Initializing...' : isLogin ? 'Initialize Link' : 'Register Node'}
+                                    {loading
+                                        ? t('auth.form.submitting')
+                                        : (isLogin ? t('auth.form.submitLogin') : t('auth.form.submitRegister'))}
                                     {!loading && <span style={{ marginLeft: '4px', fontSize: '1.2em' }}>&rarr;</span>}
                                 </button>
 
                                 <div className="auth-form-links">
-                                    <a href="#" className="auth-link">Recovery Protocol</a>
+                                    <a href="#" className="auth-link">{t('auth.form.recovery')}</a>
                                     <button
                                         type="button"
                                         className="auth-link"
                                         onClick={(e) => { e.preventDefault(); setIsLogin(!isLogin); }}
                                     >
-                                        {isLogin ? 'New Registration' : 'Return to Login'}
+                                        {isLogin ? t('auth.form.switchRegister') : t('auth.form.switchLogin')}
                                     </button>
                                 </div>
                             </div>

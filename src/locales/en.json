@@ -1,0 +1,301 @@
+{
+    "common": {
+        "units": {
+            "db": "dB",
+            "percent": "%",
+            "st": "st",
+            "hours": "h",
+            "minutes": "m"
+        },
+        "daysShort": [
+            "M",
+            "T",
+            "W",
+            "T",
+            "F",
+            "S",
+            "S"
+        ]
+    },
+    "nav": {
+        "library": "Library",
+        "profile": "Profile",
+        "landing": "Landing",
+        "studio": "Studio",
+        "playNow": "Play Now"
+    },
+    "footer": {
+        "legal": "Legal & Privacy",
+        "credits": "Credits",
+        "portfolio": "Portfolio",
+        "kofi": "Ko-fi",
+        "brandText": "All systems nominal.",
+        "copyright": "© 2024 Audio Industries Ltd.",
+        "privacy": "Privacy",
+        "terms": "Terms",
+        "status": "System Status"
+    },
+    "landing": {
+        "status": "SYS.READY",
+        "latency": "Latency: 2ms",
+        "title1": "Digital",
+        "title2": "Tactile",
+        "title3": "Response",
+        "description": "Experience the mechanical precision of a grand piano in a purely digital environment. Professional VST audio directly in your browser.",
+        "btnStart": "Start Engine",
+        "btnManual": "Manual",
+        "metaVersion": "Version",
+        "metaBuild": "Build",
+        "metaAudio": "Audio",
+        "metaMidi": "MIDI",
+        "ctaTitle1": "Ready to",
+        "ctaTitle2": "Play?",
+        "ctaDesc": "Launch the interface now. Zero setup required. Pure performance.",
+        "btnInitialize": "Initialize Interface",
+        "checkNoInstall": "No Install",
+        "checkFreeAccess": "Free Access",
+        "featureSubhead": "System Capabilities",
+        "featureTitle": "Core Specifications",
+        "featureStatus": "STATUS: ONLINE",
+        "featureModules": "MODULES: 3/3 ACTIVE",
+        "feat1Title": "Pro VST Audio",
+        "feat1Desc": "High-fidelity sampling from world-class concert grands. Zero-latency playback engine optimized for web assembly.",
+        "feat2Title": "Cloud Sync",
+        "feat2Desc": "Seamless state preservation. Your compositions, presets, and MIDI maps are pushed to edge nodes instantly.",
+        "feat3Title": "Live Visualization",
+        "feat3Desc": "Real-time frequency analysis and key-press tracking. Visual feedback loop for precise performance monitoring.",
+        "schematicAlt": "Abstract technical schematic of piano internal mechanism",
+        "keysAlt": "High contrast overhead view of piano keys"
+    },
+    "auth": {
+        "sidebar": {
+            "status": "SYSTEM STATUS: ACTIVE",
+            "version": "SIGNAL TERMINAL v2.4",
+            "description": "Secure gateway to the Pocket Piano Neural Network. Identity verification required for cloud synchronization.",
+            "signal": "SIGNAL",
+            "encryption": "ENCRYPTION",
+            "encValue": "AES-256-GCM",
+            "latency": "LATENCY"
+        },
+        "header": {
+            "titleLogin": "ACCESS_IDENTITY",
+            "titleRegister": "CREATE_IDENTITY",
+            "protocol": "PROTOCOL: SECURE_AUTH",
+            "node": "NODE: PAR-01",
+            "descLogin": "Enter your credentials to establish a secure session with the central library.",
+            "descRegister": "Initialize a new identity node to begin cloud-synced composition.",
+            "gateway": "AUTHENTICATION GATEWAY",
+            "directProtocol": "DIRECT PROTOCOL"
+        },
+        "form": {
+            "emailLabel": "EMAIL_IDENTIFIER",
+            "emailPlaceholder": "user@network.local",
+            "passwordLabel": "SECURITY_KEY",
+            "submitting": "PROCESSING...",
+            "submitLogin": "EXECUTE_LOGIN",
+            "submitRegister": "EXECUTE_REGISTRATION",
+            "recovery": "RECOVER_KEY",
+            "switchLogin": "ACCESS_EXISTING_NODE",
+            "switchRegister": "INITIALIZE_NEW_NODE"
+        },
+        "error": {
+            "emailInUse": "ERROR: Identity already registered in network.",
+            "invalidCredentials": "ERROR: Security credentials rejected.",
+            "weakPassword": "ERROR: Security key complexity insufficient.",
+            "generic": "ERROR: Authentication protocol failure.",
+            "google": "ERROR: Google gateway timed out.",
+            "discord": "ERROR: Discord node unreachable."
+        }
+    },
+    "gallery": {
+        "loading": "Loading gallery...",
+        "notLoggedIn": "Sign in to save your clips",
+        "title": "My Recordings",
+        "empty": "No recordings found",
+        "confirmDelete": "Do you really want to delete this recording?",
+        "play": "Play",
+        "delete": "Delete"
+    },
+    "recording": {
+        "saveTitle": "Save Recording",
+        "notConnected": "Not signed in",
+        "cloudNotice": "This recording will be downloaded to your device. Sign in to save it to the cloud and access it on all your devices.",
+        "defaultName": "My Song",
+        "nameLabel": "Song Name",
+        "namePlaceholder": "Enter song name...",
+        "cancel": "Cancel",
+        "save": "Save",
+        "loginButton": "Sign In to Sync"
+    },
+    "profile": {
+        "title": "User Profile",
+        "guestProfile": "Guest Profile",
+        "signOut": "Sign Out",
+        "signIn": "Sign In",
+        "avatarAlt": "{{name}}'s profile avatar",
+        "config": "Config",
+        "statusOnline": "Online Now",
+        "statusOffline": "Offline",
+        "emailLabel": "Email:",
+        "notSignedIn": "Not signed in",
+        "planLabel": "Plan:",
+        "planValue": "Pro Tier",
+        "stats": {
+            "title": "Usage Analytics",
+            "playtime": "Total Playtime",
+            "recordings": "Lifetime Notes",
+            "sessions": "Sessions",
+            "skillLevel": "Skill Level",
+            "skillPro": "PRO",
+            "skillMid": "MID",
+            "skillNew": "NEW",
+            "performanceAnalytics": "Performance Analytics",
+            "weekly": "Weekly",
+            "monthly": "Monthly",
+            "yearly": "Yearly",
+            "dynamicRange": "Dynamic Range",
+            "avg": "avg",
+            "lastSession": "Last Session",
+            "minutesDuration": "{{count}} minutes duration",
+            "notesCaptured": "{{count}} notes captured",
+            "noSessions": "No sessions recorded yet.",
+            "viewAnalysis": "View Analysis"
+        },
+        "settings": {
+            "title": "System Configuration",
+            "audio": {
+                "title": "Audio Engine",
+                "buffer": "Buffer Size",
+                "sampleRate": "Sample Rate",
+                "volume": "Master Volume",
+                "silence": "Silence",
+                "peak": "Peak",
+                "transpose": "Global Transpose",
+                "semitones": "Semitones",
+                "octMinus": "Oct -",
+                "transposeReset": "Reset",
+                "octPlus": "Oct +",
+                "autoSustain": "Auto-Sustain",
+                "performanceMode": "Performance Mode"
+            },
+            "midi": {
+                "title": "MIDI Interface",
+                "device": "Input Device",
+                "status": "Signal Status",
+                "active": "ACTIVE",
+                "searching": "SEARCHING...",
+                "channel": "Input Channel",
+                "omni": "Omni",
+                "velocityCurve": "Velocity Curve",
+                "linearHard": "Linear (Hard)",
+                "localControl": "Local Control",
+                "off": "Off"
+            },
+            "hardware": {
+                "title": "Authorized Hardware",
+                "status": "Link Status",
+                "authorized": "AUTHORIZED",
+                "notAuthorized": "NOT_AUTHORIZED",
+                "notSupported": "Hardware acceleration not supported on this node."
+            }
+        },
+        "privacy": "Privacy Protocol",
+        "terms": "Terms of Service",
+        "systemStatus": "System Status:",
+        "statusStable": "Stable"
+    },
+    "library": {
+        "confirmDelete": "Do you really want to delete this recording?",
+        "allRecordings": "All Recordings",
+        "favorites": "Favorites",
+        "proPlan": "Pro Plan",
+        "proDesc": "Unlock unlimited sheets and cloud storage.",
+        "upgrade": "Upgrade",
+        "title": "My Recordings",
+        "subtitle": "Manage and organize your personal piano sessions.",
+        "newRecording": "New Recording",
+        "loading": "Loading your recordings...",
+        "signToSee": "Sign in to see your saved recordings.",
+        "noRecordings": "You don't have any recordings yet. Head to the Studio to create one!",
+        "untitled": "Untitled Recording",
+        "dateUnknown": "Date Unknown",
+        "deleteTitle": "Delete recording",
+        "notes": "Notes",
+        "duration": "Dur",
+        "showingCount": "Showing {{count}} recordings"
+    },
+    "studio": {
+        "controls": "Studio Controls",
+        "sessionId": "SESSION ID: ",
+        "masterGain": "Master Gain",
+        "sustain": "Sustain",
+        "transpose": "Transpose",
+        "pianoAccent": "Piano Accent",
+        "default": "Default",
+        "custom": "Custom",
+        "engineProfile": "Engine Profile",
+        "waveform": "WAVEFORM",
+        "grandPiano": "GRAND PIANO",
+        "authMode": "AUTH MODE",
+        "secure": "SECURE",
+        "midiInput": "MIDI Input: ",
+        "active": "Active",
+        "waiting": "Waiting...",
+        "activeKeys": "Active Keys",
+        "engineInfo": "Engine Info",
+        "metronome": "Metronome",
+        "stopRecording": "Stop Recording",
+        "record": "Record",
+        "library": "Library",
+        "help": "Help"
+    },
+    "credits": {
+        "title": "Credits",
+        "subhead": "Project Origin",
+        "concept": {
+            "title": "Concept & Development",
+            "lead": "Lead Architect & Dev :",
+            "desc": "Developed with a passion for sound engineering and minimalist industrial interfaces."
+        },
+        "design": {
+            "title": "Design Inspiration",
+            "desc": "The visual design of Pocket Piano draws inspiration from high-precision technical interfaces, digital brutalism, and vintage studio gear."
+        },
+        "tech": {
+            "title": "Technology Stack",
+            "core": "Core :",
+            "audio": "Audio :",
+            "infra": "Infrastructure :",
+            "styling": "Styling :",
+            "dev": "Development :"
+        },
+        "build": "BUILD REV. 2.4.1 / AUDIO_ENGINE_v4"
+    },
+    "legal": {
+        "title": "Legal & GDPR",
+        "subhead": "Compliance & Data",
+        "mentions": {
+            "title": "1. Legal Mentions",
+            "editor": "Site Editor :",
+            "editorDesc": "Pocket Piano is an experimental project developed by Audio Industries Ltd.",
+            "director": "Publication Director :",
+            "hosting": "Hosting :",
+            "hostingDesc": "The site is hosted by Firebase (Google Cloud Platform)"
+        },
+        "privacy": {
+            "title": "2. Privacy Policy (GDPR)",
+            "desc": "In accordance with the General Data Protection Regulation (GDPR), we inform you that Pocket Piano collects minimal data necessary for the service operation.",
+            "dataCollected": "Data collected :",
+            "email": "Email address (via Google Authentication for profile synchronization).",
+            "stats": "Anonymized usage statistics (notes played, session time) to improve user experience.",
+            "purposes": "Purposes :",
+            "purposesDesc": "Data is used exclusively to allow saving your settings, recordings and displaying your personal statistics. No data is shared with third parties.",
+            "rights": "Your rights :",
+            "rightsDesc": "You have a right of access, rectification and deletion of your data. You can exercise these rights by contacting us at the support email indicated at the bottom of the page."
+        },
+        "intellectual": {
+            "title": "3. Intellectual Property",
+            "desc": "All elements constituting this site (structure, design, logos, sounds) are the exclusive property of its creators, unless otherwise stated."
+        }
+    }
+}

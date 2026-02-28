@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Library.css';
 import { db } from '../infra/firebase';
 import { collection, query, where, onSnapshot, orderBy, deleteDoc, doc, Timestamp } from 'firebase/firestore';
@@ -8,6 +9,7 @@ import { useAuth } from '../hooks/useAuth';
 import type { Recording } from '../domain/models';
 
 export const Library: React.FC = () => {
+    const { t } = useTranslation();
     const [recordings, setRecordings] = useState<Recording[]>([]);
     const [loading, setLoading] = useState(true);
     const { user } = useAuth();
@@ -42,7 +44,7 @@ export const Library: React.FC = () => {
 
     const removeRecording = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        if (confirm('Voulez-vous vraiment supprimer cet enregistrement ?')) {
+        if (confirm(t('library.confirmDelete'))) {
             await deleteDoc(doc(db, 'recordings', id));
         }
     };
@@ -60,18 +62,18 @@ export const Library: React.FC = () => {
             {/* Sidebar Navigation */}
             <aside className="library-sidebar">
                 <div className="sidebar-section">
-                    <h3 className="sidebar-heading">Collection</h3>
+                    <h3 className="sidebar-heading">{t('library.allRecordings')}</h3>
                     <ul className="sidebar-nav">
                         <li>
                             <button className="nav-link active">
                                 <span className="material-symbols-outlined">library_music</span>
-                                <span>All Recordings</span>
+                                <span>{t('library.allRecordings')}</span>
                             </button>
                         </li>
                         <li>
                             <button className="nav-link">
                                 <span className="material-symbols-outlined">favorite</span>
-                                <span>Favorites</span>
+                                <span>{t('library.favorites')}</span>
                             </button>
                         </li>
                     </ul>
@@ -79,9 +81,9 @@ export const Library: React.FC = () => {
 
                 <div className="sidebar-footer">
                     <div className="pro-plan-box">
-                        <h4 className="pro-title">Pro Plan</h4>
-                        <p className="pro-desc">Unlock unlimited sheets and cloud storage.</p>
-                        <button className="btn-upgrade">Upgrade</button>
+                        <h4 className="pro-title">{t('library.proPlan')}</h4>
+                        <p className="pro-desc">{t('library.proDesc')}</p>
+                        <button className="btn-upgrade">{t('library.upgrade')}</button>
                     </div>
                 </div>
             </aside>
@@ -90,8 +92,8 @@ export const Library: React.FC = () => {
             <main className="library-main">
                 <div className="library-header">
                     <div className="header-text">
-                        <h1 className="page-title">My Recordings</h1>
-                        <p className="page-subtitle">Manage and organize your personal piano sessions.</p>
+                        <h1 className="page-title">{t('library.title')}</h1>
+                        <p className="page-subtitle">{t('library.subtitle')}</p>
                     </div>
                     {/* Filters */}
                     <div className="filters-group">
@@ -111,16 +113,16 @@ export const Library: React.FC = () => {
                         <div className="add-icon-wrapper">
                             <span className="material-symbols-outlined text-4xl">add</span>
                         </div>
-                        <span className="new-sheet-text">New Recording</span>
+                        <span className="new-sheet-text">{t('library.newRecording')}</span>
                     </button>
 
                     {loading ? (
-                        <div style={{ padding: '2rem', color: '#6b7280' }}>Loading your recordings...</div>
+                        <div style={{ padding: '2rem', color: '#6b7280' }}>{t('library.loading')}</div>
                     ) : recordings.length === 0 ? (
                         <div style={{ padding: '2rem', color: '#6b7280' }}>
                             {!user
-                                ? 'Sign in to see your saved recordings.'
-                                : 'You don\'t have any recordings yet. Head to the Studio to create one!'}
+                                ? t('library.signToSee')
+                                : t('library.noRecordings')}
                         </div>
                     ) : (
                         recordings.map((rec) => (
@@ -138,30 +140,30 @@ export const Library: React.FC = () => {
                                 <div className="sheet-info">
                                     <div className="sheet-titles" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                         <div>
-                                            <h3 className="sheet-title">{rec.name || 'Untitled Recording'}</h3>
+                                            <h3 className="sheet-title">{rec.name || t('library.untitled')}</h3>
                                             <p className="sheet-composer">
                                                 {rec.timestamp ? (
                                                     rec.timestamp instanceof Timestamp
                                                         ? rec.timestamp.toDate().toLocaleDateString()
                                                         : new Date(rec.timestamp).toLocaleDateString()
-                                                ) : 'Date Unknown'}
+                                                ) : t('library.dateUnknown')}
                                             </p>
                                         </div>
                                         <button
                                             onClick={(e) => rec.id && removeRecording(rec.id, e)}
                                             style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
-                                            title="Delete recording"
+                                            title={t('library.deleteTitle')}
                                         >
                                             <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>delete</span>
                                         </button>
                                     </div>
                                     <div className="sheet-meta">
                                         <div className="meta-col">
-                                            <span className="meta-label">Notes</span>
+                                            <span className="meta-label">{t('library.notes')}</span>
                                             <span className="meta-val">{rec.notes?.length || 0}</span>
                                         </div>
                                         <div className="meta-col border-left">
-                                            <span className="meta-label">Dur</span>
+                                            <span className="meta-label">{t('library.duration')}</span>
                                             <span className="meta-val">{formatDuration(rec.duration || 0)}</span>
                                         </div>
                                     </div>
@@ -174,10 +176,11 @@ export const Library: React.FC = () => {
                 {/* Pagination */}
                 {!loading && recordings.length > 0 && (
                     <div className="library-pagination">
-                        <span className="pagination-info">Showing {recordings.length} recordings</span>
+                        <span className="pagination-info">{t('library.showingCount', { count: recordings.length })}</span>
                     </div>
                 )}
             </main>
         </div>
     );
 };
+

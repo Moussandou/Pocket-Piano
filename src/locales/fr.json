@@ -1,0 +1,306 @@
+{
+    "common": {
+        "units": {
+            "db": "dB",
+            "percent": "%",
+            "st": "st",
+            "hours": "h",
+            "minutes": "m"
+        },
+        "daysShort": [
+            "L",
+            "M",
+            "M",
+            "J",
+            "V",
+            "S",
+            "D"
+        ]
+    },
+    "nav": {
+        "library": "Bibliothèque",
+        "profile": "Profil",
+        "landing": "Accueil",
+        "studio": "Studio",
+        "playNow": "Jouer"
+    },
+    "footer": {
+        "legal": "Mentions Légales & RGPD",
+        "credits": "Crédits",
+        "portfolio": "Portfolio",
+        "kofi": "Ko-fi",
+        "brandText": "Tous les systèmes sont opérationnels.",
+        "copyright": "© 2024 Audio Industries Ltd.",
+        "privacy": "Confidentialité",
+        "terms": "Conditions",
+        "status": "Statut Système"
+    },
+    "landing": {
+        "status": "SYS.PRÊT",
+        "latency": "Latence : 2ms",
+        "title1": "Réponse",
+        "title2": "Tactile",
+        "title3": "Numérique",
+        "description": "Découvrez la précision mécanique d'un piano à queue dans un environnement purement numérique. Un son VST professionnel directement dans votre navigateur.",
+        "btnStart": "Démarrer le Moteur",
+        "btnManual": "Manuel",
+        "metaVersion": "Version",
+        "metaBuild": "Build",
+        "metaAudio": "Audio",
+        "metaMidi": "MIDI",
+        "ctaTitle1": "Prêt à",
+        "ctaTitle2": "Jouer ?",
+        "ctaDesc": "Lancez l'interface maintenant. Aucune installation requise. Pure performance.",
+        "btnInitialize": "Initialiser l'Interface",
+        "checkNoInstall": "Sans Installation",
+        "checkFreeAccess": "Accès Gratuit",
+        "featureSubhead": "Capacités Système",
+        "featureTitle": "Spécifications de Base",
+        "featureStatus": "STATUT : EN LIGNE",
+        "featureModules": "MODULES : 3/3 ACTIFS",
+        "feat1Title": "Audio VST Pro",
+        "feat1Desc": "Échantillonnage haute fidélité de pianos à queue de concert. Moteur de lecture sans latence optimisé pour WebAssembly.",
+        "feat2Title": "Sync Cloud",
+        "feat2Desc": "Préservation transparente de l'état. Vos compositions, préréglages et mappages MIDI sont synchronisés instantanément.",
+        "feat3Title": "Visualisation en Direct",
+        "feat3Desc": "Analyse de fréquence en temps réel et suivi des touches. Boucle de retour visuel pour un monitoring précis des performances.",
+        "schematicAlt": "Schéma technique abstrait du mécanisme interne d'un piano",
+        "keysAlt": "Vue de dessus à haut contraste des touches de piano"
+    },
+    "auth": {
+        "sidebar": {
+            "status": "STATUT SYSTÈME : ACTIF",
+            "version": "TERMINAL SIGNAL v2.4",
+            "description": "Passerelle sécurisée vers le réseau Pocket Piano. Vérification d'identité requise pour la synchronisation cloud.",
+            "signal": "SIGNAL",
+            "encryption": "CHIFFREMENT",
+            "encValue": "AES-256-GCM",
+            "latency": "LATENCE"
+        },
+        "header": {
+            "titleLogin": "ACCÈS_IDENTITÉ",
+            "titleRegister": "CRÉER_IDENTITÉ",
+            "protocol": "PROTOCOLE : AUTH_SÉCURISÉE",
+            "node": "NŒUD : PAR-01",
+            "descLogin": "Entrez vos identifiants pour établir une session sécurisée avec la bibliothèque centrale.",
+            "descRegister": "Initialisez un nouveau nœud d'identité pour commencer vos compositions synchronisées.",
+            "gateway": "PASSERELLE D'AUTHENTIFICATION",
+            "directProtocol": "PROTOCOLE DIRECT"
+        },
+        "form": {
+            "emailLabel": "IDENTIFIANT_EMAIL",
+            "emailPlaceholder": "utilisateur@reseau.local",
+            "passwordLabel": "CLÉ_SÉCURITÉ",
+            "submitting": "TRAITEMENT...",
+            "submitLogin": "EXÉCUTER_CONNEXION",
+            "submitRegister": "EXÉCUTER_INSCRIPTION",
+            "recovery": "RÉCUPÉRER_CLÉ",
+            "switchLogin": "ACCÉDER_NŒUD_EXISTANT",
+            "switchRegister": "INITIALISER_NOUVEAU_NŒUD"
+        },
+        "error": {
+            "emailInUse": "ERREUR : Identité déjà enregistrée sur le réseau.",
+            "invalidCredentials": "ERREUR : Identifiants de sécurité rejetés.",
+            "weakPassword": "ERREUR : Complexité de la clé de sécurité insuffisante.",
+            "generic": "ERREUR : Échec du protocole d'authentification.",
+            "google": "ERREUR : Délai d'attente de la passerelle Google dépassé.",
+            "discord": "ERREUR : Nœud Discord injoignable."
+        }
+    },
+    "gallery": {
+        "loading": "Chargement de la galerie...",
+        "notLoggedIn": "Connectez-vous pour sauvegarder vos morceaux",
+        "title": "Mes Enregistrements",
+        "empty": "Aucun enregistrement trouvé",
+        "confirmDelete": "Voulez-vous vraiment supprimer cet enregistrement ?",
+        "play": "Jouer",
+        "delete": "Supprimer"
+    },
+    "recording": {
+        "saveTitle": "Sauvegarder l'enregistrement",
+        "notConnected": "Non connecté(e)",
+        "cloudNotice": "Cet enregistrement sera téléchargé sur votre appareil. Connectez-vous pour le sauvegarder dans le cloud et le retrouver sur tous vos appareils.",
+        "defaultName": "Mon Morceau",
+        "nameLabel": "Nom du morceau",
+        "namePlaceholder": "Entrez le nom du morceau...",
+        "cancel": "Annuler",
+        "save": "Sauvegarder",
+        "loginButton": "Se connecter pour synchroniser"
+    },
+    "profile": {
+        "title": "Profil Utilisateur",
+        "guestProfile": "Profil Invité",
+        "signOut": "Se déconnecter",
+        "signIn": "Se connecter",
+        "avatarAlt": "Avatar de profil de {{name}}",
+        "config": "Config",
+        "statusOnline": "En ligne actuellement",
+        "statusOffline": "Hors ligne",
+        "emailLabel": "Email :",
+        "notSignedIn": "Non connecté(e)",
+        "planLabel": "Offre :",
+        "planValue": "Rang Pro",
+        "stats": {
+            "title": "Analyses d'utilisation",
+            "playtime": "Temps de jeu total",
+            "recordings": "Notes à vie",
+            "sessions": "Sessions",
+            "skillLevel": "Niveau",
+            "skillPro": "PRO",
+            "skillMid": "MILIEU",
+            "skillNew": "NOUVEAU",
+            "performanceAnalytics": "Analyses de Performance",
+            "weekly": "Hebdomadaire",
+            "monthly": "Mensuel",
+            "yearly": "Annuel",
+            "dynamicRange": "Gamme Dynamique",
+            "avg": "moy",
+            "lastSession": "Dernière Session",
+            "minutesDuration": "{{count}} minutes de durée",
+            "notesCaptured": "{{count}} notes capturées",
+            "noSessions": "Aucune session enregistrée pour le moment.",
+            "viewAnalysis": "Voir l'analyse"
+        },
+        "settings": {
+            "title": "Configuration Système",
+            "audio": {
+                "title": "Moteur Audio",
+                "buffer": "Taille du Buffer",
+                "sampleRate": "Taux d'échantillonnage",
+                "volume": "Volume Principal",
+                "silence": "Silence",
+                "peak": "Crête",
+                "transpose": "Transposition Globale",
+                "semitones": "Demi-tons",
+                "octMinus": "Oct -",
+                "transposeReset": "Réinitialiser",
+                "octPlus": "Oct +",
+                "autoSustain": "Sustain Auto",
+                "performanceMode": "Mode Performance"
+            },
+            "midi": {
+                "title": "Interface MIDI",
+                "device": "Appareil d'entrée",
+                "status": "Statut du Signal",
+                "active": "ACTIF",
+                "searching": "RECHERCHE...",
+                "channel": "Canal d'entrée",
+                "omni": "Omni",
+                "velocityCurve": "Courbe de Vélocité",
+                "linearHard": "Linéaire (Dur)",
+                "localControl": "Contrôle Local",
+                "off": "Désactivé"
+            },
+            "hardware": {
+                "title": "Autorisation Matérielle",
+                "status": "Statut de liaison",
+                "authorized": "AUTORISÉ",
+                "notAuthorized": "NON_AUTORISÉ",
+                "notSupported": "Accélération matérielle non supportée sur ce nœud."
+            }
+        },
+        "privacy": "Protocole de Confidentialité",
+        "terms": "Conditions d'utilisation",
+        "systemStatus": "Statut Système :",
+        "statusStable": "Stable"
+    },
+    "library": {
+        "confirmDelete": "Voulez-vous vraiment supprimer cet enregistrement ?",
+        "allRecordings": "Tous les enregistrements",
+        "favorites": "Favoris",
+        "proPlan": "Offre Pro",
+        "proDesc": "Débloquez des partitions illimitées et le stockage cloud.",
+        "upgrade": "Améliorer",
+        "title": "Mes Enregistrements",
+        "subtitle": "Gérez et organisez vos sessions de piano personnelles.",
+        "newRecording": "Nouvel Enregistrement",
+        "loading": "Chargement de vos enregistrements...",
+        "signToSee": "Connectez-vous pour voir vos enregistrements sauvegardés.",
+        "noRecordings": "Vous n'avez pas encore d'enregistrements. Allez au Studio pour en créer un !",
+        "untitled": "Enregistrement sans titre",
+        "dateUnknown": "Date inconnue",
+        "deleteTitle": "Supprimer l'enregistrement",
+        "notes": "Notes",
+        "duration": "Dur",
+        "showingCount": "Affichage de {{count}} enregistrements"
+    },
+    "studio": {
+        "controls": "Commandes Studio",
+        "sessionId": "ID SESSION : ",
+        "masterGain": "Gain Principal",
+        "sustain": "Sustain",
+        "transpose": "Transposition",
+        "pianoAccent": "Accent Piano",
+        "default": "Défaut",
+        "custom": "Personnalisé",
+        "engineProfile": "Profil Moteur",
+        "waveform": "FORME D'ONDE",
+        "grandPiano": "PIANO À QUEUE",
+        "authMode": "MODE AUTH",
+        "secure": "SÉCURISÉ",
+        "midiInput": "Entrée MIDI : ",
+        "active": "Active",
+        "waiting": "En attente...",
+        "activeKeys": "Touches Actives",
+        "engineInfo": "Infos Moteur",
+        "metronome": "Métronome",
+        "stopRecording": "Arrêter l'enregistrement",
+        "record": "Enregistrer",
+        "library": "Bibliothèque",
+        "help": "Aide",
+        "units": {
+            "db": "dB",
+            "percent": "%",
+            "st": "st"
+        }
+    },
+    "credits": {
+        "title": "Crédits",
+        "subhead": "Origine du Projet",
+        "concept": {
+            "title": "Concept & Développement",
+            "lead": "Architecte Principal & Dev :",
+            "desc": "Développé avec une passion pour l'ingénierie sonore et les interfaces industrielles minimalistes."
+        },
+        "design": {
+            "title": "Inspiration Design",
+            "desc": "Le design visuel de Pocket Piano tire son inspiration des interfaces techniques de précision, du brutalisme numérique et des équipements de studio vintage."
+        },
+        "tech": {
+            "title": "Stack Technique",
+            "core": "Cœur :",
+            "audio": "Audio :",
+            "infra": "Infrastructure :",
+            "styling": "Styling :",
+            "dev": "Développement :"
+        },
+        "build": "BUILD REV. 2.4.1 / AUDIO_ENGINE_v4"
+    },
+    "legal": {
+        "title": "Mentions Légales & RGPD",
+        "subhead": "Conformité & Données",
+        "mentions": {
+            "title": "1. Mentions Légales",
+            "editor": "Éditeur du site :",
+            "editorDesc": "Pocket Piano est un projet expérimental développé par Audio Industries Ltd.",
+            "director": "Directeur de la publication :",
+            "hosting": "Hébergement :",
+            "hostingDesc": "Le site est hébergé par Firebase (Google Cloud Platform)"
+        },
+        "privacy": {
+            "title": "2. Politique de Confidentialité (RGPD)",
+            "desc": "Conformément au Règlement Général sur la Protection des Données (RGPD), nous vous informons que Pocket Piano collecte des données minimales nécessaires au fonctionnement du service.",
+            "dataCollected": "Données collectées :",
+            "email": "Adresse email (via Google Authentication pour la synchronisation du profil).",
+            "stats": "Statistiques d'utilisation anonymisées (notes jouées, temps de session) pour améliorer l'expérience utilisateur.",
+            "purposes": "Finalités :",
+            "purposesDesc": "Les données sont utilisées exclusivement pour permettre la sauvegarde de vos réglages, de vos enregistrements et l'affichage de vos statistiques personnelles. Aucune donnée n'est cédée à des tiers.",
+            "rights": "Vos droits :",
+            "rightsDesc": "Vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Vous pouvez exercer ces droits en nous contactant à l'adresse email de support indiquée en bas de page."
+        },
+        "intellectual": {
+            "title": "3. Propriété Intellectuelle",
+            "desc": "L'ensemble des éléments constituant ce site (structure, design, logos, sons) est la propriété exclusive de ses créateurs, sauf mention contraire."
+        }
+    }
+}

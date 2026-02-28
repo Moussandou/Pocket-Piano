@@ -4,10 +4,12 @@ import { signInWithPopup, signOut, updateProfile } from 'firebase/auth';
 import { collection, query, where, onSnapshot, Timestamp, doc } from 'firebase/firestore';
 import { useAuth } from '../hooks/useAuth';
 import { useSettings } from '../hooks/useSettings';
+import { useTranslation } from 'react-i18next';
 import type { Recording } from '../domain/models';
 import './Profile.css';
 
 export const Profile: React.FC = () => {
+    const { t } = useTranslation();
     const { user } = useAuth();
     const { settings, updateSetting } = useSettings();
     const [isEditing, setIsEditing] = useState(false);
@@ -148,7 +150,7 @@ export const Profile: React.FC = () => {
                     <div className="profile-info-group">
                         <div className="profile-avatar-wrapper">
                             <img
-                                alt={user?.displayName || "Profile avatar"}
+                                alt={t('profile.avatarAlt', { name: user?.displayName || 'User' })}
                                 className="profile-avatar-img"
                                 src={user?.photoURL || "https://lh3.googleusercontent.com/aida-public/AB6AXuCBiF0_QcQXA0GYX1l-TNPu0JAk1sRMWlQgqQPzrSEFRyTQcWMyY0E77wrSb1rybE2BtKHwJJZIqw0ALG7Kmgi4hKl5mseIE-wHsA72bzwMuSp6o9eZAZtvzWecww__e0prkFSA7e9aatFhLNfqLGkqGQvngUc-lVYFN23H1hlhgl4ok4cF7iFVv7Id6Ri5y_Ai1QReKDLrST_XNu58PNESZp0W6D_jugsKcFcw4nE_yOSJ6TRVsZzuW4p2GJZuZxXe9DXWmOPYa9I"}
                             />
@@ -176,35 +178,35 @@ export const Profile: React.FC = () => {
                                     </div>
                                 ) : (
                                     <h2 className="profile-username" onClick={() => user && setIsEditing(true)}>
-                                        {user?.displayName || "Guest Profile"}
+                                        {user?.displayName || t('profile.guestProfile')}
                                         {user && <span className="material-symbols-outlined text-sm ml-2 cursor-pointer opacity-50 hover:opacity-100">edit_note</span>}
                                     </h2>
                                 )}
                                 <div className="status-indicator">
                                     <span className="status-dot"></span>
-                                    <span className="status-text">{user ? 'Online Now' : 'Offline'}</span>
+                                    <span className="status-text">{user ? t('profile.statusOnline') : t('profile.statusOffline')}</span>
                                 </div>
                             </div>
                             <div className="profile-meta">
-                                <p>Email: <span className="highlight-text">{user?.email || "Not signed in"}</span></p>
-                                <p>Plan: <span className="highlight-primary">Pro Tier</span></p>
+                                <p>{t('profile.emailLabel')} <span className="highlight-text">{user?.email || t('profile.notSignedIn')}</span></p>
+                                <p>{t('profile.planLabel')} <span className="highlight-primary">{t('profile.planValue')}</span></p>
                             </div>
                         </div>
                     </div>
                     <div className="profile-actions">
                         <button className="btn-config">
                             <span className="material-symbols-outlined text-lg">settings</span>
-                            Config
+                            {t('profile.config')}
                         </button>
                         {user ? (
                             <button className="btn-export" onClick={handleLogout}>
                                 <span className="material-symbols-outlined text-lg">logout</span>
-                                Sign Out
+                                {t('profile.signOut')}
                             </button>
                         ) : (
                             <button className="btn-export" onClick={handleLogin}>
                                 <span className="material-symbols-outlined text-lg">login</span>
-                                Sign In
+                                {t('profile.signIn')}
                             </button>
                         )}
                     </div>
@@ -217,14 +219,14 @@ export const Profile: React.FC = () => {
                         {/* Technical Preferences */}
                         <div className="tech-preferences-box">
                             <div className="box-header">
-                                <h3 className="box-title">Audio Engine</h3>
+                                <h3 className="box-title">{t('profile.settings.audio.title')}</h3>
                                 <span className="material-symbols-outlined">tune</span>
                             </div>
                             <div className="box-content space-y-wide">
                                 <div className="setting-group">
                                     <div className="setting-label-row">
-                                        <label>Master Volume</label>
-                                        <span>{settings.volume} dB</span>
+                                        <label>{t('profile.settings.audio.volume')}</label>
+                                        <span>{settings.volume} {t('common.units.db')}</span>
                                     </div>
                                     <input
                                         type="range"
@@ -235,33 +237,33 @@ export const Profile: React.FC = () => {
                                         className="profile-slider"
                                     />
                                     <div className="slider-labels">
-                                        <span>Silence</span>
-                                        <span>Peak</span>
+                                        <span>{t('profile.settings.audio.silence')}</span>
+                                        <span>{t('profile.settings.audio.peak')}</span>
                                     </div>
                                 </div>
                                 <div className="setting-group">
                                     <div className="setting-label-row">
-                                        <label>Global Transpose</label>
-                                        <span>{settings.transpose > 0 ? `+${settings.transpose}` : settings.transpose} Semitones</span>
+                                        <label>{t('profile.settings.audio.transpose')}</label>
+                                        <span>{settings.transpose > 0 ? `+${settings.transpose}` : settings.transpose} {t('common.units.st')}</span>
                                     </div>
                                     <div className="toggle-group-3">
                                         <button
                                             className={`btn-toggle ${settings.transpose === -12 ? 'active' : ''}`}
                                             onClick={() => updateSetting('transpose', -12)}
-                                        >Oct -</button>
+                                        >{t('profile.settings.audio.octMinus')}</button>
                                         <button
                                             className={`btn-toggle ${settings.transpose === 0 ? 'active' : ''}`}
                                             onClick={() => updateSetting('transpose', 0)}
-                                        >Reset</button>
+                                        >{t('profile.settings.audio.transposeReset')}</button>
                                         <button
                                             className={`btn-toggle ${settings.transpose === 12 ? 'active' : ''}`}
                                             onClick={() => updateSetting('transpose', 12)}
-                                        >Oct +</button>
+                                        >{t('profile.settings.audio.octPlus')}</button>
                                     </div>
                                 </div>
                                 <div className="setting-group pt-2">
                                     <div className="switch-row">
-                                        <span className="switch-label">Auto-Sustain</span>
+                                        <span className="switch-label">{t('profile.settings.audio.autoSustain')}</span>
                                         <div
                                             className={`switch-track ${settings.sustain > 0 ? 'active' : ''}`}
                                             onClick={() => updateSetting('sustain', settings.sustain > 0 ? 0 : 1)}
@@ -270,7 +272,7 @@ export const Profile: React.FC = () => {
                                         </div>
                                     </div>
                                     <div className="switch-row">
-                                        <span className="switch-label">Performance Mode</span>
+                                        <span className="switch-label">{t('profile.settings.audio.performanceMode')}</span>
                                         <div className="switch-track active">
                                             <div className="switch-thumb"></div>
                                         </div>
@@ -282,28 +284,28 @@ export const Profile: React.FC = () => {
                         {/* Account Settings / MIDI Mapping */}
                         <div className="tech-preferences-box">
                             <div className="box-header">
-                                <h3 className="box-title">MIDI Mapping</h3>
+                                <h3 className="box-title">{t('profile.settings.midi.title')}</h3>
                                 <span className="material-symbols-outlined">cable</span>
                             </div>
                             <div className="box-content space-y-loose">
                                 <div className="dropdown-row">
                                     <div className="dropdown-info">
-                                        <span className="dropdown-label">Input Channel</span>
-                                        <span className="dropdown-val">Omni</span>
+                                        <span className="dropdown-label">{t('profile.settings.midi.channel')}</span>
+                                        <span className="dropdown-val">{t('profile.settings.midi.omni')}</span>
                                     </div>
                                     <span className="material-symbols-outlined text-gray">arrow_drop_down</span>
                                 </div>
                                 <div className="dropdown-row">
                                     <div className="dropdown-info">
-                                        <span className="dropdown-label">Velocity Curve</span>
-                                        <span className="dropdown-val">Linear (Hard)</span>
+                                        <span className="dropdown-label">{t('profile.settings.midi.velocityCurve')}</span>
+                                        <span className="dropdown-val">{t('profile.settings.midi.linearHard')}</span>
                                     </div>
                                     <span className="material-symbols-outlined text-gray">arrow_drop_down</span>
                                 </div>
                                 <div className="dropdown-row no-border">
                                     <div className="dropdown-info">
-                                        <span className="dropdown-label">Local Control</span>
-                                        <span className="dropdown-val">Off</span>
+                                        <span className="dropdown-label">{t('profile.settings.midi.localControl')}</span>
+                                        <span className="dropdown-val">{t('profile.settings.midi.off')}</span>
                                     </div>
                                     <div className="checkbox-empty"></div>
                                 </div>
@@ -312,7 +314,7 @@ export const Profile: React.FC = () => {
 
                         {/* Hardware List */}
                         <div className="hardware-list-section">
-                            <h3 className="hardware-title">Authorized Hardware</h3>
+                            <h3 className="hardware-title">{t('profile.settings.hardware.title')}</h3>
                             <div className="hardware-items">
                                 <div className="hardware-item active">
                                     <div className="hard-icon"><span className="material-symbols-outlined">piano</span></div>
@@ -339,26 +341,26 @@ export const Profile: React.FC = () => {
                         {/* Main Stats Row */}
                         <div className="stats-grid">
                             <div className="stat-card">
-                                <span className="stat-label">Total Playtime</span>
+                                <span className="stat-label">{t('profile.stats.playtime')}</span>
                                 <div className="stat-val-group">
-                                    <span className="stat-val">{hours}<span className="stat-unit">h</span></span>
-                                    <span className="stat-val">{minutes}<span className="stat-unit">m</span></span>
+                                    <span className="stat-val">{hours}<span className="stat-unit">{t('common.units.hours')}</span></span>
+                                    <span className="stat-val">{minutes}<span className="stat-unit">{t('common.units.minutes')}</span></span>
                                 </div>
                             </div>
                             <div className="stat-card">
-                                <span className="stat-label">Lifetime Notes</span>
+                                <span className="stat-label">{t('profile.stats.recordings')}</span>
                                 <span className="stat-val">{formatNotes(totalDisplayNotes)}</span>
                             </div>
                             <div className="stat-card">
-                                <span className="stat-label">Skill Level</span>
+                                <span className="stat-label">{t('profile.stats.skillLevel')}</span>
                                 <div className="stat-val-group">
                                     <span className="stat-val primary-color">
-                                        {totalDisplaySessions > 50 ? 'PRO' : totalDisplaySessions > 10 ? 'MID' : 'NEW'}
+                                        {totalDisplaySessions > 50 ? t('profile.stats.skillPro') : totalDisplaySessions > 10 ? t('profile.stats.skillMid') : t('profile.stats.skillNew')}
                                     </span>
                                 </div>
                             </div>
                             <div className="stat-card">
-                                <span className="stat-label">Sessions</span>
+                                <span className="stat-label">{t('profile.stats.sessions')}</span>
                                 <span className="stat-val">{totalDisplaySessions}</span>
                             </div>
                         </div>
@@ -366,11 +368,11 @@ export const Profile: React.FC = () => {
                         {/* Chart Section */}
                         <div className="chart-box">
                             <div className="chart-header">
-                                <h3 className="box-title text-2xl">Performance Analytics</h3>
+                                <h3 className="box-title text-2xl">{t('profile.stats.performanceAnalytics')}</h3>
                                 <div className="chart-tabs">
-                                    <button className="tab-active">Weekly</button>
-                                    <button className="tab-inactive">Monthly</button>
-                                    <button className="tab-inactive">Yearly</button>
+                                    <button className="tab-active">{t('profile.stats.weekly')}</button>
+                                    <button className="tab-inactive">{t('profile.stats.monthly')}</button>
+                                    <button className="tab-inactive">{t('profile.stats.yearly')}</button>
                                 </div>
                             </div>
                             <div className="chart-area">
@@ -386,36 +388,38 @@ export const Profile: React.FC = () => {
                                 <div className="chart-bars">
                                     <div className="bar-wrapper" style={{ height: '30%' }}>
                                         <div className="bar default"></div>
-                                        <div className="tooltip">1.2h</div>
+                                        <div className="tooltip">1.2{t('common.units.hours')}</div>
                                     </div>
                                     <div className="bar-wrapper" style={{ height: '45%' }}>
                                         <div className="bar default"></div>
-                                        <div className="tooltip">2.1h</div>
+                                        <div className="tooltip">2.1{t('common.units.hours')}</div>
                                     </div>
                                     <div className="bar-wrapper" style={{ height: '80%' }}>
                                         <div className="bar primary"></div>
-                                        <div className="tooltip visible">4.5h</div>
+                                        <div className="tooltip visible">4.5{t('common.units.hours')}</div>
                                     </div>
                                     <div className="bar-wrapper" style={{ height: '25%' }}>
                                         <div className="bar default"></div>
-                                        <div className="tooltip">0.8h</div>
+                                        <div className="tooltip">0.8{t('common.units.hours')}</div>
                                     </div>
                                     <div className="bar-wrapper" style={{ height: '55%' }}>
                                         <div className="bar default"></div>
-                                        <div className="tooltip">2.8h</div>
+                                        <div className="tooltip">2.8{t('common.units.hours')}</div>
                                     </div>
                                     <div className="bar-wrapper" style={{ height: '90%' }}>
                                         <div className="bar default"></div>
-                                        <div className="tooltip">5.2h</div>
+                                        <div className="tooltip">5.2{t('common.units.hours')}</div>
                                     </div>
                                     <div className="bar-wrapper" style={{ height: '20%' }}>
                                         <div className="bar default"></div>
-                                        <div className="tooltip">0.5h</div>
+                                        <div className="tooltip">0.5{t('common.units.hours')}</div>
                                     </div>
                                 </div>
                             </div>
                             <div className="chart-labels">
-                                <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+                                {(t('common.daysShort', { returnObjects: true }) as string[]).map((day, i) => (
+                                    <span key={i}>{day}</span>
+                                ))}
                             </div>
                         </div>
 
@@ -423,10 +427,10 @@ export const Profile: React.FC = () => {
                         <div className="bottom-stats-grid">
                             <div className="velocity-box">
                                 <div className="velocity-header">
-                                    <h4 className="box-title">Dynamic Range</h4>
+                                    <h4 className="box-title">{t('profile.stats.dynamicRange')}</h4>
                                     <div className="velocity-score">
                                         <span className="score-val">{(totalDisplayAvgVelocity * 100).toFixed(0)}</span>
-                                        <span className="score-unit">avg</span>
+                                        <span className="score-unit">{t('profile.stats.avg')}</span>
                                     </div>
                                 </div>
                                 <div className="velocity-bars-container">
@@ -443,7 +447,7 @@ export const Profile: React.FC = () => {
                             </div>
 
                             <div className="session-box">
-                                <h4 className="box-title mb-4">Last Session</h4>
+                                <h4 className="box-title mb-4">{t('profile.stats.lastSession')}</h4>
                                 <div className="session-content">
                                     {stats.lastSession ? (
                                         <>
@@ -455,10 +459,10 @@ export const Profile: React.FC = () => {
                                                             stats.lastSession.timestamp instanceof Timestamp
                                                                 ? stats.lastSession.timestamp.toDate().toLocaleDateString()
                                                                 : new Date(stats.lastSession.timestamp).toLocaleDateString()
-                                                        ) : 'Date Unknown'}
+                                                        ) : t('library.dateUnknown')}
                                                     </p>
                                                     <p className="session-detail">
-                                                        {((stats.lastSession.duration || 0) / 1000 / 60).toFixed(1)} minutes duration
+                                                        {t('profile.stats.minutesDuration', { count: parseFloat(((stats.lastSession.duration || 0) / 1000 / 60).toFixed(1)) })}
                                                     </p>
                                                 </div>
                                             </div>
@@ -466,16 +470,16 @@ export const Profile: React.FC = () => {
                                                 <span className="material-symbols-outlined text-primary">music_note</span>
                                                 <div>
                                                     <p className="session-name">{stats.lastSession.name}</p>
-                                                    <p className="session-detail">{(stats.lastSession.notes || []).length} notes captured</p>
+                                                    <p className="session-detail">{t('profile.stats.notesCaptured', { count: (stats.lastSession.notes || []).length })}</p>
                                                 </div>
                                             </div>
                                         </>
                                     ) : (
-                                        <p className="text-gray italic">No sessions recorded yet.</p>
+                                        <p className="text-gray italic">{t('profile.stats.noSessions')}</p>
                                     )}
                                     <div className="session-link-wrapper">
                                         <button className="link-view-analysis">
-                                            View Analysis
+                                            {t('profile.stats.viewAnalysis')}
                                             <span className="material-symbols-outlined text-sm icon-arrow">arrow_forward</span>
                                         </button>
                                     </div>
@@ -487,14 +491,14 @@ export const Profile: React.FC = () => {
 
                 {/* Footer */}
                 <footer className="profile-footer">
-                    <p>© 2023 Pocket Piano Inc. Systems v2.4.1</p>
+                    <p>{t('footer.copyright')} Systems v2.4.1</p>
                     <div className="footer-links">
-                        <button>Privacy Protocol</button>
-                        <button>Terms of Service</button>
-                        <button>System Status: <span className="text-green-600">Stable</span></button>
+                        <button>{t('profile.privacy')}</button>
+                        <button>{t('profile.terms')}</button>
+                        <button>{t('profile.systemStatus')} <span className="text-green-600">{t('profile.statusStable')}</span></button>
                     </div>
                 </footer>
-            </main>
-        </div>
+            </main >
+        </div >
     );
 };

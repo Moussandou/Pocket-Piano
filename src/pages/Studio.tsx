@@ -4,11 +4,13 @@ import { audioEngine } from '../engine/audio';
 import { useRecorder } from '../hooks/useRecorder';
 import { useSettings } from '../hooks/useSettings';
 import { useAnalytics } from '../hooks/useAnalytics';
+import { useTranslation } from 'react-i18next';
 
 import { RecordingGallery } from '../components/Gallery/RecordingGallery';
 import { SaveRecordingModal } from '../components/Modals/SaveRecordingModal';
 
 export const Studio: React.FC = () => {
+    const { t } = useTranslation();
     const [isLoaded, setIsLoaded] = useState(false);
     const { settings, updateSetting } = useSettings();
     const { isRecording, startRecording, stopRecording, saveRecording, discardRecording, recordNote } = useRecorder();
@@ -66,10 +68,10 @@ export const Studio: React.FC = () => {
             <aside className="sidebar-left">
                 <div className="sidebar-header">
                     <div className="sidebar-title">
-                        <h2>Studio Controls</h2>
+                        <h2>{t('studio.controls')}</h2>
                         <div className="pulse-dot"></div>
                     </div>
-                    <p className="session-id">SESSION ID: 8X-992A</p>
+                    <p className="session-id">{t('studio.sessionId')} 8X-992A</p>
                 </div>
 
                 <div className="sidebar-content custom-scrollbar">
@@ -80,9 +82,9 @@ export const Studio: React.FC = () => {
                             <div className="slider-header">
                                 <label className="slider-label">
                                     <span className="material-symbols-outlined">volume_up</span>
-                                    Master Gain
+                                    {t('studio.masterGain')}
                                 </label>
-                                <span className="slider-value">{settings.volume} dB</span>
+                                <span className="slider-value">{settings.volume} {t('studio.units.db')}</span>
                             </div>
                             <div className="slider-wrapper">
                                 <div className="slider-fill" style={{ width: `${((settings.volume + 60) / 60) * 100}%` }}></div>
@@ -95,9 +97,9 @@ export const Studio: React.FC = () => {
                             <div className="slider-header">
                                 <label className="slider-label">
                                     <span className="material-symbols-outlined">graphic_eq</span>
-                                    Sustain
+                                    {t('studio.sustain')}
                                 </label>
-                                <span className="slider-value">{Math.round(settings.sustain * 10)}%</span>
+                                <span className="slider-value">{Math.round(settings.sustain * 10)}{t('studio.units.percent')}</span>
                             </div>
                             <div className="slider-wrapper">
                                 <div className="slider-fill" style={{ width: `${(settings.sustain / 10) * 100}%` }}></div>
@@ -110,9 +112,9 @@ export const Studio: React.FC = () => {
                             <div className="slider-header">
                                 <label className="slider-label">
                                     <span className="material-symbols-outlined">music_note</span>
-                                    Transpose
+                                    {t('studio.transpose')}
                                 </label>
-                                <span className="slider-value">{settings.transpose > 0 ? `+${settings.transpose}` : settings.transpose} st</span>
+                                <span className="slider-value">{settings.transpose > 0 ? `+${settings.transpose}` : settings.transpose} {t('studio.units.st')}</span>
                             </div>
                             <div className="transpose-stitch">
                                 <button onClick={() => updateSetting('transpose', settings.transpose - 1)}>-</button>
@@ -130,10 +132,10 @@ export const Studio: React.FC = () => {
                         <div className="slider-header" style={{ marginBottom: '1rem' }}>
                             <label className="slider-label">
                                 <span className="material-symbols-outlined">palette</span>
-                                Piano Accent
+                                {t('studio.pianoAccent')}
                             </label>
                             <span className="slider-value" style={{ textTransform: 'uppercase' }}>
-                                {settings.pianoColor === '#0d59f2' ? 'Default' : 'Custom'}
+                                {settings.pianoColor === '#0d59f2' ? t('studio.default') : t('studio.custom')}
                             </span>
                         </div>
                         <div className="color-presets-studio">
@@ -155,16 +157,16 @@ export const Studio: React.FC = () => {
                         <div className="slider-header" style={{ marginBottom: '0.5rem' }}>
                             <label className="slider-label">
                                 <span className="material-symbols-outlined">waves</span>
-                                Engine Profile
+                                {t('studio.engineProfile')}
                             </label>
                         </div>
                         <div className="engine-status-row">
-                            <div className="engine-label">WAVEFORM</div>
-                            <div className="engine-value">GRAND PIANO</div>
+                            <div className="engine-label">{t('studio.waveform')}</div>
+                            <div className="engine-value">{t('studio.grandPiano')}</div>
                         </div>
                         <div className="engine-status-row">
-                            <div className="engine-label">AUTH MODE</div>
-                            <div className="engine-value">SECURE</div>
+                            <div className="engine-label">{t('studio.authMode')}</div>
+                            <div className="engine-value">{t('studio.secure')}</div>
                         </div>
                     </div>
                 </div>
@@ -172,7 +174,7 @@ export const Studio: React.FC = () => {
                 <div className="sidebar-footer">
                     <div className="midi-status">
                         <div className="status-dot"></div>
-                        <span>MIDI Input: {isLoaded ? 'Active' : 'Waiting...'}</span>
+                        <span>{t('studio.midiInput')} {isLoaded ? t('studio.active') : t('studio.waiting')}</span>
                     </div>
                 </div>
             </aside>
@@ -190,12 +192,12 @@ export const Studio: React.FC = () => {
                     </div>
 
                     <div className="stage-status-left">
-                        <span className="status-label">Active Keys</span>
+                        <span className="status-label">{t('studio.activeKeys')}</span>
                         <span className="status-value-large">{activeKeys.length > 0 ? activeKeys.length : '0'}</span>
                     </div>
 
                     <div className="stage-status-right">
-                        <span className="status-label">Engine Info</span>
+                        <span className="status-label">{t('studio.engineInfo')}</span>
                         <span className="status-value-med">v2.0 PRO</span>
                     </div>
                 </div>
@@ -208,7 +210,7 @@ export const Studio: React.FC = () => {
             {/* Right Sidebar: Tools */}
             <aside className="sidebar-right">
                 <div className="tool-group">
-                    <button className="btn-tool" title="Metronome">
+                    <button className="btn-tool" title={t('studio.metronome')}>
                         <span className="material-symbols-outlined">timer</span>
                     </button>
 
@@ -216,7 +218,7 @@ export const Studio: React.FC = () => {
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
                         <button
                             className={`btn-tool ${isRecording ? 'is-recording' : ''}`}
-                            title={isRecording ? "Stop Recording" : "Record"}
+                            title={isRecording ? t('studio.stopRecording') : t('studio.record')}
                             onClick={isRecording ? () => {
                                 stopRecording();
                                 setIsSaveModalOpen(true);
@@ -233,13 +235,13 @@ export const Studio: React.FC = () => {
                         )}
                     </div>
 
-                    <button className={`btn-tool ${showGallery ? 'active' : ''}`} title="Library" onClick={() => setShowGallery(!showGallery)}>
+                    <button className={`btn-tool ${showGallery ? 'active' : ''}`} title={t('studio.library')} onClick={() => setShowGallery(!showGallery)}>
                         <span className="material-symbols-outlined">library_music</span>
                     </button>
                 </div>
 
                 <div className="tool-group bottom">
-                    <button className="btn-tool" title="Help">
+                    <button className="btn-tool" title={t('studio.help')}>
                         <span className="material-symbols-outlined">help</span>
                     </button>
                 </div>

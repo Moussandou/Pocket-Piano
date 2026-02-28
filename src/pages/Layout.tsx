@@ -3,11 +3,18 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Github, Instagram, Linkedin } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { AuthManager } from '../infra/AuthManager';
+import { useTranslation } from 'react-i18next';
 
 export const Layout: React.FC = () => {
     const { user } = useAuth();
     const menuRef = useRef<HTMLElement>(null);
     const location = useLocation();
+    const { t, i18n } = useTranslation();
+
+    const toggleLanguage = () => {
+        const nextLang = i18n.language.startsWith('fr') ? 'en' : 'fr';
+        i18n.changeLanguage(nextLang);
+    };
 
 
 
@@ -34,23 +41,30 @@ export const Layout: React.FC = () => {
                         {/* Navigation links - conditional on auth */}
                         {user ? (
                             <>
-                                <Link to="/library" className={location.pathname === '/library' ? 'active' : ''}>Library</Link>
-                                <Link to="/profile" className={location.pathname === '/profile' ? 'active' : ''}>Profile</Link>
+                                <Link to="/library" className={location.pathname === '/library' ? 'active' : ''}>{t('nav.library')}</Link>
+                                <Link to="/profile" className={location.pathname === '/profile' ? 'active' : ''}>{t('nav.profile')}</Link>
                             </>
                         ) : !isLandingPage && (
-                            <Link to="/">Landing</Link>
+                            <Link to="/">{t('nav.landing')}</Link>
                         )}
 
-                        {isLandingPage && <Link to="/app">Studio</Link>}
+                        {isLandingPage && <Link to="/app">{t('nav.studio')}</Link>}
                     </div>
 
                     <div className="nav-divider"></div>
 
                     <div className="header-actions">
+                        <button
+                            onClick={toggleLanguage}
+                            className="btn-icon"
+                            style={{ background: 'transparent', border: '1px solid var(--border)', padding: '0.4rem 0.8rem', borderRadius: '4px', cursor: 'pointer', color: 'var(--text-secondary)' }}
+                        >
+                            {i18n.language.startsWith('fr') ? 'EN' : 'FR'}
+                        </button>
                         {!isStudioPage && (
                             <Link to="/app" className="btn-midi" style={{ textDecoration: 'none' }}>
                                 <span className="material-symbols-outlined text-sm">play_arrow</span>
-                                <span className="text">Play Now</span>
+                                <span className="text">{t('nav.playNow')}</span>
                             </Link>
                         )}
                         <AuthManager />
@@ -74,26 +88,26 @@ export const Layout: React.FC = () => {
                         <div className="footer-brand">
                             <h5>Pocket Piano</h5>
                             <p>
-                                © 2024 Audio Industries Ltd.<br />
-                                All systems nominal.
+                                {t('footer.copyright')}<br />
+                                {t('footer.brandText')}
                             </p>
                         </div>
                         <div className="footer-links">
                             <Link to="/legal" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                 <span className="material-symbols-outlined text-sm">gavel</span>
-                                Mentions Légales & RGPD
+                                {t('footer.legal')}
                             </Link>
                             <Link to="/credits" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                 <span className="material-symbols-outlined text-sm">groups</span>
-                                Credits
+                                {t('footer.credits')}
                             </Link>
                             <a href="https://moussandou.github.io/Portfolio/" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                 <span className="material-symbols-outlined text-sm">person</span>
-                                Portfolio
+                                {t('footer.portfolio')}
                             </a>
                             <a href="https://ko-fi.com/moussandou" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                 <span className="material-symbols-outlined text-sm">volunteer_activism</span>
-                                Ko-fi
+                                {t('footer.kofi')}
                             </a>
                         </div>
                         <div className="footer-social">

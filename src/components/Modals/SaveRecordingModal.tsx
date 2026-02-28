@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { auth } from '../../infra/firebase';
 import { LogIn } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface SaveRecordingModalProps {
     isOpen: boolean;
@@ -16,7 +17,8 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
     onSave,
     onDiscard
 }) => {
-    const [recordingName, setRecordingName] = useState('Mon Morceau');
+    const { t } = useTranslation();
+    const [recordingName, setRecordingName] = useState(t('recording.defaultName'));
     const isAuthenticated = !!auth.currentUser;
     const navigate = useNavigate();
     const location = useLocation();
@@ -26,14 +28,14 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
     const handleSave = () => {
         if (recordingName.trim()) {
             onSave(recordingName.trim());
-            setRecordingName('Mon Morceau'); // Reset for next time
+            setRecordingName(t('recording.defaultName')); // Reset for next time
             onClose();
         }
     };
 
     const handleDiscard = () => {
         onDiscard();
-        setRecordingName('Mon Morceau');
+        setRecordingName(t('recording.defaultName'));
         onClose();
     };
 
@@ -45,7 +47,7 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
         <div className="gallery-overlay" style={{ zIndex: 1000 }}>
             <div className="gallery-modal" style={{ maxWidth: '400px', height: 'auto', padding: '2rem' }}>
                 <div style={{ marginBottom: '1.5rem' }}>
-                    <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: 'var(--text-dark)' }}>Sauvegarder l'enregistrement</h2>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: 'var(--text-dark)' }}>{t('recording.saveTitle')}</h2>
 
                     {!isAuthenticated && (
                         <div style={{
@@ -56,8 +58,8 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
                             marginBottom: '1.5rem',
                             fontSize: '0.875rem'
                         }}>
-                            <p style={{ margin: 0, fontWeight: 500 }}>Non connecté(e)</p>
-                            <p style={{ margin: '0.25rem 0 0 0' }}>Cet enregistrement sera téléchargé sur votre appareil. Connectez-vous pour le sauvegarder dans le cloud et le retrouver sur tous vos appareils.</p>
+                            <p style={{ margin: 0, fontWeight: 500 }}>{t('recording.notConnected')}</p>
+                            <p style={{ margin: '0.25rem 0 0 0' }}>{t('recording.cloudNotice')}</p>
                             <button
                                 onClick={handleLogin}
                                 style={{
@@ -81,21 +83,21 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
                                 onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}
                             >
                                 <LogIn size={16} />
-                                Se connecter avec Google
+                                {t('recording.loginButton')}
                             </button>
                         </div>
                     )}
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         <label htmlFor="recording-name" style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-dark)' }}>
-                            Nom du morceau
+                            {t('recording.nameLabel')}
                         </label>
                         <input
                             id="recording-name"
                             type="text"
                             value={recordingName}
                             onChange={(e) => setRecordingName(e.target.value)}
-                            placeholder="Entrez le nom du morceau..."
+                            placeholder={t('recording.namePlaceholder')}
                             autoFocus
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') handleSave();
@@ -126,7 +128,7 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
                             cursor: 'pointer'
                         }}
                     >
-                        Annuler
+                        {t('recording.cancel')}
                     </button>
                     <button
                         onClick={handleSave}
@@ -142,7 +144,7 @@ export const SaveRecordingModal: React.FC<SaveRecordingModalProps> = ({
                             opacity: !recordingName.trim() ? 0.5 : 1
                         }}
                     >
-                        Sauvegarder
+                        {t('recording.save')}
                     </button>
                 </div>
             </div>
