@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pocket Piano Library and Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#0d59f2",
+                        "primary-dark": "#0b4bc9",
+                        "background-light": "#fdfdfe",
+                        "background-dark": "#101622",
+                        "surface-light": "#ffffff",
+                        "border-light": "#d1d5db","text-main": "#0d121c",
+                        "text-sub": "#5a6e8f",
+                    },
+                    fontFamily: {
+                        display: ["Space Grotesk", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "1px",
+                        lg: "2px",
+                        xl: "4px",
+                        full: "9999px",
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: "Space Grotesk", sans-serif;background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+                background-repeat: repeat;
+                background-size: 150px 150px;
+                background-attachment: fixed;
+                opacity: 0.99;}
+            body::before {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: #fdfdfe;
+                z-index: -1;
+            }
+        }::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-left: 1px solid #d1d5db;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border: 2px solid #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        .crisp-border {
+            box-shadow: 0 0 0 1px #d1d5db;
+        }
+        .active-border {
+            box-shadow: 0 0 0 2px #0d59f2;
+        }
+    </style>
+</head>
+<body class="text-text-main antialiased min-h-screen flex flex-col">
+<header class="sticky top-0 z-50 w-full border-b border-border-light bg-background-light/90 backdrop-blur-md">
+<div class="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
+<div class="flex items-center gap-12">
+<a class="flex items-center gap-3 group" href="#">
+<div class="size-6 text-text-main group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">piano</span>
+</div>
+<span class="text-lg font-bold tracking-tight uppercase">Pocket Piano</span>
+</a>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-bold text-text-main border-b-2 border-primary py-5" href="#">Library</a>
+<a class="text-sm font-bold text-text-sub hover:text-text-main transition-colors py-5 border-b-2 border-transparent" href="#">Studio</a>
+<a class="text-sm font-bold text-text-sub hover:text-text-main transition-colors py-5 border-b-2 border-transparent" href="#">Plugins</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden sm:flex items-center h-10 bg-white border border-border-light rounded-sm px-3 w-64 focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
+<span class="material-symbols-outlined text-text-sub text-[18px]">search</span>
+<input class="w-full bg-transparent border-none text-sm focus:ring-0 placeholder:text-text-sub/50 p-0 pl-2" placeholder="Search patches..." type="text"/>
+</div>
+<button class="size-10 flex items-center justify-center rounded-sm border border-border-light hover:bg-border-light/10 transition-colors text-text-main">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+<button class="h-10 px-5 flex items-center gap-2 rounded-sm bg-text-main text-white hover:bg-black transition-colors text-sm font-bold">
+<span class="material-symbols-outlined text-[18px]">account_circle</span>
+<span>SIGN IN</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-1 w-full max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 px-6 py-12">
+<aside class="lg:col-span-3 lg:sticky lg:top-24 h-fit space-y-12">
+<section>
+<h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-text-sub mb-6">User Identity</h3>
+<div class="bg-white border border-border-light p-8 rounded-sm flex flex-col gap-5">
+<div class="size-20 bg-background-light border border-border-light rounded-full flex items-center justify-center mx-auto relative overflow-hidden">
+<div class="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/pinstriped-suit.png')]"></div>
+<span class="material-symbols-outlined text-text-sub text-[36px] filled relative z-10">person</span>
+</div>
+<div class="text-center">
+<p class="text-sm font-bold uppercase tracking-wide">Guest User</p>
+<p class="text-xs text-text-sub mt-2 leading-relaxed">Sign in to sync your library across devices.</p>
+</div>
+<button class="w-full h-11 flex items-center justify-center gap-3 bg-white border-2 border-border-light hover:border-text-main transition-all rounded-sm text-text-main text-xs font-bold uppercase tracking-wider mt-2">
+<img alt="Google G Logo" class="w-4 h-4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBNRPflHhat-63AYzpPp4ZlCCil-dTxahlEV9b8gGYG0BPIUg01i5bGjKDwUHACFhrZ-r7gTlrYxfrWM9SKHlMQSlbQRiPaay69LyrQGsEfIvoXj3KSwY8ywfi1ZpqGG9TZD5mYgzys9mYUhOq_ijzyQYKNpnV6l6YfPrNxLTz9CHtzKw0QiOY-PukqXqSMZ_2a7QJ5JAUmyXINDtB3tYMK4I3bu-KF_IMYnjYoHXt_m3R3fsjNMoFIuD2jeuaBdwVJs0i3w3C-r4"/>
+<span>Continue with Google</span>
+</button>
+</div>
+</section>
+<section>
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-text-sub">Interface Material</h3>
+<span class="text-[10px] text-text-sub font-mono bg-white border border-border-light px-1.5 py-0.5 rounded-sm">V.2.0</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<button class="group relative aspect-square bg-[#F5F5F7] border-2 border-primary rounded-sm overflow-hidden flex flex-col justify-end p-4 transition-all active-border">
+<div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/brushed-alum.png')]"></div>
+<span class="relative z-10 text-[10px] font-black uppercase tracking-widest text-text-main">Brushed<br/>Aluminum</span>
+<div class="absolute top-3 right-3 size-2 rounded-full bg-primary"></div>
+</button>
+<button class="group relative aspect-square bg-[#1a1a1a] border border-border-light hover:border-text-main rounded-sm overflow-hidden flex flex-col justify-end p-4 transition-all">
+<div class="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+<span class="relative z-10 text-[10px] font-black uppercase tracking-widest text-white">Carbon<br/>Matte</span>
+</button>
+<button class="group relative aspect-square bg-[#e2e8f0] border border-border-light hover:border-text-main rounded-sm overflow-hidden flex flex-col justify-end p-4 transition-all">
+<div class="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/white-diamond.png')]"></div>
+<span class="relative z-10 text-[10px] font-black uppercase tracking-widest text-text-main">Ceramic<br/>White</span>
+</button>
+<button class="group relative aspect-square bg-[#475569] border border-border-light hover:border-text-main rounded-sm overflow-hidden flex flex-col justify-end p-4 transition-all">
+<span class="relative z-10 text-[10px] font-black uppercase tracking-widest text-white">Slate<br/>Grey</span>
+</button>
+</div>
+<div class="mt-10 space-y-4">
+<h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-text-sub">Accent Color</h3>
+<div class="flex flex-wrap gap-4">
+<button class="size-8 rounded-full bg-primary ring-2 ring-offset-4 ring-primary"></button>
+<button class="size-8 rounded-full bg-emerald-500 border border-border-light hover:scale-105 transition-transform"></button>
+<button class="size-8 rounded-full bg-orange-500 border border-border-light hover:scale-105 transition-transform"></button>
+<button class="size-8 rounded-full bg-violet-500 border border-border-light hover:scale-105 transition-transform"></button>
+<button class="size-8 rounded-full bg-slate-900 border border-border-light hover:scale-105 transition-transform"></button>
+</div>
+</div>
+</section>
+</aside>
+<section class="lg:col-span-9">
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12 border-b-2 border-text-main pb-8">
+<div>
+<h1 class="text-5xl font-black text-text-main tracking-tighter mb-4">RECORDINGS</h1>
+<p class="text-text-sub text-sm font-medium max-w-lg leading-relaxed uppercase tracking-wider">Access your saved improvisations and patch configurations. All waveforms are generated in real-time.</p>
+</div>
+<div class="flex items-center gap-4 bg-white px-4 py-2 border border-border-light rounded-sm">
+<span class="text-[10px] font-black text-text-sub uppercase tracking-widest">SORT BY:</span>
+<select class="bg-transparent border-none text-xs font-black uppercase text-text-main focus:ring-0 p-0 pr-8 cursor-pointer tracking-widest">
+<option>Date Created (Newest)</option>
+<option>Duration</option>
+<option>Name</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+<article class="group bg-white border border-border-light rounded-sm hover:border-text-main transition-all duration-300 flex flex-col h-full relative">
+<div class="relative w-full aspect-[16/10] bg-background-light border-b border-border-light overflow-hidden p-8 flex items-center justify-center">
+<div class="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')]"></div>
+<div class="w-full h-20 flex items-end gap-[3px] justify-center opacity-40 group-hover:opacity-100 transition-opacity relative z-10">
+<div class="w-1.5 bg-text-main h-[40%]"></div>
+<div class="w-1.5 bg-text-main h-[70%]"></div>
+<div class="w-1.5 bg-text-main h-[50%]"></div>
+<div class="w-1.5 bg-text-main h-[90%]"></div>
+<div class="w-1.5 bg-text-main h-[60%]"></div>
+<div class="w-1.5 bg-text-main h-[30%]"></div>
+<div class="w-1.5 bg-text-main h-[50%]"></div>
+<div class="w-1.5 bg-text-main h-[80%]"></div>
+<div class="w-1.5 bg-text-main h-[40%]"></div>
+<div class="w-1.5 bg-text-main h-[20%]"></div>
+</div>
+<button class="absolute inset-0 flex items-center justify-center bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+<div class="size-14 border-2 border-text-main bg-white text-text-main flex items-center justify-center transform scale-90 group-hover:scale-100 transition-transform">
+<span class="material-symbols-outlined text-[32px] filled">play_arrow</span>
+</div>
+</button>
+</div>
+<div class="p-6 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-bold text-base text-text-main uppercase tracking-tight">Opus 23 - Night Sketch</h3>
+<button class="text-text-sub hover:text-text-main">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+<div class="mt-auto pt-4 flex items-center justify-between text-[10px] font-black tracking-widest text-text-sub border-t border-border-light">
+<span>OCT 27, 2023</span>
+<span class="bg-background-light px-2 py-0.5 border border-border-light">04:12</span>
+</div>
+</div>
+</article>
+<article class="group bg-white border border-border-light rounded-sm hover:border-text-main transition-all duration-300 flex flex-col h-full">
+<div class="relative w-full aspect-[16/10] bg-background-light border-b border-border-light overflow-hidden p-8 flex items-center justify-center">
+<div class="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')]"></div>
+<div class="w-full h-20 flex items-end gap-[3px] justify-center opacity-40 group-hover:opacity-100 transition-opacity relative z-10">
+<div class="w-1.5 bg-text-main h-[20%]"></div>
+<div class="w-1.5 bg-text-main h-[30%]"></div>
+<div class="w-1.5 bg-text-main h-[20%]"></div>
+<div class="w-1.5 bg-text-main h-[40%]"></div>
+<div class="w-1.5 bg-text-main h-[30%]"></div>
+<div class="w-1.5 bg-text-main h-[20%]"></div>
+<div class="w-1.5 bg-text-main h-[25%]"></div>
+<div class="w-1.5 bg-text-main h-[30%]"></div>
+<div class="w-1.5 bg-text-main h-[20%]"></div>
+</div>
+<button class="absolute inset-0 flex items-center justify-center bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+<div class="size-14 border-2 border-text-main bg-white text-text-main flex items-center justify-center transform scale-90 group-hover:scale-100 transition-transform">
+<span class="material-symbols-outlined text-[32px] filled">play_arrow</span>
+</div>
+</button>
+</div>
+<div class="p-6 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-bold text-base text-text-main uppercase tracking-tight">Industrial Pad_02</h3>
+<button class="text-text-sub hover:text-text-main">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+<div class="mt-auto pt-4 flex items-center justify-between text-[10px] font-black tracking-widest text-text-sub border-t border-border-light">
+<span>OCT 26, 2023</span>
+<span class="bg-background-light px-2 py-0.5 border border-border-light">01:45</span>
+</div>
+</div>
+</article>
+<article class="group bg-white border border-border-light rounded-sm hover:border-text-main transition-all duration-300 flex flex-col h-full">
+<div class="relative w-full aspect-[16/10] bg-background-light border-b border-border-light overflow-hidden p-8 flex items-center justify-center">
+<div class="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')]"></div>
+<div class="w-full h-20 flex items-end gap-[3px] justify-center opacity-40 group-hover:opacity-100 transition-opacity relative z-10">
+<div class="w-1.5 bg-text-main h-[60%]"></div>
+<div class="w-1.5 bg-text-main h-[80%]"></div>
+<div class="w-1.5 bg-text-main h-[90%]"></div>
+<div class="w-1.5 bg-text-main h-[50%]"></div>
+<div class="w-1.5 bg-text-main h-[70%]"></div>
+<div class="w-1.5 bg-text-main h-[80%]"></div>
+</div>
+<button class="absolute inset-0 flex items-center justify-center bg-white/40 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+<div class="size-14 border-2 border-text-main bg-white text-text-main flex items-center justify-center transform scale-90 group-hover:scale-100 transition-transform">
+<span class="material-symbols-outlined text-[32px] filled">play_arrow</span>
+</div>
+</button>
+</div>
+<div class="p-6 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-bold text-base text-text-main uppercase tracking-tight">C Minor Improvisation</h3>
+<button class="text-text-sub hover:text-text-main">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+<div class="mt-auto pt-4 flex items-center justify-between text-[10px] font-black tracking-widest text-text-sub border-t border-border-light">
+<span>OCT 25, 2023</span>
+<span class="bg-background-light px-2 py-0.5 border border-border-light">08:30</span>
+</div>
+</div>
+</article>
+<button class="group bg-white border-2 border-dashed border-border-light rounded-sm flex flex-col items-center justify-center h-full min-h-[320px] hover:border-primary hover:bg-white transition-all duration-300">
+<div class="size-16 rounded-full bg-white border-2 border-border-light flex items-center justify-center mb-6 group-hover:border-primary group-hover:text-primary text-text-sub transition-all">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</div>
+<span class="font-black text-xs uppercase tracking-[0.2em] text-text-main">New Recording</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-text-sub mt-2">Start blank session</span>
+</button>
+</div>
+<div class="mt-16 flex justify-center">
+<button class="flex items-center gap-4 px-8 py-4 border-2 border-text-main rounded-sm text-xs font-black uppercase tracking-[0.2em] hover:bg-text-main hover:text-white transition-all group">
+<span>Load earlier recordings</span>
+<span class="material-symbols-outlined text-[18px] group-hover:translate-y-1 transition-transform">arrow_downward</span>
+</button>
+</div>
+</section>
+</main>
+<footer class="w-full border-t border-border-light py-8 bg-background-light">
+<div class="max-w-[1400px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-2 opacity-50">
+<span class="material-symbols-outlined text-[20px]">piano</span>
+<span class="text-xs font-black tracking-widest uppercase">Pocket Piano © 2024</span>
+</div>
+<div class="flex gap-8">
+<a class="text-[10px] font-black uppercase tracking-widest text-text-sub hover:text-text-main transition-colors" href="#">Firmware</a>
+<a class="text-[10px] font-black uppercase tracking-widest text-text-sub hover:text-text-main transition-colors" href="#">Documentation</a>
+<a class="text-[10px] font-black uppercase tracking-widest text-text-sub hover:text-text-main transition-colors" href="#">Privacy</a>
+</div>
+</div>
+</footer>
+
+</body></html>

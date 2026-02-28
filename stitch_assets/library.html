@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pocket Piano Music Sheets Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8", 
+                        "background-dark": "#101622",
+                        "industrial-border": "#111111",
+                        "industrial-bg": "#F6F6F4",
+                        "industrial-text": "#111111",
+                        "industrial-accent": "#0d59f2",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px", // Keep full for circles if absolutely necessary, but prompt says no rounded corners generally.
+                    },
+                    boxShadow: {
+                        "none": "none",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Space Grotesk", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Override default rounded utilities just in case */
+        .rounded, .rounded-lg, .rounded-xl, .rounded-md, .rounded-sm {
+            border-radius: 0px !important;
+        }
+        /* Except rounded-full for avatars/icons which might need it */
+        .rounded-full {
+            border-radius: 9999px !important;
+        }
+    </style>
+</head>
+<body class="bg-industrial-bg text-industrial-text antialiased min-h-screen flex flex-col overflow-x-hidden">
+<!-- Top Navigation -->
+<header class="w-full border-b border-industrial-border bg-white px-8 py-4 flex items-center justify-between sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3">
+<div class="size-6 text-industrial-accent">
+<span class="material-symbols-outlined text-2xl">piano</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight uppercase">Pocket Piano</h2>
+</div>
+<!-- Search Bar -->
+<div class="hidden md:flex items-center h-10 w-80 border border-industrial-border bg-white">
+<div class="flex items-center justify-center pl-3 pr-2 text-gray-500">
+<span class="material-symbols-outlined text-xl">search</span>
+</div>
+<input class="w-full h-full border-none focus:ring-0 bg-transparent text-sm placeholder:text-gray-400" placeholder="SEARCH LIBRARY..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium hover:text-industrial-accent uppercase tracking-wide border-b-2 border-industrial-accent pb-0.5" href="#">Library</a>
+<a class="text-sm font-medium hover:text-industrial-accent uppercase tracking-wide text-gray-500" href="#">Studio</a>
+<a class="text-sm font-medium hover:text-industrial-accent uppercase tracking-wide text-gray-500" href="#">Settings</a>
+</nav>
+<div class="size-8 bg-gray-200 border border-industrial-border overflow-hidden" data-alt="User avatar placeholder">
+<img alt="User Avatar" class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBy9M2apCLlFBM-IrLmkVhok6p00CQbtmMWy0mN6Y5zrnMBkderVULc4dGT5BUCTYyWwCCr7jO6JDpSNP4LHrZo4M68-BNuaeCnxu4XFqQH1MqhHyZt3QZW4CRUSVbriqnyFy6Eon5JlbCwNKxYqJ7-AM_4RH2S89B2YktsP-tckq6iDqS5Upm_ejbWjhLcueEw2Im-M023YAOoqVktnaR1cXoMQlyanp24iRZ3l0VhMnng7siDLODX4vOoDkxkGnPyitE1Dn5uHRA"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 w-full max-w-[1440px] mx-auto">
+<!-- Sidebar Navigation -->
+<aside class="w-64 hidden lg:flex flex-col border-r border-industrial-border bg-industrial-bg pt-8 pb-8 pl-8 pr-4 sticky top-[73px] h-[calc(100vh-73px)] overflow-y-auto">
+<div class="mb-10">
+<h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Collection</h3>
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-3 py-2 bg-white border border-industrial-border text-industrial-accent font-medium" href="#">
+<span class="material-symbols-outlined text-xl">library_music</span>
+<span>All Sheets</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-black transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">favorite</span>
+<span>Favorites</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-black transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">schedule</span>
+<span>Recent</span>
+</a>
+</li>
+</ul>
+</div>
+<div class="mb-10">
+<h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Categories</h3>
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-black transition-colors group" href="#">
+<span class="material-symbols-outlined text-xl group-hover:text-industrial-accent">piano</span>
+<span>Classical</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-black transition-colors group" href="#">
+<span class="material-symbols-outlined text-xl group-hover:text-industrial-accent">headphones</span>
+<span>Contemporary</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-black transition-colors group" href="#">
+<span class="material-symbols-outlined text-xl group-hover:text-industrial-accent">speed</span>
+<span>Technical Exercises</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-100 hover:text-black transition-colors group" href="#">
+<span class="material-symbols-outlined text-xl group-hover:text-industrial-accent">movie</span>
+<span>Soundtracks</span>
+</a>
+</li>
+</ul>
+</div>
+<div class="mt-auto">
+<div class="p-4 border border-industrial-border bg-white">
+<h4 class="font-bold text-sm mb-1">Pro Plan</h4>
+<p class="text-xs text-gray-500 mb-3">Unlock unlimited sheets and cloud storage.</p>
+<button class="w-full py-2 bg-industrial-text text-white text-xs font-bold uppercase tracking-wide hover:bg-industrial-accent transition-colors">Upgrade</button>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-8">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 border-b border-gray-200 pb-6">
+<div>
+<h1 class="text-4xl font-bold tracking-tighter mb-2">Music Sheets Library</h1>
+<p class="text-gray-500">Manage and organize your personal collection.</p>
+</div>
+<!-- Filters -->
+<div class="flex flex-wrap gap-3">
+<button class="flex items-center gap-2 px-4 py-2 border border-industrial-border bg-white text-sm font-medium hover:bg-gray-50 transition-colors">
+<span>BPM Range</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 border border-industrial-border bg-white text-sm font-medium hover:bg-gray-50 transition-colors">
+<span>Key Signature</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 border border-industrial-border bg-white text-sm font-medium hover:bg-gray-50 transition-colors">
+<span>Difficulty</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<button class="flex items-center justify-center size-[38px] border border-industrial-border bg-white hover:text-industrial-accent transition-colors">
+<span class="material-symbols-outlined">grid_view</span>
+</button>
+<button class="flex items-center justify-center size-[38px] border border-transparent hover:bg-gray-200 transition-colors text-gray-400">
+<span class="material-symbols-outlined">list</span>
+</button>
+</div>
+</div>
+<!-- Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- New Sheet Card -->
+<button class="group relative flex flex-col items-center justify-center min-h-[320px] border-2 border-dashed border-gray-300 hover:border-industrial-accent hover:bg-white transition-all bg-transparent">
+<div class="size-16 flex items-center justify-center border-2 border-gray-300 group-hover:border-industrial-accent group-hover:text-industrial-accent transition-colors">
+<span class="material-symbols-outlined text-4xl">add</span>
+</div>
+<span class="mt-4 font-bold text-gray-500 group-hover:text-industrial-accent uppercase tracking-wide text-sm">Create New Sheet</span>
+</button>
+<!-- Sheet Card 1 (Active) -->
+<article class="flex flex-col border border-industrial-accent bg-white relative group cursor-pointer">
+<div class="absolute top-0 right-0 bg-industrial-accent text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">Active</div>
+<div class="h-40 w-full bg-gray-50 border-b border-gray-100 flex items-center justify-center overflow-hidden relative" data-alt="Sheet music preview showing simple staves">
+<img alt="Sheet Music Preview" class="w-full h-full object-cover opacity-80 mix-blend-multiply grayscale contrast-125" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDxewzInkryk40oXHaVbd8ipj4N96mtMXimKCp_v3fgqXKrz-NFAZn0R5D7brSq8z9cjplNWZ6GBB00Hzi3MeFrJ3fpUHZt-E5-ARRtg-Z6EE3lub4WKLViSMb1acH7wC06BBgs_ZJg9LE73BeVcPGUoAWge_oqCtAxBQnV8475VHnJ8dg-QuxAy33ilfW3HgZ8xhAr3s6VBvQc2Vak2vecEXaFayX12c5Vv2Gr2LSqKkXHMc81WOe2CFB2d7yRsIy8-hoHEc_yFw"/>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/5 backdrop-blur-[1px]">
+<div class="bg-white border border-industrial-border p-2">
+<span class="material-symbols-outlined text-black">play_arrow</span>
+</div>
+</div>
+</div>
+<div class="p-5 flex flex-col gap-4">
+<div>
+<h3 class="font-bold text-lg leading-tight mb-1 truncate">Moonlight Sonata</h3>
+<p class="text-xs text-gray-500 uppercase tracking-wide">L.V. Beethoven</p>
+</div>
+<div class="grid grid-cols-3 gap-2 border-t border-gray-100 pt-3">
+<div class="flex flex-col">
+<span class="text-[10px] text-gray-400 uppercase">BPM</span>
+<span class="text-sm font-mono font-medium">54</span>
+</div>
+<div class="flex flex-col border-l border-gray-100 pl-2">
+<span class="text-[10px] text-gray-400 uppercase">Key</span>
+<span class="text-sm font-mono font-medium">C#m</span>
+</div>
+<div class="flex flex-col border-l border-gray-100 pl-2">
+<span class="text-[10px] text-gray-400 uppercase">Dur</span>
+<span class="text-sm font-mono font-medium">5:12</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Sheet Card 2 -->
+<article class="flex flex-col border border-industrial-border bg-white group cursor-pointer hover:border-industrial-accent transition-colors">
+<div class="h-40 w-full bg-gray-50 border-b border-gray-100 flex items-center justify-center overflow-hidden relative" data-alt="Sheet music preview">
+<img alt="Sheet Music Preview" class="w-full h-full object-cover opacity-60 grayscale contrast-125 mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCAnknuRXe3hEKm9926-2zpcpFWiDwZ_PZaOH9lJhbKx8sMyNk9_n4UqwJb9sNS3oTmi_4nmL7jLL05dr2c4qgBob2ic-nLkwP8ZylfJXIQj5LNiaPy5aIeczaTKd5jDP3y1lrs3kQbC6g535OWoQAcdPB2qMRB5_FrI4zq710I7edU0gxd-6aCnjdIHB9LEjUVW0uwpgZSvOf6Dh4Upd38pxxX8dE9Bgk_T1E8YPb7ch1ZjXmV0DhQBGONmkRRH_3QCi10gD4PYY"/>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/5 backdrop-blur-[1px]">
+<div class="bg-white border border-industrial-border p-2">
+<span class="material-symbols-outlined text-black">edit</span>
+</div>
+</div>
+</div>
+<div class="p-5 flex flex-col gap-4">
+<div>
+<h3 class="font-bold text-lg leading-tight mb-1 truncate">Clair de Lune</h3>
+<p class="text-xs text-gray-500 uppercase tracking-wide">C. Debussy</p>
+</div>
+<div class="grid grid-cols-3 gap-2 border-t border-gray-100 pt-3">
+<div class="flex flex-col">
+<span class="text-[10px] text-gray-400 uppercase">BPM</span>
+<span class="text-sm font-mono font-medium">60</span>
+</div>
+<div class="flex flex-col border-l border-gray-100 pl-2">
+<span class="text-[10px] text-gray-400 uppercase">Key</span>
+<span class="text-sm font-mono font-medium">Db</span>
+</div>
+<div class="flex flex-col border-l border-gray-100 pl-2">
+<span class="text-[10px] text-gray-400 uppercase">Dur</span>
+<span class="text-sm font-mono font-medium">4:30</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Sheet Card 3 -->
+<article class="flex flex-col border border-industrial-border bg-white group cursor-pointer hover:border-industrial-accent transition-colors">
+<div class="h-40 w-full bg-gray-50 border-b border-gray-100 flex items-center justify-center overflow-hidden relative" data-alt="Sheet music preview">
+<img alt="Sheet Music Preview" class="w-full h-full object-cover opacity-60 grayscale contrast-125 mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAialkHtF2TmkfVzVQTo8Ygz9ehJOc1P3_PR4CrNfrTltaBphJwjuM4TGOu1T1r-Q3GUrdk4Wav2KoFZe17hk7CrmvXruTLRyNaMaiZSbQijtLh_5NJ4Utn7kCIRuqXfq9fulmJOicJ72-r5DSTPRH7eXZgPcM1OiN30pkPAQ5qGXFssedKPlyQ2D931rYrq_8UyCBDqPk1YAHTLgWXZ2MyN39VmtyxEqhOR9eHjHL7JkK_iXl9g3nqHrdVX-5C5k5VAL1y06sWdg"/>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/5 backdrop-blur-[1px]">
+<div class="bg-white border border-industrial-border p-2">
+<span class="material-symbols-outlined text-black">edit</span>
+</div>
+</div>
+</div>
+<div class="p-5 flex flex-col gap-4">
+<div>
+<h3 class="font-bold text-lg leading-tight mb-1 truncate">Gymnopédie No.1</h3>
+<p class="text-xs text-gray-500 uppercase tracking-wide">E. Satie</p>
+</div>
+<div class="grid grid-cols-3 gap-2 border-t border-gray-100 pt-3">
+<div class="flex flex-col">
+<span class="text-[10px] text-gray-400 uppercase">BPM</span>
+<span class="text-sm font-mono font-medium">48</span>
+</div>
+<div class="flex flex-col border-l border-gray-100 pl-2">
+<span class="text-[10px] text-gray-400 uppercase">Key</span>
+<span class="text-sm font-mono font-medium">D</span>
+</div>
+<div class="flex flex-col border-l border-gray-100 pl-2">
+<span class="text-[10px] text-gray-400 uppercase">Dur</span>
+<span class="text-sm font-mono font-medium">3:15</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Sheet Card 4 -->
+<article class="flex flex-col border border-industrial-border bg-white group cursor-pointer hover:border-industrial-accent transition-colors">
+<div class="h-40 w-full bg-gray-50 border-b border-gray-100 flex items-center justify-center overflow-hidden relative" data-alt="Sheet music preview">
+<img alt="Sheet Music Preview" class="w-full h-full object-cover opacity-60 grayscale contrast-125 mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATs3mtgIuYDvEZKh3wuYrvOv_JNqy23vQZy9KQi6wE_4OY261KghGuqZ0Q0AHJ89GnrkYvnZSnrCxyf9LvEpgd2pVaO_GQ8mU5E_Rxb8t9s5MVndhuT5IhPUu-y7vnl1aDMZ6bLRr68chduknOchmZpHJ4vRLIdVqHo_mTLWQdELc-owd0wESZ4bCQ_Kmc6CEee942hYWjCxnfHD8VIbI8K2T5sIz4bH7jsTtOfDNjVBFDyi2ZcKZaSXyP3peNhaakbpIU-7YIgaA"/>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/5 backdrop-blur-[1px]">
+<div class="bg-white border border-industrial-border p-2">
+<span class="material-symbols-outlined text-black">edit</span>
+</div>
+</div>
+</div>
+<div class="p-5 flex flex-col gap-4">
+<div>
+<h3 class="font-bold text-lg leading-tight mb-1 truncate">River Flows In You</h3>
+<p class="text-xs text-gray-500 uppercase tracking-wide">Yiruma</p>
+</div>
+<div class="grid grid-cols-3 gap-2 border-t border-gray-100 pt-3">
+<div class="flex flex-col">
+<span class="text-[10px] text-gray-400 uppercase">BPM</span>
+<span class="text-sm font-mono font-medium">64</span>
+</div>
+<div class="flex flex-col border-l border-gray-100 pl-2">
+<span class="text-[10px] text-gray-400 uppercase">Key</span>
+<span class="text-sm font-mono font-medium">A</span>
+</div>
+<div class="flex flex-col border-l border-gray-100 pl-2">
+<span class="text-[10px] text-gray-400 uppercase">Dur</span>
+<span class="text-sm font-mono font-medium">3:45</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Sheet Card 5 -->
+<article class="flex flex-col border border-industrial-border bg-white group cursor-pointer hover:border-industrial-accent transition-colors">
+<div class="h-40 w-full bg-gray-50 border-b border-gray-100 flex items-center justify-center overflow-hidden relative" data-alt="Sheet music preview">
+<img alt="Sheet Music Preview" class="w-full h-full object-cover opacity-60 grayscale contrast-125 mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXQmmxHn7kDhCoMQreslfd2YxH5h7Br196Ufw4VkXfqaLJT74kiIsZ0OhZhTB28ZPCu7KQWkww6N7VJrX59M4MDMH-OXQZJLVROdyc6M7FwSyU3HGvGDo4Bjr4thE8ADn6KmWd4Y4yG70YcJZdK7HCnwxT1af3Olm9VwvxoS5D6qFWUPxwpCEnk8Uq3u9liSmac97I3QslckNCxMAOIcG1Xg3zwBg1S1KfhyYchaQ-d8_V7UJTyXl11gNOBMl3DMi--IXFvYEKUUs"/>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/5 backdrop-blur-[1px]">
+<div class="bg-white border border-industrial-border p-2">
+<span class="material-symbols-outlined text-black">edit</span>
+</div>
+</div>
+</div>
+<div class="p-5 flex flex-col gap-4">
+<div>
+<h3 class="font-bold text-lg leading-tight mb-1 truncate">Hanon Exercise No. 1</h3>
+<p class="text-xs text-gray-500 uppercase tracking-wide">C.L. Hanon</p>
+</div>
+<div class="grid grid-cols-3 gap-2 border-t border-gray-100 pt-3">
+<div class="flex flex-col">
+<span class="text-[10px] text-gray-400 uppercase">BPM</span>
+<span class="text-sm font-mono font-medium">108</span>
+</div>
+<div class="flex flex-col border-l border-gray-100 pl-2">
+<span class="text-[10px] text-gray-400 uppercase">Key</span>
+<span class="text-sm font-mono font-medium">C</span>
+</div>
+<div class="flex flex-col border-l border-gray-100 pl-2">
+<span class="text-[10px] text-gray-400 uppercase">Dur</span>
+<span class="text-sm font-mono font-medium">1:20</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Sheet Card 6 -->
+<article class="flex flex-col border border-industrial-border bg-white group cursor-pointer hover:border-industrial-accent transition-colors">
+<div class="h-40 w-full bg-gray-50 border-b border-gray-100 flex items-center justify-center overflow-hidden relative" data-alt="Sheet music preview">
+<img alt="Sheet Music Preview" class="w-full h-full object-cover opacity-60 grayscale contrast-125 mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTB3vvfjtjpgCVfhVdoVv1w1ogOTDAhe_eGj-KB_iYsDs_4Gwh2rvc-uEte1QrOtZ5zh39N0TF1cXIhPpJ5zajhAW5-YPsYkp0KAURzxrw_6Q17Z6AITTRbRHDCfH5YtkO1NMQ3Bp_rcchk1vFS1BmxqmZPcgGFsypN5JLYKljW88pRMXB0kz3O-V6gnGkg3pPeI82qfBiPRr6_H_gHUWQeHOO4TeGYxfFnE4fEIzsqducS0gyEhN7CsrrU-h8I7db7GwBVohlZQE"/>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/5 backdrop-blur-[1px]">
+<div class="bg-white border border-industrial-border p-2">
+<span class="material-symbols-outlined text-black">edit</span>
+</div>
+</div>
+</div>
+<div class="p-5 flex flex-col gap-4">
+<div>
+<h3 class="font-bold text-lg leading-tight mb-1 truncate">Nocturne in E Flat</h3>
+<p class="text-xs text-gray-500 uppercase tracking-wide">F. Chopin</p>
+</div>
+<div class="grid grid-cols-3 gap-2 border-t border-gray-100 pt-3">
+<div class="flex flex-col">
+<span class="text-[10px] text-gray-400 uppercase">BPM</span>
+<span class="text-sm font-mono font-medium">68</span>
+</div>
+<div class="flex flex-col border-l border-gray-100 pl-2">
+<span class="text-[10px] text-gray-400 uppercase">Key</span>
+<span class="text-sm font-mono font-medium">Eb</span>
+</div>
+<div class="flex flex-col border-l border-gray-100 pl-2">
+<span class="text-[10px] text-gray-400 uppercase">Dur</span>
+<span class="text-sm font-mono font-medium">4:10</span>
+</div>
+</div>
+</div>
+</article>
+</div>
+<!-- Pagination/Load More -->
+<div class="mt-12 flex items-center justify-between border-t border-gray-200 pt-6">
+<span class="text-sm text-gray-500">Showing 6 of 124 sheets</span>
+<div class="flex gap-2">
+<button class="px-4 py-2 border border-industrial-border bg-white hover:bg-gray-100 text-sm font-bold disabled:opacity-50" disabled="">PREVIOUS</button>
+<button class="px-4 py-2 border border-industrial-border bg-white hover:bg-gray-100 text-sm font-bold">NEXT</button>
+</div>
+</div>
+</main>
+</div>
+</body></html>
