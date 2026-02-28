@@ -6,14 +6,17 @@ import { useSettings } from '../hooks/useSettings';
 import { useAnalytics } from '../hooks/useAnalytics';
 
 import { RecordingGallery } from '../components/Gallery/RecordingGallery';
+import { SaveRecordingModal } from '../components/Modals/SaveRecordingModal';
 
 export const Studio: React.FC = () => {
     const [isLoaded, setIsLoaded] = useState(false);
     const { settings, updateSetting } = useSettings();
-    const { isRecording, startRecording, stopRecording, recordNote } = useRecorder();
+    const { isRecording, startRecording, stopRecording, saveRecording, discardRecording, recordNote } = useRecorder();
     const { trackNote } = useAnalytics();
     const [activeKeys, setActiveKeys] = useState<string[]>([]);
     const [showGallery, setShowGallery] = useState(false);
+    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+    const [recordingTime, setRecordingTime] = useState(0);
 
     // Sync settings with audio engine
     useEffect(() => {
@@ -21,6 +24,27 @@ export const Studio: React.FC = () => {
         audioEngine.setTranspose(settings.transpose);
         audioEngine.setSustain(settings.sustain);
     }, [settings]);
+
+    // Handle recording timer
+    useEffect(() => {
+        let interval: ReturnType<typeof setInterval>;
+        if (isRecording) {
+            setRecordingTime(0); // Reset on new recording start
+            interval = setInterval(() => {
+                setRecordingTime(prev => prev + 1);
+            }, 1000);
+        } else {
+            // Do not reset here, let it hold the final time until modal is closed or new recording starts
+        }
+        return () => clearInterval(interval);
+    }, [isRecording]);
+
+    // Format time for display (MM:SS)
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
 
     const handleNoteEvent = useCallback((note: string, type: 'press' | 'release', velocity: number = 0.8) => {
         if (!isLoaded && type === 'press') {
@@ -187,9 +211,28 @@ export const Studio: React.FC = () => {
                     <button className="btn-tool" title="Metronome">
                         <span className="material-symbols-outlined">timer</span>
                     </button>
-                    <button className={`btn-tool ${isRecording ? 'active-record' : ''}`} title="Record" onClick={isRecording ? () => stopRecording() : startRecording}>
-                        <span className="material-symbols-outlined">fiber_manual_record</span>
-                    </button>
+
+                    {/* Record Button & Timer */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                        <button
+                            className={`btn-tool ${isRecording ? 'is-recording' : ''}`}
+                            title={isRecording ? "Stop Recording" : "Record"}
+                            onClick={isRecording ? () => {
+                                stopRecording();
+                                setIsSaveModalOpen(true);
+                            } : startRecording}
+                        >
+                            <span className="material-symbols-outlined">
+                                {isRecording ? 'stop' : 'fiber_manual_record'}
+                            </span>
+                        </button>
+                        {isRecording && (
+                            <span style={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+                                {formatTime(recordingTime)}
+                            </span>
+                        )}
+                    </div>
+
                     <button className={`btn-tool ${showGallery ? 'active' : ''}`} title="Library" onClick={() => setShowGallery(!showGallery)}>
                         <span className="material-symbols-outlined">library_music</span>
                     </button>
@@ -201,6 +244,14 @@ export const Studio: React.FC = () => {
                     </button>
                 </div>
             </aside>
+
+            {/* Save Recording Modal */}
+            <SaveRecordingModal
+                isOpen={isSaveModalOpen}
+                onClose={() => setIsSaveModalOpen(false)}
+                onSave={saveRecording}
+                onDiscard={discardRecording}
+            />
 
             {/* Gallery Overlay */}
             {showGallery && (

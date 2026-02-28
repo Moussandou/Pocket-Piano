@@ -392,6 +392,33 @@ body {
   border-color: var(--primary);
 }
 
+.btn-tool.active-record {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.btn-tool.is-recording {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: #ef4444;
+  animation: pulse-record 1.5s infinite;
+}
+
+@keyframes pulse-record {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
 .stitch-slider::-webkit-slider-runnable-track {
   width: 100%;
   height: 1px;
@@ -582,15 +609,26 @@ body {
 
 /* Piano Keyboard */
 .piano-stage {
-  height: 240px;
+  /* Use a max-height to prevent it from taking up too much vertical space on small screens */
+  height: clamp(160px, 30vh, 240px);
   width: 100%;
   background: white;
   border-top: 1px solid var(--neutral-dark);
   position: relative;
   display: flex;
-  justify-content: center;
-  overflow: hidden;
+  justify-content: safe center;
+  overflow-x: auto;
+  overflow-y: hidden;
   flex-shrink: 0;
+  -webkit-overflow-scrolling: touch;
+
+  /* Hide scrollbar for a cleaner look */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.piano-stage::-webkit-scrollbar {
+  display: none;
 }
 
 .piano-container {
@@ -599,6 +637,16 @@ body {
   position: relative;
   user-select: none;
   min-width: min-content;
+  width: fit-content;
+
+  /* 
+   * Responsive key calculations:
+   * Try to fit 36 white keys in the viewport + some padding. 
+   * Cap at 56px (large desktop), minimum 32px (mobile/tablet scroll).
+   */
+  --white-key-width: clamp(32px, calc(100vw / 36.5), 56px);
+  --black-key-width: calc(var(--white-key-width) * 0.57);
+  --black-key-margin: calc(var(--black-key-width) / -2);
 }
 
 .key {
@@ -610,8 +658,9 @@ body {
 .key.white {
   flex-grow: 1;
   flex-shrink: 0;
-  flex-basis: 56px;
-  height: 240px;
+  flex-basis: var(--white-key-width);
+  height: 100%;
+  /* Fill the stage height */
   background: var(--bg-light);
   border: 1px solid var(--neutral-dark);
   border-top: none;
@@ -620,7 +669,7 @@ body {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding-bottom: 1rem;
+  padding-bottom: 5%;
 }
 
 .key.white:first-child {
@@ -633,12 +682,14 @@ body {
 }
 
 .key.black {
-  width: 32px;
+  /* Proportional width to white key */
+  width: var(--black-key-width);
   flex-shrink: 0;
-  height: 140px;
+  height: 60%;
+  /* Proportional height */
   background: var(--neutral-dark);
-  margin-left: -16px;
-  margin-right: -16px;
+  margin-left: var(--black-key-margin);
+  margin-right: var(--black-key-margin);
   z-index: 2;
 }
 
@@ -945,4 +996,97 @@ button {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Global Footer */
+.app-footer {
+  background-color: var(--bg-light);
+  padding: 3rem 1.5rem;
+  border-top: 1px solid var(--neutral-dark);
+  position: relative;
+  z-index: 10;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .app-footer {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+.app-footer .footer-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .app-footer .footer-content {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.app-footer .footer-brand h5 {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+}
+
+.app-footer .footer-brand p {
+  font-size: 0.75rem;
+  font-family: 'Space Mono', monospace;
+  color: #666;
+}
+
+.app-footer .footer-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.app-footer .footer-links a {
+  font-size: 0.75rem;
+  font-family: 'Space Mono', monospace;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s;
+}
+
+.app-footer .footer-links a:hover {
+  color: var(--primary);
+}
+
+.app-footer .footer-social {
+  display: flex;
+  gap: 1rem;
+}
+
+.app-footer .footer-social a {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--neutral-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s;
+}
+
+.app-footer .footer-social a:hover {
+  background-color: var(--neutral-dark);
+  color: #fff;
+}
+
+.app-footer .footer-social span {
+  font-weight: 700;
+  font-size: 0.75rem;
 }

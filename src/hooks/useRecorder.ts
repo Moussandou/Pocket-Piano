@@ -17,8 +17,16 @@ export const useRecorder = () => {
         startTime.current = Date.now();
     }, []);
 
-    const stopRecording = useCallback(async (name: string = "Mon Morceau") => {
+    const stopRecording = useCallback(() => {
         setIsRecording(false);
+    }, []);
+
+    const discardRecording = useCallback(() => {
+        currentNotes.current = [];
+        setIsRecording(false);
+    }, []);
+
+    const saveRecording = useCallback(async (name: string) => {
         if (currentNotes.current.length === 0) return;
 
         const newRecording: Recording = {
@@ -45,6 +53,8 @@ export const useRecorder = () => {
                 console.error("Cloud save failed", error);
             }
         }
+
+        currentNotes.current = []; // Clear buffer after saving
     }, []);
 
     const recordNote = useCallback((note: string, velocity: number = 0.8) => {
@@ -71,6 +81,8 @@ export const useRecorder = () => {
         recordings,
         startRecording,
         stopRecording,
+        saveRecording,
+        discardRecording,
         recordNote,
         playRecording,
     };
