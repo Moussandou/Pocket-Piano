@@ -19,10 +19,11 @@ const INSTRUMENT_CONFIGS: Record<string, { baseUrl: string; urls: Record<string,
     marimba: {
         baseUrl: "https://tonejs.github.io/audio/casio/",
         urls: {
-            "A1": "A1.mp3", "A2": "A2.mp3", "A3": "A3.mp3", "A4": "A4.mp3", "A5": "A5.mp3",
-            "C2": "C2.mp3", "C3": "C3.mp3", "C4": "C4.mp3", "C5": "C5.mp3", "C6": "C6.mp3",
-            "D#2": "Ds2.mp3", "D#3": "Ds3.mp3", "D#4": "Ds4.mp3", "D#5": "Ds5.mp3",
-            "F#2": "Fs2.mp3", "F#3": "Fs3.mp3", "F#4": "Fs4.mp3", "F#5": "Fs5.mp3"
+            "A1": "A1.mp3", "A#1": "As1.mp3", "B1": "B1.mp3",
+            "C2": "C2.mp3", "C#2": "Cs2.mp3", "D2": "D2.mp3",
+            "D#2": "Ds2.mp3", "E2": "E2.mp3", "F2": "F2.mp3",
+            "F#2": "Fs2.mp3", "G2": "G2.mp3", "G#1": "Gs1.mp3",
+            "A2": "A2.mp3"
         }
     }
 };
@@ -31,32 +32,39 @@ class AudioEngine {
     private sampler: Tone.Sampler | null = null;
     private reverb: Tone.Reverb | null = null;
     private delay: Tone.FeedbackDelay | null = null;
-    private initPromise: Promise<void> | null = null;
+    private loadingPromise: Promise<void> | null = null;
+    private loadingInstrumentName: string | null = null;
     private isLoaded: boolean = false;
     private currentInstrument: string = 'piano';
     private transposeOffset: number = 0;
     private sustainMultiplier: number = 1;
     private volumeDb: number = 0;
-
-    // Recording components
     private recorder: Tone.Recorder | null = null;
     private isRecordingAudio: boolean = false;
 
-    constructor() { }
-
     public async init(instrumentName: string = 'piano'): Promise<void> {
-        if (this.isLoaded && this.currentInstrument === instrumentName) return Promise.resolve();
+        // 1. If already loaded and same instrument, do nothing
+        if (this.isLoaded && this.currentInstrument === instrumentName && this.sampler) {
+            return Promise.resolve();
+        }
 
-        this.currentInstrument = instrumentName;
+        // 2. If already loading THIS specific instrument, return existing promise
+        if (this.loadingPromise && this.loadingInstrumentName === instrumentName) {
+            return this.loadingPromise;
+        }
+
+        // 3. Start loading
+        this.loadingInstrumentName = instrumentName;
         this.isLoaded = false;
 
-        if (this.initPromise && this.currentInstrument === instrumentName) return this.initPromise;
-
-        this.initPromise = new Promise(async (resolve, reject) => {
+        this.loadingPromise = (async () => {
             try {
-                await Tone.start(); // Required by browsers
+                await Tone.start();
+                if (Tone.context.state !== 'running') {
+                    await Tone.context.resume();
+                }
 
-                // Setup effects if not exists
+                // Initialize effects if needed
                 if (!this.reverb) {
                     this.reverb = new Tone.Reverb({
                         decay: 2.5,
@@ -72,44 +80,52 @@ class AudioEngine {
                     }).connect(this.reverb);
                 }
 
-                // Dispose old sampler
+                // Dispose old sampler if exists
                 if (this.sampler) {
                     this.sampler.dispose();
+                    this.sampler = null;
                 }
 
                 const config = INSTRUMENT_CONFIGS[instrumentName] || INSTRUMENT_CONFIGS.piano;
 
-                this.sampler = new Tone.Sampler({
-                    urls: config.urls,
-                    release: 1,
-                    baseUrl: config.baseUrl,
-                    onload: () => {
-                        this.isLoaded = true;
-                        if (this.sampler) {
+                await new Promise<void>((resolve, reject) => {
+                    const sampler = new Tone.Sampler({
+                        urls: config.urls,
+                        baseUrl: config.baseUrl,
+                        release: 1,
+                        onload: () => {
+                            this.sampler = sampler;
                             this.sampler.volume.value = this.volumeDb;
+                            // Connect sampler to delay if delay exists, otherwise directly to destination
+                            if (this.delay) {
+                                this.sampler.connect(this.delay);
+                            } else {
+                                this.sampler.toDestination();
+                            }
+                            resolve();
+                        },
+                        onerror: (err) => {
+                            console.error(`Sampler error for ${instrumentName}:`, err);
+                            reject(err);
                         }
-                        console.log(`${instrumentName} samples loaded`);
-                        resolve();
-                    },
-                    onerror: (err) => {
-                        console.error(`Failed to load sampler for ${instrumentName}`, err);
-                        reject(err);
-                    }
-                }).connect(this.delay);
+                    });
+                });
 
-                // Setup recorder
-                if (!this.recorder) {
-                    this.recorder = new Tone.Recorder();
-                    Tone.Destination.connect(this.recorder);
-                }
-
+                this.currentInstrument = instrumentName;
+                this.isLoaded = true;
+                this.loadingInstrumentName = null;
+                this.loadingPromise = null;
+                console.log(`AudioEngine: ${instrumentName} loaded and ready`);
             } catch (error) {
-                console.error("Failed to initialize audio engine", error);
-                reject(error);
+                console.error(`AudioEngine: Failed to initialize ${instrumentName}`, error);
+                this.isLoaded = false;
+                this.loadingInstrumentName = null;
+                this.loadingPromise = null;
+                throw error;
             }
-        });
+        })();
 
-        return this.initPromise;
+        return this.loadingPromise;
     }
 
     public async loadInstrument(name: string) {
@@ -134,15 +150,36 @@ class AudioEngine {
         this.sampler.triggerRelease(transposedNote, Tone.now() + releaseTime);
     }
 
+    public triggerAttack(note: string, time?: number) {
+        if (!this.sampler || !this.isLoaded) return;
+        try {
+            this.sampler.triggerAttack(note, time);
+        } catch (e) {
+            console.error("AudioEngine: Error triggering attack", e);
+        }
+    }
+
+    public triggerRelease(note: string, time?: number) {
+        if (!this.sampler || !this.isLoaded) return;
+        try {
+            this.sampler.triggerRelease(note, time);
+        } catch (e) {
+            console.error("AudioEngine: Error triggering release", e);
+        }
+    }
+
     public setTranspose(offset: number) {
+        if (!Number.isFinite(offset)) return;
         this.transposeOffset = offset;
     }
 
     public setSustain(multiplier: number) {
+        if (!Number.isFinite(multiplier)) return;
         this.sustainMultiplier = Math.max(0.1, multiplier);
     }
 
     public setVolume(db: number) {
+        if (!Number.isFinite(db)) return;
         this.volumeDb = db;
         if (this.sampler) {
             this.sampler.volume.value = db;
@@ -150,21 +187,18 @@ class AudioEngine {
     }
 
     public setReverb(wet: number) {
-        if (this.reverb) {
-            this.reverb.wet.value = wet;
-        }
+        if (!Number.isFinite(wet) || !this.reverb) return;
+        this.reverb.wet.value = wet;
     }
 
     public setDelay(wet: number) {
-        if (this.delay) {
-            this.delay.wet.value = wet;
-        }
+        if (!Number.isFinite(wet) || !this.delay) return;
+        this.delay.wet.value = wet;
     }
 
     public setFeedback(feedback: number) {
-        if (this.delay) {
-            this.delay.feedback.value = feedback;
-        }
+        if (!Number.isFinite(feedback) || !this.delay) return;
+        this.delay.feedback.value = feedback;
     }
 
     public getReadyStatus() {

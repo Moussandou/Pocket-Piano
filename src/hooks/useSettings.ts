@@ -20,6 +20,24 @@ export interface UserSettings {
     currentInstrument: string;
 }
 
+const safeNum = (val: unknown, fallback: number): number =>
+    typeof val === 'number' && Number.isFinite(val) ? val : fallback;
+
+const sanitizeSettings = (s: any): UserSettings => {
+    return {
+        ...DEFAULT_SETTINGS,
+        ...s,
+        volume: safeNum(s.volume, DEFAULT_SETTINGS.volume),
+        sustain: safeNum(s.sustain, DEFAULT_SETTINGS.sustain),
+        transpose: safeNum(s.transpose, DEFAULT_SETTINGS.transpose),
+        reverb: safeNum(s.reverb, DEFAULT_SETTINGS.reverb),
+        delay: safeNum(s.delay, DEFAULT_SETTINGS.delay),
+        feedback: safeNum(s.feedback, DEFAULT_SETTINGS.feedback),
+        metronomeBpm: safeNum(s.metronomeBpm, DEFAULT_SETTINGS.metronomeBpm),
+        metronomeVolume: safeNum(s.metronomeVolume, DEFAULT_SETTINGS.metronomeVolume),
+    };
+};
+
 const DEFAULT_SETTINGS: UserSettings = {
     pianoColor: '#4a9eff',
     volume: -6,
@@ -38,7 +56,14 @@ const DEFAULT_SETTINGS: UserSettings = {
 export const useSettings = () => {
     const [settings, setSettings] = useState<UserSettings>(() => {
         const saved = localStorage.getItem('piano_settings');
-        return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
+        if (saved) {
+            try {
+                return sanitizeSettings(JSON.parse(saved));
+            } catch (e) {
+                return DEFAULT_SETTINGS;
+            }
+        }
+        return DEFAULT_SETTINGS;
     });
 
     useEffect(() => {
@@ -67,7 +92,7 @@ export const useSettings = () => {
                 const docRef = doc(db, 'userSettings', user.uid);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                    setSettings(docSnap.data() as UserSettings);
+                    setSettings(sanitizeSettings(docSnap.data()));
                 }
             }
         });
@@ -93,7 +118,7 @@ export const useSettings = () => {
         reader.onload = (e) => {
             try {
                 const json = JSON.parse(e.target?.result as string);
-                setSettings(json);
+                setSettings(sanitizeSettings(json));
             } catch (err) {
                 console.error("Failed to import settings", err);
             }

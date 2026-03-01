@@ -122,11 +122,11 @@ export const StudioSidebar: React.FC<StudioSidebarProps> = ({
                                 <span className="material-symbols-outlined">blur_on</span>
                                 {t('studio.reverb')}
                             </label>
-                            <span className="slider-value">{Math.round(settings.reverb * 100)}{t('common.units.percent')}</span>
+                            <span className="slider-value">{Math.round((settings.reverb || 0) * 100)}{t('common.units.percent')}</span>
                         </div>
                         <div className="slider-wrapper">
-                            <div className="slider-fill" style={{ width: `${settings.reverb * 100}%` }}></div>
-                            <input className="stitch-slider" type="range" min="0" max="100" value={settings.reverb * 100} onChange={(e) => updateSetting('reverb', parseInt(e.target.value) / 100)} />
+                            <div className="slider-fill" style={{ width: `${(settings.reverb || 0) * 100}%` }}></div>
+                            <input className="stitch-slider" type="range" min="0" max="100" value={(settings.reverb || 0) * 100} onChange={(e) => updateSetting('reverb', parseInt(e.target.value) / 100)} />
                         </div>
                     </div>
 
@@ -136,11 +136,11 @@ export const StudioSidebar: React.FC<StudioSidebarProps> = ({
                                 <span className="material-symbols-outlined">schedule</span>
                                 {t('studio.delay')}
                             </label>
-                            <span className="slider-value">{Math.round(settings.delay * 100)}{t('common.units.percent')}</span>
+                            <span className="slider-value">{Math.round((settings.delay || 0) * 100)}{t('common.units.percent')}</span>
                         </div>
                         <div className="slider-wrapper">
-                            <div className="slider-fill" style={{ width: `${settings.delay * 100}%` }}></div>
-                            <input className="stitch-slider" type="range" min="0" max="100" value={settings.delay * 100} onChange={(e) => updateSetting('delay', parseInt(e.target.value) / 100)} />
+                            <div className="slider-fill" style={{ width: `${(settings.delay || 0) * 100}%` }}></div>
+                            <input className="stitch-slider" type="range" min="0" max="100" value={(settings.delay || 0) * 100} onChange={(e) => updateSetting('delay', parseInt(e.target.value) / 100)} />
                         </div>
                     </div>
 
