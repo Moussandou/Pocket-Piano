@@ -18,7 +18,7 @@ import { formatTime } from '../../utils/formatters';
 import { RecordingGallery } from '../../components/Gallery/RecordingGallery';
 import { SaveRecordingModal } from '../../components/Modals/SaveRecordingModal';
 import { SessionRecap } from '../../components/Modals/SessionRecap';
-import { KEYBOARD_MAP } from '../../domain/constants';
+import { getLabelForNote } from '../../domain/constants';
 
 import './StudioSidebar.css';
 import './StudioStage.css';
@@ -74,8 +74,7 @@ export const Studio: React.FC = () => {
 
     const getDisplayNote = useCallback((note: string) => {
         if (settings.historyDisplayMode === 'keys') {
-            const found = Object.entries(KEYBOARD_MAP).find((entry) => entry[1] === note);
-            return found ? found[0] : note;
+            return getLabelForNote(note) || note;
         }
         return note;
     }, [settings.historyDisplayMode]);
@@ -117,8 +116,8 @@ export const Studio: React.FC = () => {
 
             // Sheet follow: find the keyboard key for this note and validate
             if (sheetFollow.isActive) {
-                const entry = Object.entries(KEYBOARD_MAP).find(([, v]) => v === note);
-                if (entry) sheetFollow.validateKey(entry[0]);
+                const label = getLabelForNote(note);
+                if (label) sheetFollow.validateKey(label);
             }
         } else {
             setActiveKeys(prev => prev.filter(k => k !== note));

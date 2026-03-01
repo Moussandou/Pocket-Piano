@@ -1,6 +1,6 @@
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { KEYBOARD_MAP } from '../../domain/constants';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import { resolveNoteFromEvent, getLabelForNote } from '../../domain/constants';
 import { audioEngine } from '../../engine/audio';
 
 interface KeyProps {
@@ -32,11 +32,13 @@ interface PianoProps {
     onNoteReleased?: (note: string) => void;
 }
 
-
 export const Piano: React.FC<PianoProps> = ({ onNotePlayed, onNoteReleased }) => {
     const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
 
-    // Génération des touches de C2 à C7
+    // Track which note each physical key is currently playing.
+    // Prevents stuck notes when Shift is released before the key.
+    const codeToNote = useRef<Map<string, string>>(new Map());
+
     const notes = useMemo(() => {
         const arr = [];
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -71,15 +73,19 @@ export const Piano: React.FC<PianoProps> = ({ onNotePlayed, onNoteReleased }) =>
 
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
         if (e.repeat) return;
-        const note = KEYBOARD_MAP[e.key];
+        const note = resolveNoteFromEvent(e);
         if (note) {
+            codeToNote.current.set(e.code, note);
             onPress(note);
         }
     }, [onPress]);
 
     const handleKeyUp = useCallback((e: KeyboardEvent) => {
-        const note = KEYBOARD_MAP[e.key];
+        // Release the note stored at keydown, not the one resolved now.
+        // This avoids stuck notes when Shift state changes mid-press.
+        const note = codeToNote.current.get(e.code);
         if (note) {
+            codeToNote.current.delete(e.code);
             onRelease(note);
         }
     }, [onRelease]);
@@ -93,10 +99,8 @@ export const Piano: React.FC<PianoProps> = ({ onNotePlayed, onNoteReleased }) =>
         };
     }, [handleKeyDown, handleKeyUp]);
 
-    // Trouver le label du clavier pour une note donnée
     const getKeyLabel = (note: string) => {
-        const found = Object.entries(KEYBOARD_MAP).find((entry) => entry[1] === note);
-        return found ? found[0] : undefined;
+        return getLabelForNote(note);
     };
 
     return (
