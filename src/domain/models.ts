@@ -16,6 +16,7 @@ export interface Recording {
     timestamp: number | Timestamp;
     notes: RecordedNote[];
     duration?: number;
+    favorite?: boolean;
 }
 
 export interface UserStats {

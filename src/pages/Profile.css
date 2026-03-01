@@ -577,6 +577,34 @@
     font-family: monospace;
 }
 
+/* Level Progress */
+.level-progress-wrapper {
+    margin-top: 0.5rem;
+}
+
+.level-progress-bar {
+    height: 4px;
+    background: var(--industrial-border);
+    width: 100%;
+    overflow: hidden;
+}
+
+.level-progress-fill {
+    height: 100%;
+    background: var(--industrial-accent);
+    transition: width 0.4s ease;
+}
+
+.level-progress-text {
+    font-size: 0.625rem;
+    color: #9ca3af;
+    font-family: monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.25rem;
+    display: block;
+}
+
 /* Chart Section */
 .chart-box {
     border: 1px solid var(--industrial-border);

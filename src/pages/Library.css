@@ -86,44 +86,9 @@
     color: var(--industrial-accent);
 }
 
+/* Sidebar Footer */
 .sidebar-footer {
     margin-top: auto;
-}
-
-.pro-plan-box {
-    padding: 1rem;
-    border: 1px solid var(--industrial-border);
-    background-color: #fff;
-}
-
-.pro-title {
-    font-weight: 700;
-    font-size: 0.875rem;
-    margin-bottom: 0.25rem;
-}
-
-.pro-desc {
-    font-size: 0.75rem;
-    color: #6b7280;
-    margin-bottom: 0.75rem;
-}
-
-.btn-upgrade {
-    width: 100%;
-    padding: 0.5rem;
-    background-color: var(--industrial-text);
-    color: #fff;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.btn-upgrade:hover {
-    background-color: var(--industrial-accent);
 }
 
 /* Main Content */
@@ -464,4 +429,191 @@
 .btn-page:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* Search Box */
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 0.75rem;
+    font-size: 1.25rem;
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+.search-input {
+    padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+    border: 1px solid var(--industrial-border);
+    background: #fff;
+    font-size: 0.875rem;
+    font-family: var(--font-display);
+    width: 200px;
+    transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--industrial-accent);
+}
+
+.search-input::placeholder {
+    color: #9ca3af;
+}
+
+/* Card Actions */
+.card-actions {
+    display: flex;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.btn-card-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s ease;
+}
+
+.btn-card-action:hover {
+    color: var(--industrial-text);
+}
+
+.btn-card-action.active {
+    color: #ef4444;
+}
+
+.btn-card-action.danger:hover {
+    color: #ef4444;
+}
+
+.btn-card-action .material-symbols-outlined {
+    font-size: 20px;
+}
+
+/* Note Mini-Visualizer */
+.note-mini-vis {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 100%;
+    width: 100%;
+    padding: 1rem;
+    justify-content: center;
+}
+
+.note-bar {
+    width: 4px;
+    min-height: 4px;
+    background-color: #d1d5db;
+    transition: background-color 0.2s ease;
+}
+
+.note-bar.playing {
+    background-color: var(--industrial-accent);
+    animation: notePulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes notePulse {
+    from {
+        opacity: 0.4;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* List View */
+.sheets-list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--industrial-border);
+}
+
+.list-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--industrial-border);
+    background: #fff;
+    transition: background-color 0.15s ease;
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.list-item:hover {
+    background-color: #f9fafb;
+}
+
+.list-item.active-card {
+    background-color: #f0f9ff;
+    border-left: 3px solid var(--industrial-accent);
+}
+
+.list-play-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--industrial-border);
+    background: #fff;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+.list-play-btn:hover {
+    border-color: var(--industrial-accent);
+    color: var(--industrial-accent);
+}
+
+.list-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.list-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.list-date {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.list-meta {
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-family: monospace;
+    flex-shrink: 0;
+    min-width: 60px;
+    text-align: right;
+}
+
+.list-actions {
+    display: flex;
+    gap: 0.25rem;
+    flex-shrink: 0;
 }
