@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 import { RecordingGallery } from '../components/Gallery/RecordingGallery';
 import { SaveRecordingModal } from '../components/Modals/SaveRecordingModal';
+import { SessionRecap } from '../components/Modals/SessionRecap';
 import { KEYBOARD_MAP } from '../domain/constants';
 
 export const Studio: React.FC = () => {
@@ -25,7 +26,19 @@ export const Studio: React.FC = () => {
     const [comboProgress, setComboProgress] = useState(0);
     const [showGallery, setShowGallery] = useState(false);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+    const [isRecapOpen, setIsRecapOpen] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
+    const [sessionStats, setSessionStats] = useState({
+        totalNotes: 0,
+        maxCombo: 1,
+        score: 0,
+        duration: 0,
+        avgVelocity: 0.8
+    });
+    const [sessionStartTime, setSessionStartTime] = useState(0);
+    const [currentSessionNotes, setCurrentSessionNotes] = useState(0);
+    const [currentSessionVelocity, setCurrentSessionVelocity] = useState(0);
+    const [maxSessionMultiplier, setMaxSessionMultiplier] = useState(1);
 
     const getDisplayNote = useCallback((note: string) => {
         if (settings.historyDisplayMode === 'keys') {
@@ -40,6 +53,9 @@ export const Studio: React.FC = () => {
         audioEngine.setVolume(settings.volume);
         audioEngine.setTranspose(settings.transpose);
         audioEngine.setSustain(settings.sustain);
+        audioEngine.setReverb(settings.reverb);
+        audioEngine.setDelay(settings.delay);
+        audioEngine.setFeedback(settings.feedback);
     }, [settings]);
 
     // Handle recording timer
@@ -68,9 +84,9 @@ export const Studio: React.FC = () => {
         const interval = setInterval(() => {
             setComboProgress(prev => {
                 if (prev <= 0) {
-                    if (multiplier > 1) {
+                    if (multiplier > 1 || comboScore > 0) {
                         setMultiplier(1);
-                        return 0;
+                        setComboScore(0);
                     }
                     return 0;
                 }
@@ -101,20 +117,30 @@ export const Studio: React.FC = () => {
             setComboProgress(prev => Math.min(100, prev + 15));
             setComboScore(prev => prev + (10 * multiplier));
 
+            // Session Stats
+            setCurrentSessionNotes(prev => prev + 1);
+            setCurrentSessionVelocity(prev => prev + velocity);
+
             // Tiered multiplier
             setMultiplier(m => {
-                if (comboScore > 5000) return 8;
-                if (comboScore > 2000) return 4;
-                if (comboScore > 500) return 2;
-                return m;
+                let next = m;
+                if (comboScore > 5000) next = 8;
+                else if (comboScore > 2000) next = 4;
+                else if (comboScore > 500) next = 2;
+
+                if (next > maxSessionMultiplier) {
+                    setMaxSessionMultiplier(next);
+                }
+                return next;
             });
 
-            recordNote(note, velocity);
+            recordNote(note, velocity, 'DOWN');
             trackNote(note, velocity);
         } else {
             setActiveKeys(prev => prev.filter(k => k !== note));
+            recordNote(note, 0, 'UP');
         }
-    }, [recordNote, trackNote, isLoaded, multiplier, comboScore]);
+    }, [recordNote, trackNote, isLoaded, multiplier, comboScore, maxSessionMultiplier]);
 
     return (
         <main className="app-main">
@@ -222,6 +248,51 @@ export const Studio: React.FC = () => {
                             <div className="engine-label">{t('studio.authMode')}</div>
                             <div className="engine-value">{t('studio.secure')}</div>
                         </div>
+
+                        <div className="control-divider" style={{ margin: '1.5rem 0' }}></div>
+
+                        {/* Audio Effects Section */}
+                        <div className="slider-group">
+                            <div className="slider-header">
+                                <label className="slider-label">
+                                    <span className="material-symbols-outlined">blur_circular</span>
+                                    {t('studio.reverb')}
+                                </label>
+                                <span className="slider-value">{Math.round(settings.reverb * 100)}{t('common.units.percent')}</span>
+                            </div>
+                            <div className="slider-wrapper">
+                                <div className="slider-fill" style={{ width: `${settings.reverb * 100}%` }}></div>
+                                <input className="stitch-slider" type="range" min="0" max="1" step="0.01" value={settings.reverb} onChange={(e) => updateSetting('reverb', parseFloat(e.target.value))} />
+                            </div>
+                        </div>
+
+                        <div className="slider-group">
+                            <div className="slider-header">
+                                <label className="slider-label">
+                                    <span className="material-symbols-outlined">history</span>
+                                    {t('studio.delay')}
+                                </label>
+                                <span className="slider-value">{Math.round(settings.delay * 100)}{t('common.units.percent')}</span>
+                            </div>
+                            <div className="slider-wrapper">
+                                <div className="slider-fill" style={{ width: `${settings.delay * 100}%` }}></div>
+                                <input className="stitch-slider" type="range" min="0" max="1" step="0.01" value={settings.delay} onChange={(e) => updateSetting('delay', parseFloat(e.target.value))} />
+                            </div>
+                        </div>
+
+                        <div className="slider-group">
+                            <div className="slider-header">
+                                <label className="slider-label">
+                                    <span className="material-symbols-outlined">repeat</span>
+                                    {t('studio.feedback')}
+                                </label>
+                                <span className="slider-value">{Math.round(settings.feedback * 100)}{t('common.units.percent')}</span>
+                            </div>
+                            <div className="slider-wrapper">
+                                <div className="slider-fill" style={{ width: `${settings.feedback * 100}%` }}></div>
+                                <input className="stitch-slider" type="range" min="0" max="1" step="0.01" value={settings.feedback} onChange={(e) => updateSetting('feedback', parseFloat(e.target.value))} />
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -300,7 +371,24 @@ export const Studio: React.FC = () => {
                             onClick={isRecording ? () => {
                                 stopRecording();
                                 setIsSaveModalOpen(true);
-                            } : startRecording}
+                                // Prepare recap
+                                setSessionStats({
+                                    totalNotes: currentSessionNotes,
+                                    maxCombo: maxSessionMultiplier,
+                                    score: comboScore,
+                                    duration: Math.floor((Date.now() - sessionStartTime) / 1000),
+                                    avgVelocity: currentSessionNotes > 0 ? currentSessionVelocity / currentSessionNotes : 0.8
+                                });
+                            } : () => {
+                                startRecording();
+                                setSessionStartTime(Date.now());
+                                setCurrentSessionNotes(0);
+                                setCurrentSessionVelocity(0);
+                                setMaxSessionMultiplier(1);
+                                setComboScore(0);
+                                setMultiplier(1);
+                                setComboProgress(0);
+                            }}
                         >
                             <span className="material-symbols-outlined">
                                 {isRecording ? 'stop' : 'fiber_manual_record'}
@@ -338,9 +426,26 @@ export const Studio: React.FC = () => {
             {/* Save Recording Modal */}
             <SaveRecordingModal
                 isOpen={isSaveModalOpen}
-                onClose={() => setIsSaveModalOpen(false)}
-                onSave={saveRecording}
-                onDiscard={discardRecording}
+                onClose={() => {
+                    setIsSaveModalOpen(false);
+                    setIsRecapOpen(true);
+                }}
+                onSave={(name) => {
+                    saveRecording(name);
+                    setIsSaveModalOpen(false);
+                    setIsRecapOpen(true);
+                }}
+                onDiscard={() => {
+                    discardRecording();
+                    setIsSaveModalOpen(false);
+                    setIsRecapOpen(true);
+                }}
+            />
+
+            <SessionRecap
+                isOpen={isRecapOpen}
+                onClose={() => setIsRecapOpen(false)}
+                stats={sessionStats}
             />
 
             {/* Gallery Overlay */}

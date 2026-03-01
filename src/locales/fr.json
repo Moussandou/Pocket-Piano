@@ -256,6 +256,17 @@
         "record": "Enregistrer",
         "library": "Bibliothèque",
         "help": "Aide",
+        "reverb": "Réverb",
+        "delay": "Délai",
+        "feedback": "Feedback",
+        "sessionRecap": "Récapitulatif de Session",
+        "stats": {
+            "totalNotes": "TOTAL NOTES",
+            "duration": "DURÉE",
+            "maxCombo": "MULTIPLICATEUR MAX",
+            "finalScore": "SCORE FINAL",
+            "avgVelocity": "VELOCITY MOY."
+        },
         "units": {
             "db": "dB",
             "percent": "%",

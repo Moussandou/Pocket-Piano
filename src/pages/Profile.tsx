@@ -22,13 +22,10 @@ export const Profile: React.FC = () => {
         totalSessions: 0,
         lastSession: null as Recording | null,
         avgVelocity: 0,
-        isLoading: true,
-        // Combined with global stats
-        globalPlaytime: 0,
-        globalNotes: 0,
-        globalAvgVelocity: 0,
-        globalSessions: 0
+        isLoading: true
     });
+    const [statsTimeframe, setStatsTimeframe] = useState<'weekly' | 'monthly' | 'yearly'>('weekly');
+    const { exportSettings, importSettings } = useSettings();
 
     useEffect(() => {
         if (user) {
@@ -41,37 +38,52 @@ export const Profile: React.FC = () => {
             const unsubRecordings = onSnapshot(recordingsQuery, (snapshot) => {
                 let playtime = 0;
                 let notesCount = 0;
-                let lastSession: Recording | null = null;
                 let totalVelocity = 0;
                 let noteCountForVelocity = 0;
+                const sessions: Recording[] = [];
 
                 snapshot.docs.forEach(doc => {
-                    const data = doc.data();
-                    playtime += data.duration || 0;
-                    notesCount += (data.notes || []).length;
+                    const data = doc.data() as Recording & { timestamp: any };
+                    const timestamp = data.timestamp instanceof Timestamp
+                        ? data.timestamp.toMillis()
+                        : (typeof data.timestamp === 'number' ? data.timestamp : 0);
 
-                    const recNotes = data.notes || [];
-                    recNotes.forEach((n: { velocity?: number }) => {
-                        if (typeof n.velocity === 'number') {
-                            totalVelocity += n.velocity;
-                            noteCountForVelocity++;
-                        }
-                    });
+                    const now = Date.now();
+                    const weekMs = 7 * 24 * 60 * 60 * 1000;
+                    const monthMs = 30 * 24 * 60 * 60 * 1000;
+                    const yearMs = 365 * 24 * 60 * 60 * 1000;
 
-                    const ts = data.timestamp;
-                    const timestamp = (ts && ts instanceof Timestamp) ? ts.toMillis() : (typeof ts === 'number' ? ts : 0);
+                    let inTimeframe = true;
+                    if (statsTimeframe === 'weekly') inTimeframe = (now - timestamp) <= weekMs;
+                    else if (statsTimeframe === 'monthly') inTimeframe = (now - timestamp) <= monthMs;
+                    else if (statsTimeframe === 'yearly') inTimeframe = (now - timestamp) <= yearMs;
 
-                    if (!lastSession || timestamp > (lastSession.timestamp instanceof Timestamp ? lastSession.timestamp.toMillis() : 0)) {
-                        lastSession = { ...data, id: doc.id } as Recording;
+                    if (inTimeframe) {
+                        playtime += data.duration || 0;
+                        notesCount += (data.notes || []).length;
+                        const recNotes = data.notes || [];
+                        recNotes.forEach((n: { velocity?: number }) => {
+                            if (typeof n.velocity === 'number') {
+                                totalVelocity += n.velocity;
+                                noteCountForVelocity++;
+                            }
+                        });
+                        sessions.push({ ...data, id: doc.id } as Recording);
                     }
+                });
+
+                const sortedSessions = [...sessions].sort((a, b) => {
+                    const tA = (a.timestamp instanceof Timestamp) ? a.timestamp.toMillis() : (typeof a.timestamp === 'number' ? a.timestamp : 0);
+                    const tB = (b.timestamp instanceof Timestamp) ? b.timestamp.toMillis() : (typeof b.timestamp === 'number' ? b.timestamp : 0);
+                    return tB - tA;
                 });
 
                 setStats(prev => ({
                     ...prev,
                     totalPlaytime: playtime,
                     totalNotes: notesCount,
-                    totalSessions: snapshot.size,
-                    lastSession,
+                    totalSessions: sessions.length,
+                    lastSession: sortedSessions[0] || null,
                     avgVelocity: noteCountForVelocity > 0 ? (totalVelocity / noteCountForVelocity) : 0,
                     isLoading: false
                 }));
@@ -98,7 +110,7 @@ export const Profile: React.FC = () => {
                 unsubGlobal();
             };
         }
-    }, [user]);
+    }, [user, statsTimeframe]);
 
     const handleLogin = async (provider: AuthProvider = googleProvider) => {
         try {
@@ -118,6 +130,17 @@ export const Profile: React.FC = () => {
 
     const handleConfigClick = () => {
         configRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const handleImportClick = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (file) importSettings(file);
+        };
+        input.click();
     };
 
     const handleSaveName = async () => {
@@ -142,10 +165,10 @@ export const Profile: React.FC = () => {
         return n.toString();
     };
 
-    const totalDisplayPlaytime = stats.globalPlaytime || stats.totalPlaytime;
-    const totalDisplayNotes = stats.globalNotes || stats.totalNotes;
-    const totalDisplayAvgVelocity = stats.globalAvgVelocity || stats.avgVelocity;
-    const totalDisplaySessions = stats.globalSessions || stats.totalSessions;
+    const totalDisplayPlaytime = stats.totalPlaytime;
+    const totalDisplayNotes = stats.totalNotes;
+    const totalDisplayAvgVelocity = stats.avgVelocity;
+    const totalDisplaySessions = stats.totalSessions;
 
     const { hours, minutes } = formatPlaytime(totalDisplayPlaytime);
     return (
@@ -195,7 +218,7 @@ export const Profile: React.FC = () => {
                             </div>
                             <div className="profile-meta">
                                 <p>{t('profile.emailLabel')} <span className="highlight-text">{user?.email || t('profile.notSignedIn')}</span></p>
-                                <p>{t('profile.planLabel')} <span className="highlight-primary">{user ? t('profile.planValue') : 'FREE TIER'}</span></p>
+                                <p>{t('profile.planLabel')} <span className="highlight-primary">COMMUNITY TIER</span></p>
                             </div>
                         </div>
                     </div>
@@ -211,11 +234,11 @@ export const Profile: React.FC = () => {
                             </button>
                         ) : (
                             <div className="flex gap-2">
-                                <button className="btn-export" onClick={() => handleLogin(googleProvider)}>
+                                <button className="btn-config" onClick={() => handleLogin(googleProvider)}>
                                     <span className="material-symbols-outlined text-lg">login</span>
                                     Google
                                 </button>
-                                <button className="btn-export btn-discord" onClick={() => handleLogin(discordProvider)}>
+                                <button className="btn-config btn-discord" onClick={() => handleLogin(discordProvider)}>
                                     <span className="material-symbols-outlined text-lg">login</span>
                                     Discord
                                 </button>
@@ -255,6 +278,50 @@ export const Profile: React.FC = () => {
                                 </div>
                                 <div className="setting-group">
                                     <div className="setting-label-row">
+                                        <label>REVERB / SPACE</label>
+                                        <span>{Math.round(settings.reverb * 100)}%</span>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max="100"
+                                        value={settings.reverb * 100}
+                                        onChange={(e) => updateSetting('reverb', parseInt(e.target.value) / 100)}
+                                        className="profile-slider"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="setting-group">
+                                        <div className="setting-label-row">
+                                            <label>DELAY</label>
+                                            <span>{Math.round(settings.delay * 100)}%</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="100"
+                                            value={settings.delay * 100}
+                                            onChange={(e) => updateSetting('delay', parseInt(e.target.value) / 100)}
+                                            className="profile-slider"
+                                        />
+                                    </div>
+                                    <div className="setting-group">
+                                        <div className="setting-label-row">
+                                            <label>FEEDBACK</label>
+                                            <span>{Math.round(settings.feedback * 100)}%</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="100"
+                                            value={settings.feedback * 100}
+                                            onChange={(e) => updateSetting('feedback', parseInt(e.target.value) / 100)}
+                                            className="profile-slider"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="setting-group">
+                                    <div className="setting-label-row">
                                         <label>{t('profile.settings.audio.transpose')}</label>
                                         <span>{settings.transpose > 0 ? `+${settings.transpose}` : settings.transpose} {t('common.units.st')}</span>
                                     </div>
@@ -284,9 +351,14 @@ export const Profile: React.FC = () => {
                                         </div>
                                     </div>
                                     <div className="switch-row">
-                                        <span className="switch-label">{t('profile.settings.audio.performanceMode')}</span>
-                                        <div className="switch-track active">
-                                            <div className="switch-thumb"></div>
+                                        <span className="switch-label">DATA EXPORT / IMPORT</span>
+                                        <div className="flex gap-2">
+                                            <button className="btn-mini" onClick={exportSettings}>
+                                                <span className="material-symbols-outlined text-sm">download</span>
+                                            </button>
+                                            <button className="btn-mini" onClick={handleImportClick}>
+                                                <span className="material-symbols-outlined text-sm">upload</span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -382,9 +454,18 @@ export const Profile: React.FC = () => {
                             <div className="chart-header">
                                 <h3 className="box-title text-2xl">{t('profile.stats.performanceAnalytics')}</h3>
                                 <div className="chart-tabs">
-                                    <button className="tab-active">{t('profile.stats.weekly')}</button>
-                                    <button className="tab-inactive">{t('profile.stats.monthly')}</button>
-                                    <button className="tab-inactive">{t('profile.stats.yearly')}</button>
+                                    <button
+                                        className={statsTimeframe === 'weekly' ? 'tab-active' : 'tab-inactive'}
+                                        onClick={() => setStatsTimeframe('weekly')}
+                                    >{t('profile.stats.weekly')}</button>
+                                    <button
+                                        className={statsTimeframe === 'monthly' ? 'tab-active' : 'tab-inactive'}
+                                        onClick={() => setStatsTimeframe('monthly')}
+                                    >{t('profile.stats.monthly')}</button>
+                                    <button
+                                        className={statsTimeframe === 'yearly' ? 'tab-active' : 'tab-inactive'}
+                                        onClick={() => setStatsTimeframe('yearly')}
+                                    >{t('profile.stats.yearly')}</button>
                                 </div>
                             </div>
                             <div className="chart-area">

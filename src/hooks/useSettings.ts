@@ -10,6 +10,9 @@ export interface UserSettings {
     sustain: number;
     transpose: number;
     historyDisplayMode: 'notes' | 'keys';
+    reverb: number; // 0 to 1
+    delay: number; // 0 to 1
+    feedback: number; // 0 to 1
 }
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -18,6 +21,9 @@ const DEFAULT_SETTINGS: UserSettings = {
     sustain: 0,
     transpose: 0,
     historyDisplayMode: 'keys',
+    reverb: 0.3,
+    delay: 0,
+    feedback: 0,
 };
 
 export const useSettings = () => {

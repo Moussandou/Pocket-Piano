@@ -255,7 +255,18 @@
         "stopRecording": "Stop Recording",
         "record": "Record",
         "library": "Library",
-        "help": "Help"
+        "help": "Help",
+        "reverb": "Reverb",
+        "delay": "Delay",
+        "feedback": "Feedback",
+        "sessionRecap": "Session Recap",
+        "stats": {
+            "totalNotes": "TOTAL NOTES",
+            "duration": "DURATION",
+            "maxCombo": "MAX MULTIPLIER",
+            "finalScore": "FINAL SCORE",
+            "avgVelocity": "AVG VELOCITY"
+        }
     },
     "credits": {
         "title": "Credits",

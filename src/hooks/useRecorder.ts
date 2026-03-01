@@ -9,6 +9,7 @@ export const useRecorder = () => {
     const [isRecording, setIsRecording] = useState(false);
     const [recordings, setRecordings] = useState<Recording[]>([]);
     const currentNotes = useRef<RecordedNote[]>([]);
+    const activeNotes = useRef<Map<string, { startTime: number; index: number }>>(new Map());
     const startTime = useRef<number>(0);
     const currentAudioBlob = useRef<Blob | null>(null);
 
@@ -19,16 +20,26 @@ export const useRecorder = () => {
         audioEngine.startRecording();
         setIsRecording(true);
         currentNotes.current = [];
+        activeNotes.current.clear();
         startTime.current = Date.now();
     }, []);
 
     const stopRecording = useCallback(async () => {
         setIsRecording(false);
+        // Clean up any notes still pressed
+        const now = Date.now() - startTime.current;
+        activeNotes.current.forEach((data) => {
+            if (currentNotes.current[data.index]) {
+                currentNotes.current[data.index].duration = now - (currentNotes.current[data.index].time);
+            }
+        });
+        activeNotes.current.clear();
         currentAudioBlob.current = await audioEngine.stopRecording();
     }, []);
 
     const discardRecording = useCallback(() => {
         currentNotes.current = [];
+        activeNotes.current.clear();
         currentAudioBlob.current = null;
         audioEngine.stopRecording(); // ensure it stops capturing
         setIsRecording(false);
@@ -42,6 +53,9 @@ export const useRecorder = () => {
             name,
             timestamp: Date.now(),
             notes: [...currentNotes.current],
+            duration: currentNotes.current.length > 0
+                ? (currentNotes.current[currentNotes.current.length - 1].time + (currentNotes.current[currentNotes.current.length - 1].duration || 0))
+                : 0
         };
 
         setRecordings(prev => [newRecording, ...prev]);
@@ -54,7 +68,7 @@ export const useRecorder = () => {
                     name,
                     notes: newRecording.notes,
                     timestamp: serverTimestamp(),
-                    duration: currentNotes.current[currentNotes.current.length - 1].time
+                    duration: newRecording.duration
                 });
                 console.log("Recording saved to cloud");
             } catch (error) {
@@ -78,21 +92,41 @@ export const useRecorder = () => {
         currentNotes.current = []; // Clear buffer after saving
     }, []);
 
-    const recordNote = useCallback((note: string, velocity: number = 0.8) => {
+    const recordNote = useCallback((note: string, velocity: number = 0.8, type: 'DOWN' | 'UP' = 'DOWN') => {
         if (!isRecording) return;
-        currentNotes.current.push({
-            note,
-            velocity,
-            time: Date.now() - startTime.current,
-        });
+
+        const now = Date.now() - startTime.current;
+
+        if (type === 'DOWN') {
+            const noteIndex = currentNotes.current.length;
+            currentNotes.current.push({
+                note,
+                velocity,
+                time: now,
+                duration: 0
+            });
+            activeNotes.current.set(note, { startTime: now, index: noteIndex });
+        } else {
+            const data = activeNotes.current.get(note);
+            if (data !== undefined) {
+                const duration = now - data.startTime;
+                if (currentNotes.current[data.index]) {
+                    currentNotes.current[data.index].duration = duration;
+                }
+                activeNotes.current.delete(note);
+            }
+        }
     }, [isRecording]);
 
     const playRecording = useCallback((recording: Recording) => {
         recording.notes.forEach(note => {
             setTimeout(() => {
                 audioEngine.playNote(note.note, note.velocity);
-                // On simule un release après 200ms si pas de durée définie
-                setTimeout(() => audioEngine.releaseNote(note.note), 200);
+                if (note.duration) {
+                    setTimeout(() => audioEngine.releaseNote(note.note), note.duration);
+                } else {
+                    setTimeout(() => audioEngine.releaseNote(note.note), 200);
+                }
             }, note.time);
         });
     }, []);

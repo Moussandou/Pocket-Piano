@@ -4,6 +4,8 @@ import * as lamejs from 'lamejs-fixed';
 
 class AudioEngine {
     private sampler: Tone.Sampler | null = null;
+    private reverb: Tone.Reverb | null = null;
+    private delay: Tone.FeedbackDelay | null = null;
     private initPromise: Promise<void> | null = null;
     private isLoaded: boolean = false;
     private transposeOffset: number = 0;
@@ -24,11 +26,17 @@ class AudioEngine {
             try {
                 await Tone.start(); // Required by browsers
 
-                // Setup recorder
-                if (!this.recorder) {
-                    this.recorder = new Tone.Recorder();
-                    Tone.Destination.connect(this.recorder);
-                }
+                // Setup effects
+                this.reverb = new Tone.Reverb({
+                    decay: 2.5,
+                    wet: 0.3
+                }).toDestination();
+
+                this.delay = new Tone.FeedbackDelay({
+                    delayTime: "8n",
+                    feedback: 0.2,
+                    wet: 0
+                }).connect(this.reverb);
 
                 this.sampler = new Tone.Sampler({
                     urls: {
@@ -55,7 +63,13 @@ class AudioEngine {
                         console.error("Failed to load sampler", err);
                         reject(err);
                     }
-                }).toDestination();
+                }).connect(this.delay);
+
+                // Setup recorder
+                if (!this.recorder) {
+                    this.recorder = new Tone.Recorder();
+                    Tone.Destination.connect(this.recorder);
+                }
 
             } catch (error) {
                 console.error("Failed to initialize audio engine", error);
@@ -96,6 +110,24 @@ class AudioEngine {
         this.volumeDb = db;
         if (this.sampler) {
             this.sampler.volume.value = db;
+        }
+    }
+
+    public setReverb(wet: number) {
+        if (this.reverb) {
+            this.reverb.wet.value = wet;
+        }
+    }
+
+    public setDelay(wet: number) {
+        if (this.delay) {
+            this.delay.wet.value = wet;
+        }
+    }
+
+    public setFeedback(feedback: number) {
+        if (this.delay) {
+            this.delay.feedback.value = feedback;
         }
     }
 
