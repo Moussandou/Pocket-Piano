@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useCallback } from 'react';
 import { resolveNoteFromEvent, getLabelForNote } from '../../domain/constants';
 import { audioEngine } from '../../engine/audio';
 
@@ -33,11 +33,20 @@ interface PianoProps {
 }
 
 export const Piano: React.FC<PianoProps> = ({ onNotePlayed, onNoteReleased }) => {
-    const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
+    // Use a ref-backed Set to avoid stale closure issues with keyboard events.
+    // A separate render counter forces re-renders for visual updates.
+    const activeKeysRef = useRef<Set<string>>(new Set());
+    const [, forceRender] = React.useState(0);
+    const triggerRender = useCallback(() => forceRender(n => n + 1), []);
 
     // Track which note each physical key is currently playing.
-    // Prevents stuck notes when Shift is released before the key.
     const codeToNote = useRef<Map<string, string>>(new Map());
+
+    // Keep latest callbacks in refs to avoid recreating keyboard handlers.
+    const onNotePlayedRef = useRef(onNotePlayed);
+    onNotePlayedRef.current = onNotePlayed;
+    const onNoteReleasedRef = useRef(onNoteReleased);
+    onNoteReleasedRef.current = onNoteReleased;
 
     const notes = useMemo(() => {
         const arr = [];
@@ -51,53 +60,47 @@ export const Piano: React.FC<PianoProps> = ({ onNotePlayed, onNoteReleased }) =>
         return arr;
     }, []);
 
-    const onPress = useCallback((note: string) => {
-        if (!activeKeys.has(note)) {
-            setActiveKeys(prev => new Set(prev).add(note));
-            audioEngine.playNote(note);
-            onNotePlayed?.(note);
-        }
-    }, [activeKeys, onNotePlayed]);
+    const pressNote = useCallback((note: string) => {
+        if (activeKeysRef.current.has(note)) return;
+        activeKeysRef.current.add(note);
+        triggerRender();
+        audioEngine.playNote(note);
+        onNotePlayedRef.current?.(note);
+    }, [triggerRender]);
 
-    const onRelease = useCallback((note: string) => {
-        if (activeKeys.has(note)) {
-            setActiveKeys(prev => {
-                const next = new Set(prev);
-                next.delete(note);
-                return next;
-            });
-            audioEngine.releaseNote(note);
-            onNoteReleased?.(note);
-        }
-    }, [activeKeys, onNoteReleased]);
-
-    const handleKeyDown = useCallback((e: KeyboardEvent) => {
-        if (e.repeat) return;
-        const note = resolveNoteFromEvent(e);
-        if (note) {
-            codeToNote.current.set(e.code, note);
-            onPress(note);
-        }
-    }, [onPress]);
-
-    const handleKeyUp = useCallback((e: KeyboardEvent) => {
-        // Release the note stored at keydown, not the one resolved now.
-        // This avoids stuck notes when Shift state changes mid-press.
-        const note = codeToNote.current.get(e.code);
-        if (note) {
-            codeToNote.current.delete(e.code);
-            onRelease(note);
-        }
-    }, [onRelease]);
+    const releaseNote = useCallback((note: string) => {
+        if (!activeKeysRef.current.has(note)) return;
+        activeKeysRef.current.delete(note);
+        triggerRender();
+        audioEngine.releaseNote(note);
+        onNoteReleasedRef.current?.(note);
+    }, [triggerRender]);
 
     useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.repeat) return;
+            const note = resolveNoteFromEvent(e);
+            if (note) {
+                codeToNote.current.set(e.code, note);
+                pressNote(note);
+            }
+        };
+
+        const handleKeyUp = (e: KeyboardEvent) => {
+            const note = codeToNote.current.get(e.code);
+            if (note) {
+                codeToNote.current.delete(e.code);
+                releaseNote(note);
+            }
+        };
+
         window.addEventListener('keydown', handleKeyDown);
         window.addEventListener('keyup', handleKeyUp);
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
-    }, [handleKeyDown, handleKeyUp]);
+    }, [pressNote, releaseNote]);
 
     const getKeyLabel = (note: string) => {
         return getLabelForNote(note);
@@ -111,9 +114,9 @@ export const Piano: React.FC<PianoProps> = ({ onNotePlayed, onNoteReleased }) =>
                     note={note}
                     isBlack={note.includes('#')}
                     label={getKeyLabel(note)}
-                    active={activeKeys.has(note)}
-                    onPress={onPress}
-                    onRelease={onRelease}
+                    active={activeKeysRef.current.has(note)}
+                    onPress={pressNote}
+                    onRelease={releaseNote}
                 />
             ))}
         </div>

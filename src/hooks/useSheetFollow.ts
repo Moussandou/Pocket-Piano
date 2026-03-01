@@ -51,18 +51,18 @@ export function useSheetFollow() {
 
     const start = useCallback(() => {
         if (tokens.length === 0) return;
-        setCursor(startCursor);
-        setResults(prev => {
-            const next = [...prev];
-            // Reset everything from startCursor onward
-            for (let i = startCursor; i < next.length; i++) {
-                next[i] = 'pending';
-            }
-            return next;
-        });
+        const startResults = results.map((r, i) => i >= startCursor ? 'pending' as TokenResult : r);
+        // Skip any pauses at the start position
+        let idx = startCursor;
+        while (idx < tokens.length && tokens[idx].type === 'pause') {
+            startResults[idx] = 'correct';
+            idx++;
+        }
+        setCursor(idx);
+        setResults(startResults);
         setIsActive(true);
         chordBuffer.current.clear();
-    }, [tokens, startCursor]);
+    }, [tokens, startCursor, results]);
 
     const stop = useCallback(() => {
         setIsActive(false);
@@ -70,17 +70,19 @@ export function useSheetFollow() {
     }, []);
 
     const restart = useCallback(() => {
-        setCursor(startCursor);
-        setResults(prev => {
-            const next = [...prev];
-            for (let i = startCursor; i < next.length; i++) {
-                next[i] = 'pending';
-            }
-            return next;
-        });
+        const freshResults = results.map((r, i) =>
+            i >= startCursor ? 'pending' as TokenResult : r
+        );
+        let idx = startCursor;
+        while (idx < tokens.length && tokens[idx].type === 'pause') {
+            freshResults[idx] = 'correct';
+            idx++;
+        }
+        setCursor(idx);
+        setResults(freshResults);
         setIsActive(true);
         chordBuffer.current.clear();
-    }, [startCursor]);
+    }, [startCursor, tokens, results]);
 
     const setStartPosition = useCallback((index: number) => {
         if (index >= 0 && index < tokens.length) {

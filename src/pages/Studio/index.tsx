@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Piano } from '../../components/Piano/Piano';
 import { audioEngine } from '../../engine/audio';
 import { useRecorder } from '../../hooks/useRecorder';
@@ -32,6 +32,8 @@ export const Studio: React.FC = () => {
     const { trackNote } = useAnalytics();
     const { comboScore, multiplier, comboProgress, processNoteHit, resetCombo, maxSessionMultiplier } = useComboSystem();
     const sheetFollow = useSheetFollow();
+    const sheetFollowRef = useRef(sheetFollow);
+    sheetFollowRef.current = sheetFollow;
     const { user } = useAuth();
 
     const [activeKeys, setActiveKeys] = useState<string[]>([]);
@@ -114,10 +116,10 @@ export const Studio: React.FC = () => {
             recordNote(note, velocity, 'DOWN');
             trackNote(note, velocity);
 
-            // Sheet follow: find the keyboard key for this note and validate
-            if (sheetFollow.isActive) {
+            // Sheet follow: validate the pressed note
+            if (sheetFollowRef.current.isActive) {
                 const label = getLabelForNote(note);
-                if (label) sheetFollow.validateKey(label);
+                if (label) sheetFollowRef.current.validateKey(label);
             }
         } else {
             setActiveKeys(prev => prev.filter(k => k !== note));
