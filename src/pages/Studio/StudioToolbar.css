@@ -1,0 +1,136 @@
+/* StudioToolbar — Right sidebar, tool buttons, record button */
+
+.sidebar-right {
+    width: 64px;
+    border-left: 1px solid var(--neutral-dark);
+    background: var(--bg-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0;
+    z-index: 40;
+    flex-shrink: 0;
+}
+
+.tool-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.tool-group.bottom {
+    margin-top: auto;
+}
+
+.btn-tool {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--neutral-mid);
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+.btn-tool:hover {
+    color: var(--neutral-dark);
+    background: var(--neutral-light);
+}
+
+.btn-tool.active-record {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.btn-tool.is-recording {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-color: #ef4444;
+    animation: pulse-record 1.5s infinite;
+}
+
+@keyframes pulse-record {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
+.active-record {
+    color: var(--primary);
+    background: rgba(13, 89, 242, 0.1);
+}
+
+.btn-tool.active {
+    color: var(--neutral-dark);
+    background: var(--neutral-light);
+}
+
+/* Prominent Record Button */
+.record-btn-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.btn-record-prominent {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 3px solid #ef4444;
+    background: transparent;
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-record-prominent .material-symbols-outlined {
+    font-size: 28px;
+}
+
+.btn-record-prominent:hover {
+    background: #ef4444;
+    color: #fff;
+}
+
+.btn-record-prominent.is-recording {
+    background: #ef4444;
+    color: #fff;
+    animation: recordPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes recordPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+    }
+}
+
+.record-timer {
+    font-size: 0.75rem;
+    color: #ef4444;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.05em;
+}

@@ -7,13 +7,17 @@ import { useAnalytics } from '../../hooks/useAnalytics';
 import { useTranslation } from 'react-i18next';
 import { useComboSystem } from './useComboSystem';
 import { StudioSidebar } from './StudioSidebar';
-import { StudioToolbar } from './StudioToolbar';
+
 import { formatTime } from '../../utils/formatters';
 
 import { RecordingGallery } from '../../components/Gallery/RecordingGallery';
 import { SaveRecordingModal } from '../../components/Modals/SaveRecordingModal';
 import { SessionRecap } from '../../components/Modals/SessionRecap';
 import { KEYBOARD_MAP } from '../../domain/constants';
+
+import './StudioSidebar.css';
+import './StudioStage.css';
+import './StudioToolbar.css';
 
 export const Studio: React.FC = () => {
     const { t } = useTranslation();
@@ -26,7 +30,6 @@ export const Studio: React.FC = () => {
     const [activeKeys, setActiveKeys] = useState<string[]>([]);
     const [noteHistory, setNoteHistory] = useState<string[]>([]);
     const [showGallery, setShowGallery] = useState(false);
-    const [showHelp, setShowHelp] = useState(false);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
     const [isRecapOpen, setIsRecapOpen] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);

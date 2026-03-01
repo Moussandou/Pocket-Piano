@@ -1,0 +1,205 @@
+/* StudioStage — Main stage, visualizer, combo, note history */
+
+.main-stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background-image: linear-gradient(var(--neutral-light) 1px, transparent 1px), linear-gradient(90deg, var(--neutral-light) 1px, transparent 1px);
+    background-size: 40px 40px;
+    overflow: hidden;
+}
+
+.stage-content {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 1rem;
+    padding-inline: 2.5rem;
+    overflow: hidden;
+}
+
+.stage-visualizer {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    padding: 0 10%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.6;
+}
+
+.vis-bar {
+    width: 12px;
+    background: var(--neutral-light);
+    border-radius: 6px 6px 0 0;
+    transition: height 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.vis-bar.primary {
+    background: linear-gradient(to top, var(--primary), rgba(13, 89, 242, 0.2));
+    box-shadow: 0 0 20px var(--primary);
+    animation: bar-glow 2s infinite ease-in-out;
+}
+
+@keyframes bar-glow {
+    0% {
+        filter: brightness(1);
+        transform: scaleX(1);
+    }
+
+    50% {
+        filter: brightness(1.2);
+        transform: scaleX(1.1);
+    }
+
+    100% {
+        filter: brightness(1);
+        transform: scaleX(1);
+    }
+}
+
+.stage-status-left {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.status-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--neutral-mid);
+}
+
+.status-value-large {
+    font-size: 2.25rem;
+    font-family: 'Space Mono', monospace;
+    color: var(--neutral-dark);
+}
+
+.stage-status-right {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: right;
+}
+
+.status-value-med {
+    font-size: 1.25rem;
+    font-family: 'Space Mono', monospace;
+    color: var(--primary);
+}
+
+.note-history-list {
+    display: flex;
+    gap: 0.75rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 1.25rem;
+    color: var(--neutral-dark);
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+    min-height: 1.5rem;
+}
+
+.note-history-item {
+    opacity: 0.4;
+    transition: all 0.2s;
+}
+
+.note-history-item:first-child {
+    opacity: 1;
+    color: var(--primary);
+    font-weight: 800;
+    transform: scale(1.2);
+    text-shadow: 0 0 10px rgba(13, 89, 242, 0.3);
+}
+
+.note-history-item:not(:first-child) {
+    opacity: 0.5;
+}
+
+.streak-container {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.streak-value {
+    font-size: 1.25rem;
+    font-family: 'Space Mono', monospace;
+    color: var(--primary);
+}
+
+.streak-label {
+    font-size: 0.625rem;
+    font-family: 'Space Mono', monospace;
+    color: var(--neutral-mid);
+    text-transform: uppercase;
+}
+
+/* Combo System */
+.combo-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 120px;
+}
+
+.combo-value-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.multiplier-badge {
+    background: var(--primary);
+    color: white;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+    border-radius: 2px;
+    animation: pulse-small 2s infinite;
+}
+
+.combo-bar-container {
+    width: 100%;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 0.25rem;
+}
+
+.combo-bar-fill {
+    height: 100%;
+    background: var(--primary);
+    transition: width 0.1s linear;
+    box-shadow: 0 0 8px var(--primary);
+}
+
+@keyframes pulse-small {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
