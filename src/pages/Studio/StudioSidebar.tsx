@@ -82,6 +82,35 @@ export const StudioSidebar: React.FC<StudioSidebarProps> = ({
                         </div>
                     </div>
                 </div>
+                <div className="control-divider"></div>
+
+                {/* Instrument Selection */}
+                <div className="control-section">
+                    <div className="slider-header" style={{ marginBottom: '1rem' }}>
+                        <label className="slider-label">
+                            <span className="material-symbols-outlined">piano</span>
+                            {t('studio.instrument')}
+                        </label>
+                        <span className="slider-value" style={{ textTransform: 'uppercase' }}>
+                            {settings.currentInstrument}
+                        </span>
+                    </div>
+                    <div className="instrument-selector">
+                        {[
+                            { id: 'piano', label: 'Grand Piano', icon: 'piano' },
+                            { id: 'marimba', label: 'Casio Marimba', icon: 'music_note' }
+                        ].map(instr => (
+                            <button
+                                key={instr.id}
+                                className={`btn-instrument ${settings.currentInstrument === instr.id ? 'active' : ''}`}
+                                onClick={() => updateSetting('currentInstrument', instr.id)}
+                            >
+                                <span className="material-symbols-outlined">{instr.icon}</span>
+                                <span>{instr.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
 
                 <div className="control-divider"></div>
 

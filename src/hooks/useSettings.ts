@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { db, auth } from '../infra/firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+import { audioEngine } from '../engine/audio';
 
 export interface UserSettings {
     pianoColor: string;
@@ -16,6 +17,7 @@ export interface UserSettings {
     darkMode: boolean;
     metronomeBpm: number;
     metronomeVolume: number;
+    currentInstrument: string;
 }
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -30,6 +32,7 @@ const DEFAULT_SETTINGS: UserSettings = {
     darkMode: false,
     metronomeBpm: 120,
     metronomeVolume: -6,
+    currentInstrument: 'piano',
 };
 
 export const useSettings = () => {
@@ -48,6 +51,14 @@ export const useSettings = () => {
             setDoc(doc(db, 'userSettings', auth.currentUser.uid), settings, { merge: true });
         }
     }, [settings]);
+
+    // Sync instrument with AudioEngine
+    useEffect(() => {
+        const loadInstr = async () => {
+            await audioEngine.loadInstrument(settings.currentInstrument);
+        };
+        loadInstr();
+    }, [settings.currentInstrument]);
 
     // Load from Firestore on mount/auth change
     useEffect(() => {

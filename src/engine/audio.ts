@@ -2,12 +2,38 @@ import * as Tone from 'tone';
 // @ts-ignore
 import * as lamejs from 'lamejs-fixed';
 
+const INSTRUMENT_CONFIGS: Record<string, { baseUrl: string; urls: Record<string, string> }> = {
+    piano: {
+        baseUrl: "https://tonejs.github.io/audio/salamander/",
+        urls: {
+            A0: "A0.mp3", C1: "C1.mp3", "D#1": "Ds1.mp3", "F#1": "Fs1.mp3",
+            A1: "A1.mp3", C2: "C2.mp3", "D#2": "Ds2.mp3", "F#2": "Fs2.mp3",
+            A2: "A2.mp3", C3: "C3.mp3", "D#3": "Ds3.mp3", "F#3": "Fs3.mp3",
+            A3: "A3.mp3", C4: "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3",
+            A4: "A4.mp3", C5: "C5.mp3", "D#5": "Ds5.mp3", "F#5": "Fs5.mp3",
+            A5: "A5.mp3", C6: "C6.mp3", "D#6": "Ds6.mp3", "F#6": "Fs6.mp3",
+            A6: "A6.mp3", C7: "C7.mp3", "D#7": "Ds7.mp3", "F#7": "Fs7.mp3",
+            A7: "A7.mp3", C8: "C8.mp3"
+        }
+    },
+    marimba: {
+        baseUrl: "https://tonejs.github.io/audio/casio/",
+        urls: {
+            "A1": "A1.mp3", "A2": "A2.mp3", "A3": "A3.mp3", "A4": "A4.mp3", "A5": "A5.mp3",
+            "C2": "C2.mp3", "C3": "C3.mp3", "C4": "C4.mp3", "C5": "C5.mp3", "C6": "C6.mp3",
+            "D#2": "Ds2.mp3", "D#3": "Ds3.mp3", "D#4": "Ds4.mp3", "D#5": "Ds5.mp3",
+            "F#2": "Fs2.mp3", "F#3": "Fs3.mp3", "F#4": "Fs4.mp3", "F#5": "Fs5.mp3"
+        }
+    }
+};
+
 class AudioEngine {
     private sampler: Tone.Sampler | null = null;
     private reverb: Tone.Reverb | null = null;
     private delay: Tone.FeedbackDelay | null = null;
     private initPromise: Promise<void> | null = null;
     private isLoaded: boolean = false;
+    private currentInstrument: string = 'piano';
     private transposeOffset: number = 0;
     private sustainMultiplier: number = 1;
     private volumeDb: number = 0;
@@ -18,49 +44,55 @@ class AudioEngine {
 
     constructor() { }
 
-    public init(): Promise<void> {
-        if (this.isLoaded) return Promise.resolve();
-        if (this.initPromise) return this.initPromise;
+    public async init(instrumentName: string = 'piano'): Promise<void> {
+        if (this.isLoaded && this.currentInstrument === instrumentName) return Promise.resolve();
+
+        this.currentInstrument = instrumentName;
+        this.isLoaded = false;
+
+        if (this.initPromise && this.currentInstrument === instrumentName) return this.initPromise;
 
         this.initPromise = new Promise(async (resolve, reject) => {
             try {
                 await Tone.start(); // Required by browsers
 
-                // Setup effects
-                this.reverb = new Tone.Reverb({
-                    decay: 2.5,
-                    wet: 0.3
-                }).toDestination();
+                // Setup effects if not exists
+                if (!this.reverb) {
+                    this.reverb = new Tone.Reverb({
+                        decay: 2.5,
+                        wet: 0.3
+                    }).toDestination();
+                }
 
-                this.delay = new Tone.FeedbackDelay({
-                    delayTime: "8n",
-                    feedback: 0.2,
-                    wet: 0
-                }).connect(this.reverb);
+                if (!this.delay) {
+                    this.delay = new Tone.FeedbackDelay({
+                        delayTime: "8n",
+                        feedback: 0.2,
+                        wet: 0
+                    }).connect(this.reverb);
+                }
+
+                // Dispose old sampler
+                if (this.sampler) {
+                    this.sampler.dispose();
+                }
+
+                const config = INSTRUMENT_CONFIGS[instrumentName] || INSTRUMENT_CONFIGS.piano;
 
                 this.sampler = new Tone.Sampler({
-                    urls: {
-                        A0: "A0.mp3", C1: "C1.mp3", "D#1": "Ds1.mp3", "F#1": "Fs1.mp3",
-                        A1: "A1.mp3", C2: "C2.mp3", "D#2": "Ds2.mp3", "F#2": "Fs2.mp3",
-                        A2: "A2.mp3", C3: "C3.mp3", "D#3": "Ds3.mp3", "F#3": "Fs3.mp3",
-                        A3: "A3.mp3", C4: "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3",
-                        A4: "A4.mp3", C5: "C5.mp3", "D#5": "Ds5.mp3", "F#5": "Fs5.mp3",
-                        A5: "A5.mp3", C6: "C6.mp3", "D#6": "Ds6.mp3", "F#6": "Fs6.mp3",
-                        A6: "A6.mp3", C7: "C7.mp3", "D#7": "Ds7.mp3", "F#7": "Fs7.mp3",
-                        A7: "A7.mp3", C8: "C8.mp3"
-                    },
+                    urls: config.urls,
                     release: 1,
-                    baseUrl: "https://tonejs.github.io/audio/salamander/",
+                    baseUrl: config.baseUrl,
                     onload: () => {
                         this.isLoaded = true;
                         if (this.sampler) {
                             this.sampler.volume.value = this.volumeDb;
                         }
-                        console.log("Piano samples loaded");
+                        console.log(`${instrumentName} samples loaded`);
                         resolve();
                     },
                     onerror: (err) => {
-                        console.error("Failed to load sampler", err);
+                        console.error(`Failed to load sampler for ${instrumentName}`, err);
                         reject(err);
                     }
                 }).connect(this.delay);
@@ -78,6 +110,10 @@ class AudioEngine {
         });
 
         return this.initPromise;
+    }
+
+    public async loadInstrument(name: string) {
+        return this.init(name);
     }
 
     public async playNote(note: string, velocity: number = 0.8) {
