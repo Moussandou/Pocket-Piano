@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { sheetRepository } from '../../infra/repositories/sheetRepository';
 import { tokenLabel, type SheetToken } from '../../domain/sheetParser';
-import type { TokenResult } from '../../hooks/useSheetFollow';
+import type { TokenResult, SheetFollowStats } from '../../hooks/useSheetFollow';
 import type { Sheet } from '../../domain/models';
 import './SheetPanel.css';
 
@@ -14,7 +14,7 @@ interface SheetPanelProps {
     results: TokenResult[];
     isActive: boolean;
     isComplete: boolean;
-    stats: { correct: number; wrong: number; total: number };
+    stats: SheetFollowStats;
     sheetText: string;
     onLoadSheet: (text: string) => void;
     onStart: () => void;
@@ -272,16 +272,9 @@ export const SheetPanel: React.FC<SheetPanelProps> = ({
                         </div>
                     </div>
 
-                    {/* Completion message */}
+                    {/* Results screen */}
                     {isComplete && (
-                        <div className="sheet-complete-banner">
-                            <span className="material-symbols-outlined">celebration</span>
-                            <span>{t('sheet.complete', 'Partition terminée !')} — {stats.correct}/{stats.total}</span>
-                            <button className="sheet-btn-sm" onClick={onRestart}>
-                                <span className="material-symbols-outlined">replay</span>
-                                {t('sheet.replay', 'Rejouer')}
-                            </button>
-                        </div>
+                        <SheetResults stats={stats} onRestart={onRestart} />
                     )}
                 </div>
             )}
@@ -327,5 +320,75 @@ const SheetTokenElement: React.FC<SheetTokenElementProps> = ({
             <span className="sheet-token-label">{tokenLabel(token)}</span>
             {isStartMarker && <span className="start-indicator" />}
         </button>
+    );
+};
+
+/* Results screen */
+interface SheetResultsProps {
+    stats: SheetFollowStats;
+    onRestart: () => void;
+}
+
+function getVerdict(rating: number): { label: string; icon: string } {
+    if (rating >= 900) return { label: 'Parfait !', icon: 'military_tech' };
+    if (rating >= 750) return { label: 'Excellent', icon: 'stars' };
+    if (rating >= 600) return { label: 'Bien joue', icon: 'thumb_up' };
+    if (rating >= 400) return { label: 'Presque, continue', icon: 'trending_up' };
+    return { label: 'Continue de pratiquer', icon: 'fitness_center' };
+}
+
+function formatDuration(ms: number): string {
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    if (minutes > 0) return `${minutes}m ${secs}s`;
+    return `${secs}s`;
+}
+
+const SheetResults: React.FC<SheetResultsProps> = ({ stats, onRestart }) => {
+    const verdict = getVerdict(stats.rating);
+
+    return (
+        <div className="sheet-results">
+            <div className="sheet-results-verdict">
+                <span className="material-symbols-outlined sheet-results-verdict-icon">{verdict.icon}</span>
+                <span className="sheet-results-verdict-label">{verdict.label}</span>
+            </div>
+
+            <div className="sheet-results-rating">
+                <span className="sheet-results-rating-label">Score</span>
+                <span className="sheet-results-rating-value">{stats.rating}</span>
+            </div>
+
+            <div className="sheet-results-grid">
+                <div className="sheet-results-metric">
+                    <span className="sheet-results-metric-label">Precision</span>
+                    <span className="sheet-results-metric-value">{stats.accuracy}%</span>
+                </div>
+                <div className="sheet-results-metric">
+                    <span className="sheet-results-metric-label">Rythme</span>
+                    <span className="sheet-results-metric-value">{stats.rhythm}%</span>
+                </div>
+                <div className="sheet-results-metric">
+                    <span className="sheet-results-metric-label">Difficulte</span>
+                    <span className="sheet-results-metric-value sheet-results-stars">
+                        {'★'.repeat(stats.difficulty)}{'☆'.repeat(5 - stats.difficulty)}
+                    </span>
+                </div>
+                <div className="sheet-results-metric">
+                    <span className="sheet-results-metric-label">Temps</span>
+                    <span className="sheet-results-metric-value">{formatDuration(stats.durationMs)}</span>
+                </div>
+            </div>
+
+            <div className="sheet-results-detail">
+                {stats.correct}/{stats.total} notes correctes
+            </div>
+
+            <button className="sheet-btn-primary sheet-results-replay" onClick={onRestart}>
+                <span className="material-symbols-outlined">replay</span>
+                Rejouer
+            </button>
+        </div>
     );
 };

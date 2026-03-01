@@ -9,7 +9,7 @@
     position: absolute;
     top: 1.5rem;
     right: 1.5rem;
-    left: 50%;
+    left: 30%;
     z-index: 10;
     background: var(--bg-light);
     border: 1px solid var(--neutral-light);
@@ -495,23 +495,104 @@
     border-radius: 2px;
 }
 
-/* Completion banner */
-.sheet-complete-banner {
+/* Results screen */
+.sheet-results {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background: rgba(34, 197, 94, 0.08);
-    border: 1px solid rgba(34, 197, 94, 0.3);
-    border-radius: 8px;
-    color: #16a34a;
-    font-size: 0.8rem;
-    font-weight: 600;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: var(--bg-light);
+    border: 1px solid var(--neutral-light);
+    border-radius: 10px;
     animation: sheet-slide-down 0.3s ease;
 }
 
-.sheet-complete-banner .material-symbols-outlined {
-    font-size: 1.2rem;
+.sheet-results-verdict {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sheet-results-verdict-icon {
+    font-size: 1.6rem;
+    color: var(--primary);
+}
+
+.sheet-results-verdict-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--neutral-dark);
+    letter-spacing: 0.02em;
+}
+
+.sheet-results-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+}
+
+.sheet-results-rating-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--neutral-mid);
+    font-weight: 600;
+}
+
+.sheet-results-rating-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--neutral-dark);
+    font-variant-numeric: tabular-nums;
+}
+
+.sheet-results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.sheet-results-metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+}
+
+.sheet-results-metric-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--neutral-mid);
+    font-weight: 600;
+}
+
+.sheet-results-metric-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--neutral-dark);
+    font-variant-numeric: tabular-nums;
+}
+
+.sheet-results-stars {
+    color: #eab308;
+    letter-spacing: 0.1em;
+}
+
+.sheet-results-detail {
+    font-size: 0.7rem;
+    color: var(--neutral-mid);
+}
+
+.sheet-results-replay {
+    margin-top: 0.25rem;
 }
 
 /* Responsive */

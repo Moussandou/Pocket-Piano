@@ -278,16 +278,11 @@ export const Studio: React.FC = () => {
             {/* Modals */}
             <SaveRecordingModal
                 isOpen={isSaveModalOpen}
-                onClose={() => { setIsSaveModalOpen(false); setIsRecapOpen(true); }}
-                onSave={(name) => { saveRecording(name); setIsSaveModalOpen(false); setIsRecapOpen(true); }}
-                onDiscard={() => { discardRecording(); setIsSaveModalOpen(false); setIsRecapOpen(true); }}
+                onClose={() => { setIsSaveModalOpen(false); }}
+                onSave={(name) => { saveRecording(name); setIsSaveModalOpen(false); }}
+                onDiscard={() => { discardRecording(); setIsSaveModalOpen(false); }}
             />
 
-            <SessionRecap
-                isOpen={isRecapOpen}
-                onClose={() => setIsRecapOpen(false)}
-                stats={sessionStats}
-            />
 
             {showGallery && (
                 <div className="gallery-overlay">
