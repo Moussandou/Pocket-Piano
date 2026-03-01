@@ -17,7 +17,7 @@ import { formatTime } from '../../utils/formatters';
 
 import { RecordingGallery } from '../../components/Gallery/RecordingGallery';
 import { SaveRecordingModal } from '../../components/Modals/SaveRecordingModal';
-import { SessionRecap } from '../../components/Modals/SessionRecap';
+
 import { getLabelForNote } from '../../domain/constants';
 
 import './StudioSidebar.css';
@@ -30,7 +30,7 @@ export const Studio: React.FC = () => {
     const { settings, updateSetting, resetSettings, exportSettings, importSettings } = useSettings();
     const { isRecording, startRecording, stopRecording, saveRecording, discardRecording, recordNote } = useRecorder();
     const { trackNote } = useAnalytics();
-    const { comboScore, multiplier, comboProgress, processNoteHit, resetCombo, maxSessionMultiplier } = useComboSystem();
+    const { comboScore, multiplier, comboProgress, processNoteHit, resetCombo } = useComboSystem();
     const sheetFollow = useSheetFollow();
     const sheetFollowRef = useRef(sheetFollow);
     sheetFollowRef.current = sheetFollow;
@@ -42,18 +42,7 @@ export const Studio: React.FC = () => {
     const [showSheetPanel, setShowSheetPanel] = useState(false);
     const [savedSheets, setSavedSheets] = useState<Sheet[]>([]);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
-    const [isRecapOpen, setIsRecapOpen] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
-    const [sessionStats, setSessionStats] = useState({
-        totalNotes: 0,
-        maxCombo: 1,
-        score: 0,
-        duration: 0,
-        avgVelocity: 0.8
-    });
-    const [sessionStartTime, setSessionStartTime] = useState(0);
-    const [currentSessionNotes, setCurrentSessionNotes] = useState(0);
-    const [currentSessionVelocity, setCurrentSessionVelocity] = useState(0);
 
     // Subscribe to saved sheets
     useEffect(() => {
@@ -111,8 +100,6 @@ export const Studio: React.FC = () => {
             setActiveKeys(prev => Array.from(new Set([...prev, note])));
             setNoteHistory(prev => [note, ...prev].slice(0, 10));
             processNoteHit();
-            setCurrentSessionNotes(prev => prev + 1);
-            setCurrentSessionVelocity(prev => prev + velocity);
             recordNote(note, velocity, 'DOWN');
             trackNote(note, velocity);
 
@@ -131,22 +118,12 @@ export const Studio: React.FC = () => {
         if (isRecording) {
             stopRecording();
             setIsSaveModalOpen(true);
-            setSessionStats({
-                totalNotes: currentSessionNotes,
-                maxCombo: maxSessionMultiplier,
-                score: comboScore,
-                duration: Math.floor((Date.now() - sessionStartTime) / 1000),
-                avgVelocity: currentSessionNotes > 0 ? currentSessionVelocity / currentSessionNotes : 0.8
-            });
         } else {
             startRecording();
             setRecordingTime(0);
-            setSessionStartTime(Date.now());
-            setCurrentSessionNotes(0);
-            setCurrentSessionVelocity(0);
             resetCombo();
         }
-    }, [isRecording, stopRecording, startRecording, currentSessionNotes, maxSessionMultiplier, comboScore, sessionStartTime, currentSessionVelocity, resetCombo]);
+    }, [isRecording, stopRecording, startRecording, resetCombo]);
 
     return (
         <main className="app-main">

@@ -173,16 +173,16 @@ export const Library: React.FC = () => {
     const emptyMessage = !user
         ? t('library.signToSee')
         : filterMode === 'favorites'
-            ? t('library.noFavorites') || 'No favorites yet'
+            ? t('library.noFavorites')
             : searchQuery
-                ? t('library.noResults') || 'No results found'
+                ? t('library.noResults')
                 : t('library.noRecordings');
 
     return (
         <div className="library-container">
             <aside className="library-sidebar">
                 <div className="sidebar-section">
-                    <h3 className="sidebar-heading">{t('library.collections', 'Collections')}</h3>
+                    <h3 className="sidebar-heading">{t('library.collections')}</h3>
                     <ul className="sidebar-nav">
                         <li>
                             <button
@@ -190,7 +190,7 @@ export const Library: React.FC = () => {
                                 onClick={() => { setActiveTab('recordings'); setFilterMode('all'); }}
                             >
                                 <span className="material-symbols-outlined">library_music</span>
-                                <span>{t('library.recordings', 'Enregistrements')}</span>
+                                <span>{t('library.recordings')}</span>
                             </button>
                         </li>
                         <li>
@@ -199,13 +199,13 @@ export const Library: React.FC = () => {
                                 onClick={() => { setActiveTab('sheets'); setFilterMode('all'); }}
                             >
                                 <span className="material-symbols-outlined">queue_music</span>
-                                <span>{t('library.sheets', 'Partitions')}</span>
+                                <span>{t('library.sheets')}</span>
                             </button>
                         </li>
                     </ul>
                 </div>
                 <div className="sidebar-section">
-                    <h3 className="sidebar-heading">{t('library.filter', 'Filtrer')}</h3>
+                    <h3 className="sidebar-heading">{t('library.filter')}</h3>
                     <ul className="sidebar-nav">
                         <li>
                             <button
@@ -213,7 +213,7 @@ export const Library: React.FC = () => {
                                 onClick={() => setFilterMode('all')}
                             >
                                 <span className="material-symbols-outlined">select_all</span>
-                                <span>{t('library.allItems', 'Tout')}</span>
+                                <span>{t('library.allItems')}</span>
                             </button>
                         </li>
                         <li>
@@ -233,10 +233,10 @@ export const Library: React.FC = () => {
                 <div className="library-header">
                     <div className="header-text">
                         <h1 className="page-title">
-                            {activeTab === 'recordings' ? t('library.title') : t('library.sheetsTitle', 'Partitions')}
+                            {activeTab === 'recordings' ? t('library.title') : t('library.sheetsTitle')}
                         </h1>
                         <p className="page-subtitle">
-                            {activeTab === 'recordings' ? t('library.subtitle') : t('library.sheetsSubtitle', 'Vos partitions sauvegardees')}
+                            {activeTab === 'recordings' ? t('library.subtitle') : t('library.sheetsSubtitle')}
                         </p>
                     </div>
                     <div className="filters-group">
@@ -245,7 +245,7 @@ export const Library: React.FC = () => {
                             <input
                                 type="text"
                                 className="search-input"
-                                placeholder={t('library.searchPlaceholder') || 'Search...'}
+                                placeholder={t('library.searchPlaceholder')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
@@ -321,7 +321,7 @@ export const Library: React.FC = () => {
                         {sheetsLoading ? (
                             <div style={{ padding: '2rem', color: '#6b7280' }}>{t('library.loading')}</div>
                         ) : filteredSheets.length === 0 ? (
-                            <div style={{ padding: '2rem', color: '#6b7280' }}>{t('library.noSheets', 'Aucune partition sauvegardee')}</div>
+                            <div style={{ padding: '2rem', color: '#6b7280' }}>{t('library.noSheets')}</div>
                         ) : (
                             filteredSheets.map(sheet => (
                                 <div key={sheet.id} className="sheet-card" onClick={() => loadSheetInStudio(sheet)}>
