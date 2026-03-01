@@ -83,5 +83,9 @@ export const useSettings = () => {
         reader.readAsText(file);
     };
 
-    return { settings, updateSetting, exportSettings, importSettings };
+    const resetSettings = () => {
+        setSettings(DEFAULT_SETTINGS);
+    };
+
+    return { settings, updateSetting, resetSettings, exportSettings, importSettings };
 };

@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import * as Tone from 'tone';
-import pkg from '../../package.json';
 import { Piano } from '../components/Piano/Piano';
 import { audioEngine } from '../engine/audio';
 import { useRecorder } from '../hooks/useRecorder';
@@ -16,7 +14,7 @@ import { KEYBOARD_MAP } from '../domain/constants';
 export const Studio: React.FC = () => {
     const { t } = useTranslation();
     const [isLoaded, setIsLoaded] = useState(false);
-    const { settings, updateSetting } = useSettings();
+    const { settings, updateSetting, resetSettings } = useSettings();
     const { isRecording, startRecording, stopRecording, saveRecording, discardRecording, recordNote } = useRecorder();
     const { trackNote } = useAnalytics();
     const [activeKeys, setActiveKeys] = useState<string[]>([]);
@@ -43,7 +41,7 @@ export const Studio: React.FC = () => {
     const getDisplayNote = useCallback((note: string) => {
         if (settings.historyDisplayMode === 'keys') {
             const found = Object.entries(KEYBOARD_MAP).find((entry) => entry[1] === note);
-            return found ? found[0].toUpperCase() : note;
+            return found ? found[0] : note;
         }
         return note;
     }, [settings.historyDisplayMode]);
@@ -151,7 +149,6 @@ export const Studio: React.FC = () => {
                         <h2>{t('studio.controls')}</h2>
                         <div className="pulse-dot"></div>
                     </div>
-                    <p className="session-id">{t('studio.sessionId')} 8X-992A</p>
                 </div>
 
                 <div className="sidebar-content custom-scrollbar">
@@ -164,7 +161,7 @@ export const Studio: React.FC = () => {
                                     <span className="material-symbols-outlined">volume_up</span>
                                     {t('studio.masterGain')}
                                 </label>
-                                <span className="slider-value">{settings.volume} {t('studio.units.db')}</span>
+                                <span className="slider-value">{settings.volume} {t('common.units.db')}</span>
                             </div>
                             <div className="slider-wrapper">
                                 <div className="slider-fill" style={{ width: `${((settings.volume + 60) / 60) * 100}%` }}></div>
@@ -179,7 +176,7 @@ export const Studio: React.FC = () => {
                                     <span className="material-symbols-outlined">graphic_eq</span>
                                     {t('studio.sustain')}
                                 </label>
-                                <span className="slider-value">{Math.round(settings.sustain * 10)}{t('studio.units.percent')}</span>
+                                <span className="slider-value">{Math.round(settings.sustain * 10)}{t('common.units.percent')}</span>
                             </div>
                             <div className="slider-wrapper">
                                 <div className="slider-fill" style={{ width: `${(settings.sustain / 10) * 100}%` }}></div>
@@ -194,7 +191,7 @@ export const Studio: React.FC = () => {
                                     <span className="material-symbols-outlined">music_note</span>
                                     {t('studio.transpose')}
                                 </label>
-                                <span className="slider-value">{settings.transpose > 0 ? `+${settings.transpose}` : settings.transpose} {t('studio.units.st')}</span>
+                                <span className="slider-value">{settings.transpose > 0 ? `+${settings.transpose}` : settings.transpose} {t('common.units.st')}</span>
                             </div>
                             <div className="transpose-stitch">
                                 <button onClick={() => updateSetting('transpose', settings.transpose - 1)}>-</button>
@@ -229,71 +226,6 @@ export const Studio: React.FC = () => {
                             ))}
                         </div>
                     </div>
-
-                    <div className="control-divider"></div>
-
-                    {/* Audio Profile Section */}
-                    <div className="control-section">
-                        <div className="slider-header" style={{ marginBottom: '0.5rem' }}>
-                            <label className="slider-label">
-                                <span className="material-symbols-outlined">waves</span>
-                                {t('studio.engineProfile')}
-                            </label>
-                        </div>
-                        <div className="engine-status-row">
-                            <div className="engine-label">{t('studio.waveform')}</div>
-                            <div className="engine-value">{t('studio.grandPiano')}</div>
-                        </div>
-                        <div className="engine-status-row">
-                            <div className="engine-label">{t('studio.authMode')}</div>
-                            <div className="engine-value">{t('studio.secure')}</div>
-                        </div>
-
-                        <div className="control-divider" style={{ margin: '1.5rem 0' }}></div>
-
-                        {/* Audio Effects Section */}
-                        <div className="slider-group">
-                            <div className="slider-header">
-                                <label className="slider-label">
-                                    <span className="material-symbols-outlined">blur_circular</span>
-                                    {t('studio.reverb')}
-                                </label>
-                                <span className="slider-value">{Math.round(settings.reverb * 100)}{t('common.units.percent')}</span>
-                            </div>
-                            <div className="slider-wrapper">
-                                <div className="slider-fill" style={{ width: `${settings.reverb * 100}%` }}></div>
-                                <input className="stitch-slider" type="range" min="0" max="1" step="0.01" value={settings.reverb} onChange={(e) => updateSetting('reverb', parseFloat(e.target.value))} />
-                            </div>
-                        </div>
-
-                        <div className="slider-group">
-                            <div className="slider-header">
-                                <label className="slider-label">
-                                    <span className="material-symbols-outlined">history</span>
-                                    {t('studio.delay')}
-                                </label>
-                                <span className="slider-value">{Math.round(settings.delay * 100)}{t('common.units.percent')}</span>
-                            </div>
-                            <div className="slider-wrapper">
-                                <div className="slider-fill" style={{ width: `${settings.delay * 100}%` }}></div>
-                                <input className="stitch-slider" type="range" min="0" max="1" step="0.01" value={settings.delay} onChange={(e) => updateSetting('delay', parseFloat(e.target.value))} />
-                            </div>
-                        </div>
-
-                        <div className="slider-group">
-                            <div className="slider-header">
-                                <label className="slider-label">
-                                    <span className="material-symbols-outlined">repeat</span>
-                                    {t('studio.feedback')}
-                                </label>
-                                <span className="slider-value">{Math.round(settings.feedback * 100)}{t('common.units.percent')}</span>
-                            </div>
-                            <div className="slider-wrapper">
-                                <div className="slider-fill" style={{ width: `${settings.feedback * 100}%` }}></div>
-                                <input className="stitch-slider" type="range" min="0" max="1" step="0.01" value={settings.feedback} onChange={(e) => updateSetting('feedback', parseFloat(e.target.value))} />
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <div className="sidebar-footer">
@@ -301,6 +233,20 @@ export const Studio: React.FC = () => {
                         <div className="status-dot"></div>
                         <span>{t('studio.midiInput')} {isLoaded ? t('studio.active') : t('studio.waiting')}</span>
                     </div>
+
+                    <div className="control-divider"></div>
+
+                    <button
+                        className="btn-reset-studio"
+                        onClick={() => {
+                            if (window.confirm(t('studio.resetConfirm'))) {
+                                resetSettings();
+                            }
+                        }}
+                    >
+                        <span className="material-symbols-outlined">restart_alt</span>
+                        {t('studio.resetSettings')}
+                    </button>
                 </div>
             </aside>
 
@@ -341,13 +287,6 @@ export const Studio: React.FC = () => {
                             ))}
                             {noteHistory.length === 0 && <span className="note-history-item">--</span>}
                         </div>
-                    </div>
-
-                    <div className="stage-status-right">
-                        <span className="status-label">{t('studio.engineStatus')}</span>
-                        <span className="status-value-med">
-                            {Tone.getContext()?.sampleRate || '44100'}Hz / v{pkg.version}
-                        </span>
                     </div>
                 </div>
 
