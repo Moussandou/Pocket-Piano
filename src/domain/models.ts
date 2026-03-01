@@ -1,4 +1,3 @@
-
 import { Timestamp } from 'firebase/firestore';
 
 export interface RecordedNote {
@@ -19,6 +18,15 @@ export interface Recording {
     favorite?: boolean;
 }
 
+export interface Sheet {
+    id?: string;
+    userId?: string;
+    name: string;
+    content: string;
+    timestamp: number | Timestamp;
+    favorite?: boolean;
+}
+
 export interface UserStats {
     totalNotes: number;
     totalPlaytime: number;
@@ -28,7 +36,7 @@ export interface UserStats {
     lastUpdated: Timestamp;
     currentStreak: number;
     bestStreak: number;
-    lastPlayDate: string; // ISO date string YYYY-MM-DD
+    lastPlayDate: string;
     xp: number;
     level: number;
 }

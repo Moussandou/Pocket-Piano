@@ -4,9 +4,14 @@ import { audioEngine } from '../../engine/audio';
 import { useRecorder } from '../../hooks/useRecorder';
 import { useSettings } from '../../hooks/useSettings';
 import { useAnalytics } from '../../hooks/useAnalytics';
+import { useSheetFollow } from '../../hooks/useSheetFollow';
+import { useAuth } from '../../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { useComboSystem } from './useComboSystem';
 import { StudioSidebar } from './StudioSidebar';
+import { SheetPanel } from '../../components/SheetPanel/SheetPanel';
+import { sheetRepository } from '../../infra/repositories/sheetRepository';
+import type { Sheet } from '../../domain/models';
 
 import { formatTime } from '../../utils/formatters';
 
@@ -26,10 +31,14 @@ export const Studio: React.FC = () => {
     const { isRecording, startRecording, stopRecording, saveRecording, discardRecording, recordNote } = useRecorder();
     const { trackNote } = useAnalytics();
     const { comboScore, multiplier, comboProgress, processNoteHit, resetCombo, maxSessionMultiplier } = useComboSystem();
+    const sheetFollow = useSheetFollow();
+    const { user } = useAuth();
 
     const [activeKeys, setActiveKeys] = useState<string[]>([]);
     const [noteHistory, setNoteHistory] = useState<string[]>([]);
     const [showGallery, setShowGallery] = useState(false);
+    const [showSheetPanel, setShowSheetPanel] = useState(false);
+    const [savedSheets, setSavedSheets] = useState<Sheet[]>([]);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
     const [isRecapOpen, setIsRecapOpen] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
@@ -43,6 +52,25 @@ export const Studio: React.FC = () => {
     const [sessionStartTime, setSessionStartTime] = useState(0);
     const [currentSessionNotes, setCurrentSessionNotes] = useState(0);
     const [currentSessionVelocity, setCurrentSessionVelocity] = useState(0);
+
+    // Subscribe to saved sheets
+    useEffect(() => {
+        if (!user) {
+            setSavedSheets([]);
+            return;
+        }
+        return sheetRepository.subscribeByUser(user.uid, setSavedSheets);
+    }, [user]);
+
+    // Load sheet from Library (via sessionStorage)
+    useEffect(() => {
+        const pending = sessionStorage.getItem('pocket-piano-load-sheet');
+        if (pending) {
+            sessionStorage.removeItem('pocket-piano-load-sheet');
+            sheetFollow.loadSheet(pending);
+            setShowSheetPanel(true);
+        }
+    }, []);
 
     const getDisplayNote = useCallback((note: string) => {
         if (settings.historyDisplayMode === 'keys') {
@@ -86,6 +114,12 @@ export const Studio: React.FC = () => {
             setCurrentSessionVelocity(prev => prev + velocity);
             recordNote(note, velocity, 'DOWN');
             trackNote(note, velocity);
+
+            // Sheet follow: find the keyboard key for this note and validate
+            if (sheetFollow.isActive) {
+                const entry = Object.entries(KEYBOARD_MAP).find(([, v]) => v === note);
+                if (entry) sheetFollow.validateKey(entry[0]);
+            }
         } else {
             setActiveKeys(prev => prev.filter(k => k !== note));
             recordNote(note, 0, 'UP');
@@ -160,6 +194,27 @@ export const Studio: React.FC = () => {
                             {noteHistory.length === 0 && <span className="note-history-item">--</span>}
                         </div>
                     </div>
+
+                    {/* Sheet Follow Overlay */}
+                    <SheetPanel
+                        tokens={sheetFollow.tokens}
+                        cursor={sheetFollow.cursor}
+                        startCursor={sheetFollow.startCursor}
+                        results={sheetFollow.results}
+                        isActive={sheetFollow.isActive}
+                        isComplete={sheetFollow.isComplete}
+                        stats={sheetFollow.stats}
+                        sheetText={sheetFollow.sheetText}
+                        onLoadSheet={sheetFollow.loadSheet}
+                        onStart={sheetFollow.start}
+                        onStop={sheetFollow.stop}
+                        onRestart={sheetFollow.restart}
+                        onSetStartPosition={sheetFollow.setStartPosition}
+                        onReset={sheetFollow.reset}
+                        visible={showSheetPanel}
+                        onClose={() => setShowSheetPanel(false)}
+                        savedSheets={savedSheets}
+                    />
                 </div>
 
                 <div className="piano-stage">
@@ -191,6 +246,14 @@ export const Studio: React.FC = () => {
 
                     <button className={`btn-tool ${showGallery ? 'active' : ''}`} title={t('studio.library')} onClick={() => setShowGallery(!showGallery)}>
                         <span className="material-symbols-outlined">library_music</span>
+                    </button>
+
+                    <button
+                        className={`btn-tool ${showSheetPanel ? 'active' : ''}`}
+                        title={t('sheet.title', 'Partition')}
+                        onClick={() => setShowSheetPanel(!showSheetPanel)}
+                    >
+                        <span className="material-symbols-outlined">queue_music</span>
                     </button>
                 </div>
 

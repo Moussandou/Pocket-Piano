@@ -4,20 +4,25 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { audioEngine } from '../../engine/audio';
 import { recordingRepository } from '../../infra/repositories/recordingRepository';
+import { sheetRepository } from '../../infra/repositories/sheetRepository';
 import { formatDuration } from '../../utils/formatters';
 import { RecordingCard } from './RecordingCard';
 import { RecordingListItem } from './RecordingListItem';
 import '../Library.css';
 
-import type { Recording, RecordedNote } from '../../domain/models';
+import type { Recording, RecordedNote, Sheet } from '../../domain/models';
 
 type ViewMode = 'grid' | 'list';
 type FilterMode = 'all' | 'favorites';
+type LibraryTab = 'recordings' | 'sheets';
 
 export const Library: React.FC = () => {
     const { t } = useTranslation();
     const [recordings, setRecordings] = useState<Recording[]>([]);
+    const [sheets, setSheets] = useState<Sheet[]>([]);
     const [loading, setLoading] = useState(true);
+    const [sheetsLoading, setSheetsLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState<LibraryTab>('recordings');
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
     const [filterMode, setFilterMode] = useState<FilterMode>('all');
     const [searchQuery, setSearchQuery] = useState('');
@@ -36,6 +41,19 @@ export const Library: React.FC = () => {
         return recordingRepository.subscribeByUser(user.uid, (docs) => {
             setRecordings(docs);
             setLoading(false);
+        });
+    }, [user]);
+
+    // Subscribe to sheets
+    useEffect(() => {
+        if (!user) {
+            setSheets([]);
+            setSheetsLoading(false);
+            return;
+        }
+        return sheetRepository.subscribeByUser(user.uid, (docs) => {
+            setSheets(docs);
+            setSheetsLoading(false);
         });
     }, [user]);
 
@@ -125,6 +143,33 @@ export const Library: React.FC = () => {
         return true;
     });
 
+    const filteredSheets = sheets.filter(s => {
+        if (filterMode === 'favorites' && !s.favorite) return false;
+        if (searchQuery) {
+            return (s.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+        }
+        return true;
+    });
+
+    const removeSheet = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (confirm(t('library.confirmDelete'))) {
+            await sheetRepository.remove(id);
+        }
+    };
+
+    const toggleSheetFavorite = async (id: string, currentVal: boolean, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!id) return;
+        await sheetRepository.updateFavorite(id, !currentVal);
+    };
+
+    const loadSheetInStudio = (sheet: Sheet) => {
+        // Navigate to studio with sheet content via sessionStorage
+        sessionStorage.setItem('pocket-piano-load-sheet', sheet.content);
+        navigate('/app');
+    };
+
     const emptyMessage = !user
         ? t('library.signToSee')
         : filterMode === 'favorites'
@@ -137,15 +182,38 @@ export const Library: React.FC = () => {
         <div className="library-container">
             <aside className="library-sidebar">
                 <div className="sidebar-section">
-                    <h3 className="sidebar-heading">{t('library.allRecordings')}</h3>
+                    <h3 className="sidebar-heading">{t('library.collections', 'Collections')}</h3>
+                    <ul className="sidebar-nav">
+                        <li>
+                            <button
+                                className={`nav-link ${activeTab === 'recordings' ? 'active' : ''}`}
+                                onClick={() => { setActiveTab('recordings'); setFilterMode('all'); }}
+                            >
+                                <span className="material-symbols-outlined">library_music</span>
+                                <span>{t('library.recordings', 'Enregistrements')}</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                className={`nav-link ${activeTab === 'sheets' ? 'active' : ''}`}
+                                onClick={() => { setActiveTab('sheets'); setFilterMode('all'); }}
+                            >
+                                <span className="material-symbols-outlined">queue_music</span>
+                                <span>{t('library.sheets', 'Partitions')}</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div className="sidebar-section">
+                    <h3 className="sidebar-heading">{t('library.filter', 'Filtrer')}</h3>
                     <ul className="sidebar-nav">
                         <li>
                             <button
                                 className={`nav-link ${filterMode === 'all' ? 'active' : ''}`}
                                 onClick={() => setFilterMode('all')}
                             >
-                                <span className="material-symbols-outlined">library_music</span>
-                                <span>{t('library.allRecordings')}</span>
+                                <span className="material-symbols-outlined">select_all</span>
+                                <span>{t('library.allItems', 'Tout')}</span>
                             </button>
                         </li>
                         <li>
@@ -164,8 +232,12 @@ export const Library: React.FC = () => {
             <main className="library-main">
                 <div className="library-header">
                     <div className="header-text">
-                        <h1 className="page-title">{t('library.title')}</h1>
-                        <p className="page-subtitle">{t('library.subtitle')}</p>
+                        <h1 className="page-title">
+                            {activeTab === 'recordings' ? t('library.title') : t('library.sheetsTitle', 'Partitions')}
+                        </h1>
+                        <p className="page-subtitle">
+                            {activeTab === 'recordings' ? t('library.subtitle') : t('library.sheetsSubtitle', 'Vos partitions sauvegardees')}
+                        </p>
                     </div>
                     <div className="filters-group">
                         <div className="search-box">
@@ -187,60 +259,105 @@ export const Library: React.FC = () => {
                     </div>
                 </div>
 
-                {viewMode === 'grid' ? (
-                    <div className="sheets-grid">
-                        <button className="sheet-card new-sheet" onClick={() => navigate('/app')}>
-                            <div className="add-icon-wrapper">
-                                <span className="material-symbols-outlined text-4xl">add</span>
-                            </div>
-                            <span className="new-sheet-text">{t('library.newRecording')}</span>
-                        </button>
+                {/* Recordings tab */}
+                {activeTab === 'recordings' && (
+                    <>
+                        {viewMode === 'grid' ? (
+                            <div className="sheets-grid">
+                                <button className="sheet-card new-sheet" onClick={() => navigate('/app')}>
+                                    <div className="add-icon-wrapper">
+                                        <span className="material-symbols-outlined text-4xl">add</span>
+                                    </div>
+                                    <span className="new-sheet-text">{t('library.newRecording')}</span>
+                                </button>
 
-                        {loading ? (
-                            <div style={{ padding: '2rem', color: '#6b7280' }}>{t('library.loading')}</div>
-                        ) : filteredRecordings.length === 0 ? (
-                            <div style={{ padding: '2rem', color: '#6b7280' }}>{emptyMessage}</div>
+                                {loading ? (
+                                    <div style={{ padding: '2rem', color: '#6b7280' }}>{t('library.loading')}</div>
+                                ) : filteredRecordings.length === 0 ? (
+                                    <div style={{ padding: '2rem', color: '#6b7280' }}>{emptyMessage}</div>
+                                ) : (
+                                    filteredRecordings.map(rec => (
+                                        <RecordingCard
+                                            key={rec.id}
+                                            recording={rec}
+                                            isPlaying={playingId === rec.id}
+                                            onPlay={playRecording}
+                                            onToggleFavorite={toggleFavorite}
+                                            onDownload={downloadNotes}
+                                            onDelete={removeRecording}
+                                            formatDuration={formatDuration}
+                                        />
+                                    ))
+                                )}
+                            </div>
                         ) : (
-                            filteredRecordings.map(rec => (
-                                <RecordingCard
-                                    key={rec.id}
-                                    recording={rec}
-                                    isPlaying={playingId === rec.id}
-                                    onPlay={playRecording}
-                                    onToggleFavorite={toggleFavorite}
-                                    onDownload={downloadNotes}
-                                    onDelete={removeRecording}
-                                    formatDuration={formatDuration}
-                                />
-                            ))
+                            <div className="sheets-list">
+                                {loading ? (
+                                    <div style={{ padding: '2rem', color: '#6b7280' }}>{t('library.loading')}</div>
+                                ) : filteredRecordings.length === 0 ? (
+                                    <div style={{ padding: '2rem', color: '#6b7280' }}>{emptyMessage}</div>
+                                ) : (
+                                    filteredRecordings.map(rec => (
+                                        <RecordingListItem
+                                            key={rec.id}
+                                            recording={rec}
+                                            isPlaying={playingId === rec.id}
+                                            onPlay={playRecording}
+                                            onToggleFavorite={toggleFavorite}
+                                            onDownload={downloadNotes}
+                                            onDelete={removeRecording}
+                                            formatDuration={formatDuration}
+                                        />
+                                    ))
+                                )}
+                            </div>
                         )}
-                    </div>
-                ) : (
-                    <div className="sheets-list">
-                        {loading ? (
+                    </>
+                )}
+
+                {/* Sheets tab */}
+                {activeTab === 'sheets' && (
+                    <div className="sheets-grid">
+                        {sheetsLoading ? (
                             <div style={{ padding: '2rem', color: '#6b7280' }}>{t('library.loading')}</div>
-                        ) : filteredRecordings.length === 0 ? (
-                            <div style={{ padding: '2rem', color: '#6b7280' }}>{emptyMessage}</div>
+                        ) : filteredSheets.length === 0 ? (
+                            <div style={{ padding: '2rem', color: '#6b7280' }}>{t('library.noSheets', 'Aucune partition sauvegardee')}</div>
                         ) : (
-                            filteredRecordings.map(rec => (
-                                <RecordingListItem
-                                    key={rec.id}
-                                    recording={rec}
-                                    isPlaying={playingId === rec.id}
-                                    onPlay={playRecording}
-                                    onToggleFavorite={toggleFavorite}
-                                    onDownload={downloadNotes}
-                                    onDelete={removeRecording}
-                                    formatDuration={formatDuration}
-                                />
+                            filteredSheets.map(sheet => (
+                                <div key={sheet.id} className="sheet-card" onClick={() => loadSheetInStudio(sheet)}>
+                                    <div className="sheet-card-header">
+                                        <span className="material-symbols-outlined sheet-card-icon">queue_music</span>
+                                        <button
+                                            className={`sheet-card-fav ${sheet.favorite ? 'active' : ''}`}
+                                            onClick={(e) => toggleSheetFavorite(sheet.id!, sheet.favorite || false, e)}
+                                        >
+                                            <span className="material-symbols-outlined">{sheet.favorite ? 'favorite' : 'favorite_border'}</span>
+                                        </button>
+                                    </div>
+                                    <h4 className="sheet-card-name">{sheet.name}</h4>
+                                    <p className="sheet-card-preview">{sheet.content.slice(0, 60)}...</p>
+                                    <div className="sheet-card-actions">
+                                        <button className="sheet-card-btn" onClick={(e) => { e.stopPropagation(); loadSheetInStudio(sheet); }}>
+                                            <span className="material-symbols-outlined">play_arrow</span>
+                                        </button>
+                                        <button className="sheet-card-btn danger" onClick={(e) => removeSheet(sheet.id!, e)}>
+                                            <span className="material-symbols-outlined">delete</span>
+                                        </button>
+                                    </div>
+                                </div>
                             ))
                         )}
                     </div>
                 )}
 
-                {!loading && filteredRecordings.length > 0 && (
+                {!loading && activeTab === 'recordings' && filteredRecordings.length > 0 && (
                     <div className="library-pagination">
                         <span className="pagination-info">{t('library.showingCount', { count: filteredRecordings.length })}</span>
+                    </div>
+                )}
+                {!sheetsLoading && activeTab === 'sheets' && filteredSheets.length > 0 && (
+                    <div className="library-pagination">
+                        <span className="pagination-info">{t('library.showingCount', { count: filteredSheets.length })}</span>
                     </div>
                 )}
             </main>

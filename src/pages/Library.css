@@ -617,3 +617,92 @@
     gap: 0.25rem;
     flex-shrink: 0;
 }
+
+/* Sheet cards (Library Sheets tab) */
+.sheet-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.sheet-card-icon {
+    font-size: 2rem;
+    color: var(--primary, #0d59f2);
+    opacity: 0.6;
+}
+
+.sheet-card-fav {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #d1d5db;
+    transition: color 0.15s;
+    padding: 4px;
+}
+
+.sheet-card-fav:hover,
+.sheet-card-fav.active {
+    color: #ef4444;
+}
+
+.sheet-card-fav .material-symbols-outlined {
+    font-size: 1.25rem;
+}
+
+.sheet-card-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--neutral-dark, #111827);
+    margin: 0 0 0.5rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sheet-card-preview {
+    font-size: 0.75rem;
+    font-family: 'Space Mono', monospace;
+    color: #9ca3af;
+    margin: 0 0 1rem 0;
+    line-height: 1.4;
+    height: 2.8em;
+    overflow: hidden;
+    word-break: break-all;
+}
+
+.sheet-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: auto;
+}
+
+.sheet-card-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: transparent;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.sheet-card-btn:hover {
+    background: #f3f4f6;
+    color: var(--primary, #0d59f2);
+    border-color: var(--primary, #0d59f2);
+}
+
+.sheet-card-btn.danger:hover {
+    color: #ef4444;
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.sheet-card-btn .material-symbols-outlined {
+    font-size: 1.1rem;
+}
