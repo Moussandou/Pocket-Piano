@@ -10,10 +10,8 @@ interface ProfileStatsProps {
     displayNotes: number;
     displayAvgVelocity: number;
     displaySessions: number;
-    currentLevel: { label: string; min: number; max: number };
-    nextLevel: { label: string; min: number; max: number } | undefined;
+    currentLevel: number;
     levelProgress: number;
-    notesToNextLevel: number;
     statsTimeframe: Timeframe;
     setStatsTimeframe: (tf: Timeframe) => void;
     recordings: Recording[];
@@ -26,9 +24,7 @@ export const ProfileStats: React.FC<ProfileStatsProps> = ({
     displayAvgVelocity,
     displaySessions,
     currentLevel,
-    nextLevel,
     levelProgress,
-    notesToNextLevel,
     statsTimeframe,
     setStatsTimeframe,
     recordings,
@@ -55,16 +51,13 @@ export const ProfileStats: React.FC<ProfileStatsProps> = ({
                 <div className="stat-card">
                     <span className="stat-label">{t('profile.stats.skillLevel')}</span>
                     <div className="stat-val-group">
-                        <span className="stat-val primary-color">{currentLevel.label}</span>
+                        <span className="stat-val primary-color">LVL {currentLevel}</span>
                     </div>
-                    {nextLevel && (
-                        <div className="level-progress-wrapper">
-                            <div className="level-progress-bar">
-                                <div className="level-progress-fill" style={{ width: `${levelProgress}%` }}></div>
-                            </div>
-                            <span className="level-progress-text">{notesToNextLevel} notes to {nextLevel.label}</span>
+                    <div className="level-progress-wrapper">
+                        <div className="level-progress-bar">
+                            <div className="level-progress-fill" style={{ width: `${levelProgress}%` }}></div>
                         </div>
-                    )}
+                    </div>
                 </div>
                 <div className="stat-card">
                     <span className="stat-label">{t('profile.stats.sessions')}</span>

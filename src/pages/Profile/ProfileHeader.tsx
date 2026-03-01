@@ -7,9 +7,22 @@ import { useTranslation } from 'react-i18next';
 interface ProfileHeaderProps {
     user: User | null;
     onConfigClick: () => void;
+    currentLevel: number;
+    levelProgress: number;
+    xp: number;
+    currentStreak: number;
+    bestStreak: number;
 }
 
-export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onConfigClick }) => {
+export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
+    user,
+    onConfigClick,
+    currentLevel,
+    levelProgress,
+    xp,
+    currentStreak,
+    bestStreak,
+}) => {
     const { t } = useTranslation();
     const [isEditing, setIsEditing] = useState(false);
     const [newName, setNewName] = useState(user?.displayName || '');
@@ -86,6 +99,30 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onConfigClic
                         <p>{t('profile.emailLabel')} <span className="highlight-text">{user?.email || t('profile.notSignedIn')}</span></p>
                         <p>{t('profile.planLabel')} <span className="highlight-primary">COMMUNITY TIER</span></p>
                     </div>
+
+                    {/* Level & XP */}
+                    {user && (
+                        <div className="profile-level-bar">
+                            <div className="level-info">
+                                <span className="level-badge">LVL {currentLevel}</span>
+                                <span className="level-xp">{xp.toLocaleString()} XP</span>
+                            </div>
+                            <div className="xp-bar-track">
+                                <div className="xp-bar-fill" style={{ width: `${levelProgress}%` }}></div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Streak */}
+                    {user && currentStreak > 0 && (
+                        <div className="profile-streak">
+                            <span className="material-symbols-outlined streak-fire">local_fire_department</span>
+                            <span className="streak-count">{currentStreak} day{currentStreak > 1 ? 's' : ''}</span>
+                            {bestStreak > currentStreak && (
+                                <span className="streak-best">best: {bestStreak}</span>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="profile-actions">

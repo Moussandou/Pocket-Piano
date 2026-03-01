@@ -5,6 +5,7 @@ import { useProfileData } from './useProfileData';
 import { ProfileHeader } from './ProfileHeader';
 import { ProfileSettings } from './ProfileSettings';
 import { ProfileStats } from './ProfileStats';
+import { SessionHistory } from './SessionHistory';
 import '../Profile.css';
 
 export const Profile: React.FC = () => {
@@ -34,6 +35,11 @@ export const Profile: React.FC = () => {
                 <ProfileHeader
                     user={profileData.user}
                     onConfigClick={handleConfigClick}
+                    currentLevel={profileData.currentLevel}
+                    levelProgress={profileData.levelProgress}
+                    xp={profileData.xp}
+                    currentStreak={profileData.currentStreak}
+                    bestStreak={profileData.bestStreak}
                 />
 
                 <div className="profile-dashboard-grid">
@@ -52,15 +58,15 @@ export const Profile: React.FC = () => {
                         displayAvgVelocity={profileData.displayAvgVelocity}
                         displaySessions={profileData.displaySessions}
                         currentLevel={profileData.currentLevel}
-                        nextLevel={profileData.nextLevel}
                         levelProgress={profileData.levelProgress}
-                        notesToNextLevel={profileData.notesToNextLevel}
                         statsTimeframe={profileData.statsTimeframe}
                         setStatsTimeframe={profileData.setStatsTimeframe}
                         recordings={profileData.recordings}
                         lastSession={profileData.stats.lastSession}
                     />
                 </div>
+
+                <SessionHistory recordings={profileData.recordings} />
 
                 <footer className="profile-footer">
                     <p>{t('footer.copyright')} Systems v2.4.1</p>

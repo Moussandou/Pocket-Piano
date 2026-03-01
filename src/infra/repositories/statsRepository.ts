@@ -24,6 +24,11 @@ export const statsRepository = {
                     totalVelocity: data.totalVelocity || 0,
                     noteCountForVelocity: data.noteCountForVelocity || 0,
                     lastUpdated: data.lastUpdated,
+                    currentStreak: data.currentStreak || 0,
+                    bestStreak: data.bestStreak || 0,
+                    lastPlayDate: data.lastPlayDate || '',
+                    xp: data.xp || 0,
+                    level: data.level || 1,
                 });
             } else {
                 onData(null);

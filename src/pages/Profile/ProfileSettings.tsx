@@ -120,6 +120,15 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({
                             </div>
                         </div>
                         <div className="switch-row">
+                            <span className="switch-label">DARK MODE</span>
+                            <div
+                                className={`switch-track ${settings.darkMode ? 'active' : ''}`}
+                                onClick={() => updateSetting('darkMode', !settings.darkMode)}
+                            >
+                                <div className="switch-thumb"></div>
+                            </div>
+                        </div>
+                        <div className="switch-row">
                             <span className="switch-label">DATA EXPORT / IMPORT</span>
                             <div className="flex gap-2">
                                 <button className="btn-mini" onClick={exportSettings}>

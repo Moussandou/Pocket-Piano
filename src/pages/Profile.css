@@ -1057,3 +1057,95 @@
 .text-green-600 {
     color: #16a34a;
 }
+
+/* XP Level Bar */
+
+.profile-level-bar {
+    margin-top: 10px;
+}
+
+.level-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.level-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    background: var(--primary, #0d59f2);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.level-xp {
+    font-size: 0.72rem;
+    color: rgba(0, 0, 0, 0.45);
+    font-weight: 500;
+}
+
+.xp-bar-track {
+    height: 4px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.xp-bar-fill {
+    height: 100%;
+    background: var(--primary, #0d59f2);
+    border-radius: 2px;
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Streak */
+
+.profile-streak {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.streak-fire {
+    color: #f97316;
+    font-size: 18px;
+}
+
+.streak-count {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--industrial-text);
+}
+
+.streak-best {
+    font-size: 0.7rem;
+    color: rgba(0, 0, 0, 0.4);
+    margin-left: 4px;
+}
+
+/* Dark mode overrides for profile */
+
+[data-theme="dark"] .profile-container {
+    background-color: var(--bg-light);
+    color: #e8e8e8;
+}
+
+[data-theme="dark"] .level-xp {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+[data-theme="dark"] .xp-bar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .streak-count {
+    color: #e8e8e8;
+}
+
+[data-theme="dark"] .streak-best {
+    color: rgba(255, 255, 255, 0.4);
+}

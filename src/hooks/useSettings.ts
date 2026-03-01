@@ -10,9 +10,10 @@ export interface UserSettings {
     sustain: number;
     transpose: number;
     historyDisplayMode: 'notes' | 'keys';
-    reverb: number; // 0 to 1
-    delay: number; // 0 to 1
-    feedback: number; // 0 to 1
+    reverb: number;
+    delay: number;
+    feedback: number;
+    darkMode: boolean;
 }
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -24,6 +25,7 @@ const DEFAULT_SETTINGS: UserSettings = {
     reverb: 0.3,
     delay: 0,
     feedback: 0,
+    darkMode: false,
 };
 
 export const useSettings = () => {
@@ -35,6 +37,7 @@ export const useSettings = () => {
     useEffect(() => {
         localStorage.setItem('piano_settings', JSON.stringify(settings));
         document.documentElement.style.setProperty('--accent-color', settings.pianoColor);
+        document.documentElement.dataset.theme = settings.darkMode ? 'dark' : 'light';
 
         // Sync to Firestore if logged in
         if (auth.currentUser) {

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { useTranslation } from 'react-i18next';
 import { recordingRepository } from '../../infra/repositories/recordingRepository';
 import { statsRepository } from '../../infra/repositories/statsRepository';
+import { levelFromXp, levelProgress as calcLevelProgress, xpForLevel } from '../../domain/leveling';
 import type { Recording } from '../../domain/models';
 
 interface ProfileStats {
@@ -16,6 +16,10 @@ interface ProfileStats {
     globalPlaytime: number;
     globalAvgVelocity: number;
     globalSessions: number;
+    currentStreak: number;
+    bestStreak: number;
+    xp: number;
+    level: number;
 }
 
 const INITIAL_STATS: ProfileStats = {
@@ -29,6 +33,10 @@ const INITIAL_STATS: ProfileStats = {
     globalPlaytime: 0,
     globalAvgVelocity: 0,
     globalSessions: 0,
+    currentStreak: 0,
+    bestStreak: 0,
+    xp: 0,
+    level: 1,
 };
 
 export type Timeframe = 'weekly' | 'monthly' | 'yearly';
@@ -41,7 +49,6 @@ const TIMEFRAME_MS: Record<Timeframe, number> = {
 
 export function useProfileData() {
     const { user } = useAuth();
-    const { t } = useTranslation();
     const [stats, setStats] = useState<ProfileStats>(INITIAL_STATS);
     const [recordings, setRecordings] = useState<Recording[]>([]);
     const [statsTimeframe, setStatsTimeframe] = useState<Timeframe>('weekly');
@@ -101,6 +108,10 @@ export function useProfileData() {
                         ? globalStats.totalVelocity / globalStats.noteCountForVelocity
                         : 0,
                     globalSessions: globalStats.totalSessions,
+                    currentStreak: globalStats.currentStreak || 0,
+                    bestStreak: globalStats.bestStreak || 0,
+                    xp: globalStats.xp || 0,
+                    level: globalStats.level || 1,
                 }));
             }
         });
@@ -111,24 +122,14 @@ export function useProfileData() {
         };
     }, [user, statsTimeframe]);
 
-    // Derived display values — prefer global stats, fallback to recording-derived
     const displayNotes = stats.globalNotes || stats.totalNotes;
     const displayPlaytime = stats.globalPlaytime || stats.totalPlaytime;
     const displayAvgVelocity = stats.globalAvgVelocity || stats.avgVelocity;
     const displaySessions = stats.globalSessions || stats.totalSessions;
 
-    // Level progression
-    const LEVEL_THRESHOLDS = [
-        { label: t('profile.stats.skillNew'), min: 0, max: 500 },
-        { label: t('profile.stats.skillMid'), min: 500, max: 5000 },
-        { label: t('profile.stats.skillPro'), min: 5000, max: Infinity },
-    ];
-    const currentLevel = LEVEL_THRESHOLDS.find(l => displayNotes >= l.min && displayNotes < l.max) || LEVEL_THRESHOLDS[0];
-    const nextLevel = LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.indexOf(currentLevel) + 1];
-    const levelProgress = nextLevel
-        ? Math.min(100, ((displayNotes - currentLevel.min) / (nextLevel.min - currentLevel.min)) * 100)
-        : 100;
-    const notesToNextLevel = nextLevel ? nextLevel.min - displayNotes : 0;
+    const currentLevel = levelFromXp(stats.xp);
+    const progress = calcLevelProgress(stats.xp);
+    const xpToNextLevel = xpForLevel(currentLevel + 1);
 
     return {
         user,
@@ -141,8 +142,10 @@ export function useProfileData() {
         displayAvgVelocity,
         displaySessions,
         currentLevel,
-        nextLevel,
-        levelProgress,
-        notesToNextLevel,
+        levelProgress: progress * 100,
+        xpToNextLevel,
+        currentStreak: stats.currentStreak,
+        bestStreak: stats.bestStreak,
+        xp: stats.xp,
     };
 }

@@ -7,6 +7,15 @@
   --neutral-light: #E5E5E5;
 }
 
+[data-theme="dark"] {
+  --bg-light: #0c1017;
+  --bg-dark: #060a10;
+  --neutral-dark: #e8e8e8;
+  --neutral-mid: #9ca3af;
+  --neutral-light: #1e2433;
+  color-scheme: dark;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

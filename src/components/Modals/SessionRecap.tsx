@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import './SessionRecap.css';
 
 interface SessionRecapProps {
     isOpen: boolean;
