@@ -23,14 +23,17 @@ interface UseComboSystemReturn {
  */
 export function useComboSystem(): UseComboSystemReturn {
     const [combo, setCombo] = useState<ComboState>({ score: 0, multiplier: 1, progress: 0 });
-    const lastActionTime = useRef(Date.now());
-    const maxMultiplier = useRef(1);
+    const [maxSessionMultiplier, setMaxSessionMultiplier] = useState(1);
+    const lastActionTime = useRef(0);
+
+    const depletion = 2.5; // Amount of progress depleted per interval
+    const intervalTime = 100; // Milliseconds for depletion interval
 
     // Depletion interval
     useEffect(() => {
         const interval = setInterval(() => {
             setCombo(prev => {
-                let nextProgress = Math.max(0, prev.progress - 2.5);
+                const nextProgress = Math.max(0, prev.progress - depletion);
 
                 // Reset multiplier + score when progress hits 0
                 if (nextProgress <= 0 && (prev.multiplier > 1 || prev.score > 0)) {
@@ -44,7 +47,7 @@ export function useComboSystem(): UseComboSystemReturn {
 
                 return { ...prev, progress: nextProgress };
             });
-        }, 100);
+        }, intervalTime);
 
         return () => clearInterval(interval);
     }, []);
@@ -61,17 +64,17 @@ export function useComboSystem(): UseComboSystemReturn {
             else if (newScore > 2000) newMultiplier = 4;
             else if (newScore > 500) newMultiplier = 2;
 
-            if (newMultiplier > maxMultiplier.current) {
-                maxMultiplier.current = newMultiplier;
+            if (newMultiplier > maxSessionMultiplier) {
+                setMaxSessionMultiplier(newMultiplier);
             }
 
             return { score: newScore, multiplier: newMultiplier, progress: newProgress };
         });
-    }, []);
+    }, [maxSessionMultiplier]);
 
     const resetCombo = useCallback(() => {
         setCombo({ score: 0, multiplier: 1, progress: 0 });
-        maxMultiplier.current = 1;
+        setMaxSessionMultiplier(1);
     }, []);
 
     return {
@@ -80,6 +83,6 @@ export function useComboSystem(): UseComboSystemReturn {
         comboProgress: combo.progress,
         processNoteHit,
         resetCombo,
-        maxSessionMultiplier: maxMultiplier.current,
+        maxSessionMultiplier,
     };
 }

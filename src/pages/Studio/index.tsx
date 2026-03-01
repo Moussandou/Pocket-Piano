@@ -66,7 +66,6 @@ export const Studio: React.FC = () => {
     useEffect(() => {
         let interval: ReturnType<typeof setInterval>;
         if (isRecording) {
-            setRecordingTime(0);
             interval = setInterval(() => {
                 setRecordingTime(prev => prev + 1);
             }, 1000);
@@ -106,6 +105,7 @@ export const Studio: React.FC = () => {
             });
         } else {
             startRecording();
+            setRecordingTime(0);
             setSessionStartTime(Date.now());
             setCurrentSessionNotes(0);
             setCurrentSessionVelocity(0);

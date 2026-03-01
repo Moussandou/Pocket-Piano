@@ -40,14 +40,15 @@ export const Auth: React.FC = () => {
                 await createUserWithEmailAndPassword(auth, email, password);
             }
             navigate(from, { replace: true });
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const firebaseError = err as { code?: string };
             console.error("Auth error:", err);
             // Translate common Firebase errors
-            if (err.code === 'auth/email-already-in-use') {
+            if (firebaseError.code === 'auth/email-already-in-use') {
                 setError(t('auth.error.emailInUse'));
-            } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+            } else if (firebaseError.code === 'auth/invalid-credential' || firebaseError.code === 'auth/wrong-password' || firebaseError.code === 'auth/user-not-found') {
                 setError(t('auth.error.invalidCredentials'));
-            } else if (err.code === 'auth/weak-password') {
+            } else if (firebaseError.code === 'auth/weak-password') {
                 setError(t('auth.error.weakPassword'));
             } else {
                 setError(t('auth.error.generic'));
@@ -62,9 +63,10 @@ export const Auth: React.FC = () => {
         try {
             await signInWithPopup(auth, googleProvider);
             navigate(from, { replace: true });
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const firebaseError = err as { code?: string };
             console.error("Google Auth error:", err);
-            if (err.code !== 'auth/popup-closed-by-user') {
+            if (firebaseError.code !== 'auth/popup-closed-by-user') {
                 setError(t('auth.error.google'));
             }
         }
@@ -75,9 +77,10 @@ export const Auth: React.FC = () => {
         try {
             await signInWithPopup(auth, discordProvider);
             navigate(from, { replace: true });
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const firebaseError = err as { code?: string };
             console.error("Discord Auth error:", err);
-            if (err.code !== 'auth/popup-closed-by-user') {
+            if (firebaseError.code !== 'auth/popup-closed-by-user') {
                 setError(t('auth.error.discord'));
             }
         }

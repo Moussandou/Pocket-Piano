@@ -14,6 +14,8 @@ export interface UserSettings {
     delay: number;
     feedback: number;
     darkMode: boolean;
+    metronomeBpm: number;
+    metronomeVolume: number;
 }
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -26,6 +28,8 @@ const DEFAULT_SETTINGS: UserSettings = {
     delay: 0,
     feedback: 0,
     darkMode: false,
+    metronomeBpm: 120,
+    metronomeVolume: -6,
 };
 
 export const useSettings = () => {
