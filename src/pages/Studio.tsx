@@ -14,7 +14,7 @@ import { KEYBOARD_MAP } from '../domain/constants';
 export const Studio: React.FC = () => {
     const { t } = useTranslation();
     const [isLoaded, setIsLoaded] = useState(false);
-    const { settings, updateSetting, resetSettings } = useSettings();
+    const { settings, updateSetting, resetSettings, exportSettings, importSettings } = useSettings();
     const { isRecording, startRecording, stopRecording, saveRecording, discardRecording, recordNote } = useRecorder();
     const { trackNote } = useAnalytics();
     const [activeKeys, setActiveKeys] = useState<string[]>([]);
@@ -205,6 +205,53 @@ export const Studio: React.FC = () => {
                     </div>
 
                     <div className="control-divider"></div>
+
+                    {/* Audio FX Section */}
+                    <div className="control-section">
+                        <div className="slider-group">
+                            <div className="slider-header">
+                                <label className="slider-label">
+                                    <span className="material-symbols-outlined">blur_on</span>
+                                    {t('studio.reverb')}
+                                </label>
+                                <span className="slider-value">{Math.round(settings.reverb * 100)}{t('common.units.percent')}</span>
+                            </div>
+                            <div className="slider-wrapper">
+                                <div className="slider-fill" style={{ width: `${settings.reverb * 100}%` }}></div>
+                                <input className="stitch-slider" type="range" min="0" max="100" value={settings.reverb * 100} onChange={(e) => updateSetting('reverb', parseInt(e.target.value) / 100)} />
+                            </div>
+                        </div>
+
+                        <div className="slider-group">
+                            <div className="slider-header">
+                                <label className="slider-label">
+                                    <span className="material-symbols-outlined">schedule</span>
+                                    {t('studio.delay')}
+                                </label>
+                                <span className="slider-value">{Math.round(settings.delay * 100)}{t('common.units.percent')}</span>
+                            </div>
+                            <div className="slider-wrapper">
+                                <div className="slider-fill" style={{ width: `${settings.delay * 100}%` }}></div>
+                                <input className="stitch-slider" type="range" min="0" max="100" value={settings.delay * 100} onChange={(e) => updateSetting('delay', parseInt(e.target.value) / 100)} />
+                            </div>
+                        </div>
+
+                        <div className="slider-group">
+                            <div className="slider-header">
+                                <label className="slider-label">
+                                    <span className="material-symbols-outlined">laps</span>
+                                    {t('studio.feedback')}
+                                </label>
+                                <span className="slider-value">{Math.round(settings.feedback * 100)}{t('common.units.percent')}</span>
+                            </div>
+                            <div className="slider-wrapper">
+                                <div className="slider-fill" style={{ width: `${settings.feedback * 100}%` }}></div>
+                                <input className="stitch-slider" type="range" min="0" max="100" value={settings.feedback * 100} onChange={(e) => updateSetting('feedback', parseInt(e.target.value) / 100)} />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="control-divider"></div>
                     <div className="control-section">
                         <div className="slider-header" style={{ marginBottom: '1rem' }}>
                             <label className="slider-label">
@@ -235,6 +282,26 @@ export const Studio: React.FC = () => {
                     </div>
 
                     <div className="control-divider"></div>
+
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button className="btn-studio-action" onClick={exportSettings}>
+                            <span className="material-symbols-outlined">download</span>
+                            Export
+                        </button>
+                        <button className="btn-studio-action" onClick={() => {
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            input.accept = '.json';
+                            input.onchange = (e) => {
+                                const file = (e.target as HTMLInputElement).files?.[0];
+                                if (file) importSettings(file);
+                            };
+                            input.click();
+                        }}>
+                            <span className="material-symbols-outlined">upload</span>
+                            Import
+                        </button>
+                    </div>
 
                     <button
                         className="btn-reset-studio"

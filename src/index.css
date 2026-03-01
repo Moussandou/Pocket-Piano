@@ -889,6 +889,46 @@ button {
   font-family: 'Space Grotesk', sans-serif;
 }
 
+/* Studio sidebar action buttons */
+.btn-reset-studio,
+.btn-studio-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.625rem 1rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--neutral-dark);
+}
+
+.btn-reset-studio {
+  background-color: transparent;
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.btn-reset-studio:hover {
+  background-color: #ef4444;
+  color: #fff;
+}
+
+.btn-studio-action {
+  background-color: transparent;
+  color: var(--neutral-dark);
+}
+
+.btn-studio-action:hover {
+  background-color: var(--neutral-dark);
+  color: #fff;
+}
+
 /* Auth Manager */
 .auth-controls {
   display: flex;
