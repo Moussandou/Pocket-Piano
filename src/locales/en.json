@@ -1,4 +1,7 @@
 {
+    "site": {
+        "version": "ENGINE STATUS: ACTIVE"
+    },
     "common": {
         "units": {
             "db": "dB",

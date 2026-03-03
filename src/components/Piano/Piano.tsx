@@ -31,11 +31,18 @@ interface PianoProps {
     onNotePlayed?: (note: string) => void;
     onNoteReleased?: (note: string) => void;
     active?: boolean;
+    startOctave?: number;
+    endOctave?: number;
 }
 
-export const Piano: React.FC<PianoProps> = ({ onNotePlayed, onNoteReleased, active = true }) => {
-    // Use a ref-backed Set to avoid stale closure issues with keyboard events.
-    // A separate render counter forces re-renders for visual updates.
+export const Piano: React.FC<PianoProps> = ({
+    onNotePlayed,
+    onNoteReleased,
+    active = true,
+    startOctave = 2,
+    endOctave = 6
+}) => {
+    // ... existing code ...
     const activeKeysRef = useRef<Set<string>>(new Set());
     const [, forceRender] = React.useState(0);
     const triggerRender = useCallback(() => forceRender(n => n + 1), []);
@@ -63,14 +70,17 @@ export const Piano: React.FC<PianoProps> = ({ onNotePlayed, onNoteReleased, acti
     const notes = useMemo(() => {
         const arr = [];
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-        for (let octave = 2; octave <= 6; octave++) {
+        for (let octave = startOctave; octave <= endOctave; octave++) {
             for (let i = 0; i < 12; i++) {
                 arr.push(`${noteNames[i]}${octave}`);
             }
         }
-        arr.push('C7');
+        // Add C of the next octave if we are at the end
+        if (endOctave < 8) {
+            arr.push(`C${endOctave + 1}`);
+        }
         return arr;
-    }, []);
+    }, [startOctave, endOctave]);
 
     const pressNote = useCallback((note: string) => {
         if (activeKeysRef.current.has(note)) return;

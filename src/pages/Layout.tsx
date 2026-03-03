@@ -31,7 +31,6 @@ export const Layout: React.FC = () => {
                         <span className="material-symbols-outlined text-2xl">piano</span>
                         <h1>Pocket Piano</h1>
                     </Link>
-                    <span className="version-badge">v2.0.4</span>
                 </div>
 
                 <nav className="header-nav">

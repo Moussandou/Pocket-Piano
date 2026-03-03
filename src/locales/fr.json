@@ -1,4 +1,7 @@
 {
+    "site": {
+        "version": "ÉTAT DU SYSTÈME : ACTIF"
+    },
     "common": {
         "units": {
             "db": "dB",

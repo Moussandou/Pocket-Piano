@@ -64,7 +64,7 @@ export const Landing: React.FC = () => {
             <section className="hero-section border-bottom">
                 <div className="section-container hero-grid">
                     <div className="hero-content reveal">
-                        <div className="hero-tag mono">{t('site.version')} // v2.0.4</div>
+                        <div className="hero-tag mono">{t('site.version')}</div>
                         <h1 className="hero-title">{t('landing.hero.title')}</h1>
                         <p className="hero-description">{t('landing.hero.description')}</p>
                         <div className="hero-actions">
@@ -97,7 +97,7 @@ export const Landing: React.FC = () => {
                         <p className="hero-description" style={{ color: 'white', margin: '1rem auto' }}>{t('landing.try.description')}</p>
                     </div>
                     <div className="piano-wrapper reveal">
-                        <Piano active={demoPianoVisible} />
+                        <Piano active={demoPianoVisible} startOctave={3} endOctave={4} />
                     </div>
                 </div>
             </section>
