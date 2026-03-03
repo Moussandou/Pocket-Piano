@@ -36,36 +36,67 @@
         "status": "Statut Système"
     },
     "landing": {
-        "status": "SYS.PRÊT",
-        "latency": "Latence : 2ms",
-        "title1": "Réponse",
-        "title2": "Tactile",
-        "title3": "Numérique",
-        "description": "Découvrez la précision mécanique d'un piano à queue dans un environnement purement numérique. Un son VST professionnel directement dans votre navigateur.",
-        "btnStart": "Démarrer le Moteur",
-        "btnManual": "Manuel",
-        "metaVersion": "Version",
-        "metaBuild": "Build",
-        "metaAudio": "Audio",
-        "metaMidi": "MIDI",
-        "ctaTitle1": "Prêt à",
-        "ctaTitle2": "Jouer ?",
-        "ctaDesc": "Lancez l'interface maintenant. Aucune installation requise. Pure performance.",
-        "btnInitialize": "Initialiser l'Interface",
-        "checkNoInstall": "Sans Installation",
-        "checkFreeAccess": "Accès Gratuit",
-        "featureSubhead": "Capacités Système",
-        "featureTitle": "Spécifications de Base",
-        "featureStatus": "STATUT : EN LIGNE",
-        "featureModules": "MODULES : 3/3 ACTIFS",
-        "feat1Title": "Audio VST Pro",
-        "feat1Desc": "Échantillonnage haute fidélité de pianos à queue de concert. Moteur de lecture sans latence optimisé pour WebAssembly.",
-        "feat2Title": "Sync Cloud",
-        "feat2Desc": "Préservation transparente de l'état. Vos compositions, préréglages et mappages MIDI sont synchronisés instantanément.",
-        "feat3Title": "Visualisation en Direct",
-        "feat3Desc": "Analyse de fréquence en temps réel et suivi des touches. Boucle de retour visuel pour un monitoring précis des performances.",
-        "schematicAlt": "Schéma technique abstrait du mécanisme interne d'un piano",
-        "keysAlt": "Vue de dessus à haut contraste des touches de piano"
+        "hero": {
+            "title": "Réponse Tactile Numérique",
+            "subtitle": "Un moteur de piano professionnel reconstruit pour le web moderne.",
+            "description": "Découvrez la précision mécanique et l'échantillonnage haute fidélité dans un environnement purement numérique. Zéro installation, performance sans latence.",
+            "cta": "Démarrer l'Interface"
+        },
+        "try": {
+            "label": "Interaction en Direct",
+            "title": "Essayez maintenant",
+            "description": "Le moteur est actif. Jouez avec votre clavier ou votre souris pour tester la réponse sans latence."
+        },
+        "features": {
+            "subhead": "Capacités Système",
+            "title": "Modules Principaux",
+            "feat1": {
+                "title": "Moteur Audio VST",
+                "desc": "Échantillonnage haute fidélité de pianos de concert, optimisé pour une lecture Wasm sans latence."
+            },
+            "feat2": {
+                "title": "Architecture Cloud",
+                "desc": "Synchronisation multi-appareils transparente. Vos enregistrements et réglages suivent votre identité."
+            },
+            "feat3": {
+                "title": "Visualisation Live",
+                "desc": "Analyse de fréquence en temps réel et suivi des touches pour un contrôle précis des performances."
+            },
+            "feat4": {
+                "title": "Mastering MP3",
+                "desc": "Moteur d'enregistrement intégré avec export MP3 haute qualité."
+            },
+            "feat5": {
+                "title": "Partitions Interactives",
+                "desc": "Panneau de partitions complet avec mode de suivi intelligent pour maîtriser toute composition."
+            },
+            "feat6": {
+                "title": "Protocole MIDI",
+                "desc": "Pont direct pour matériel MIDI externe via l'API WebMIDI. Plug and play."
+            },
+            "feat7": {
+                "title": "Effets Analogiques",
+                "desc": "Modules professionnels de réverbération et de délai inspirés des équipements de studio vintage."
+            },
+            "feat8": {
+                "title": "Analyses de Progrès",
+                "desc": "Suivez votre XP, vos niveaux et vos séries de performances avec des statistiques détaillées."
+            },
+            "feat9": {
+                "title": "Mappage Global",
+                "desc": "Support natif des dispositions AZERTY et QWERTY sur 5 octaves complètes."
+            },
+            "feat10": {
+                "title": "Multi-région",
+                "desc": "Internationalisation complète avec basculement instantané entre les interfaces localisées."
+            }
+        },
+        "final": {
+            "title": "Prêt à composer ?",
+            "description": "Accédez à votre bibliothèque, synchronisez vos progrès et rejoignez le conservatoire numérique.",
+            "cta": "Initialiser la Session",
+            "kofi": "Soutenir le Projet"
+        }
     },
     "auth": {
         "sidebar": {

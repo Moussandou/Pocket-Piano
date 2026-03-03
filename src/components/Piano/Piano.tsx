@@ -30,9 +30,10 @@ const PianoKey: React.FC<KeyProps> = ({ note, isBlack, label, active, onPress, o
 interface PianoProps {
     onNotePlayed?: (note: string) => void;
     onNoteReleased?: (note: string) => void;
+    active?: boolean;
 }
 
-export const Piano: React.FC<PianoProps> = ({ onNotePlayed, onNoteReleased }) => {
+export const Piano: React.FC<PianoProps> = ({ onNotePlayed, onNoteReleased, active = true }) => {
     // Use a ref-backed Set to avoid stale closure issues with keyboard events.
     // A separate render counter forces re-renders for visual updates.
     const activeKeysRef = useRef<Set<string>>(new Set());
@@ -47,6 +48,17 @@ export const Piano: React.FC<PianoProps> = ({ onNotePlayed, onNoteReleased }) =>
     onNotePlayedRef.current = onNotePlayed;
     const onNoteReleasedRef = useRef(onNoteReleased);
     onNoteReleasedRef.current = onNoteReleased;
+
+    // Release all notes helper
+    const releaseAll = useCallback(() => {
+        activeKeysRef.current.forEach(note => {
+            audioEngine.releaseNote(note);
+            onNoteReleasedRef.current?.(note);
+        });
+        activeKeysRef.current.clear();
+        codeToNote.current.clear();
+        triggerRender();
+    }, [triggerRender]);
 
     const notes = useMemo(() => {
         const arr = [];
@@ -77,6 +89,11 @@ export const Piano: React.FC<PianoProps> = ({ onNotePlayed, onNoteReleased }) =>
     }, [triggerRender]);
 
     useEffect(() => {
+        if (!active) {
+            releaseAll();
+            return;
+        }
+
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.repeat) return;
             const note = resolveNoteFromEvent(e);
@@ -100,7 +117,7 @@ export const Piano: React.FC<PianoProps> = ({ onNotePlayed, onNoteReleased }) =>
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
-    }, [pressNote, releaseNote]);
+    }, [active, pressNote, releaseNote, releaseAll]);
 
     const getKeyLabel = (note: string) => {
         return getLabelForNote(note);

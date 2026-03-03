@@ -36,36 +36,67 @@
         "status": "System Status"
     },
     "landing": {
-        "status": "SYS.READY",
-        "latency": "Latency: 2ms",
-        "title1": "Digital",
-        "title2": "Tactile",
-        "title3": "Response",
-        "description": "Experience the mechanical precision of a grand piano in a purely digital environment. Professional VST audio directly in your browser.",
-        "btnStart": "Start Engine",
-        "btnManual": "Manual",
-        "metaVersion": "Version",
-        "metaBuild": "Build",
-        "metaAudio": "Audio",
-        "metaMidi": "MIDI",
-        "ctaTitle1": "Ready to",
-        "ctaTitle2": "Play?",
-        "ctaDesc": "Launch the interface now. Zero setup required. Pure performance.",
-        "btnInitialize": "Initialize Interface",
-        "checkNoInstall": "No Install",
-        "checkFreeAccess": "Free Access",
-        "featureSubhead": "System Capabilities",
-        "featureTitle": "Core Specifications",
-        "featureStatus": "STATUS: ONLINE",
-        "featureModules": "MODULES: 3/3 ACTIVE",
-        "feat1Title": "Pro VST Audio",
-        "feat1Desc": "High-fidelity sampling from world-class concert grands. Zero-latency playback engine optimized for web assembly.",
-        "feat2Title": "Cloud Sync",
-        "feat2Desc": "Seamless state preservation. Your compositions, presets, and MIDI maps are pushed to edge nodes instantly.",
-        "feat3Title": "Live Visualization",
-        "feat3Desc": "Real-time frequency analysis and key-press tracking. Visual feedback loop for precise performance monitoring.",
-        "schematicAlt": "Abstract technical schematic of piano internal mechanism",
-        "keysAlt": "High contrast overhead view of piano keys"
+        "hero": {
+            "title": "Digital Tactile Response",
+            "subtitle": "Professional piano engine reconstructed for the modern web.",
+            "description": "Experience mechanical precision and high-fidelity sampling in a pure digital environment. Zero setup, zero latency performance.",
+            "cta": "Start Interface"
+        },
+        "try": {
+            "label": "Live Interaction",
+            "title": "Try it now",
+            "description": "The engine is active. Play with your keyboard or mouse to experience the latency-free response."
+        },
+        "features": {
+            "subhead": "System Capabilities",
+            "title": "Core Modules",
+            "feat1": {
+                "title": "VST Audio Engine",
+                "desc": "High-fidelity sampling from concert grands. optimized for zero-latency Wasm playback."
+            },
+            "feat2": {
+                "title": "Cloud Architecture",
+                "desc": "Seamless multi-device synchronization. Your recordings and presets follow your identity."
+            },
+            "feat3": {
+                "title": "Live Visualization",
+                "desc": "Real-time frequency analysis and key-press tracking for precise performance monitoring."
+            },
+            "feat4": {
+                "title": "MP3 Mastering",
+                "desc": "Integrated recording engine with high-quality MP3 export capabilities."
+            },
+            "feat5": {
+                "title": "Sheet Music Mode",
+                "desc": "Full sheet panel with interactive follow mode to help you master any composition."
+            },
+            "feat6": {
+                "title": "MIDI Protocol",
+                "desc": "Direct bridge for external MIDI hardware via WebMIDI API. Plug and play."
+            },
+            "feat7": {
+                "title": "Analog Effects",
+                "desc": "Professional reverb and delay modules inspired by vintage studio gear."
+            },
+            "feat8": {
+                "title": "Progress Analytics",
+                "desc": "Track your XP, levels, and performance streaks with detailed usage statistics."
+            },
+            "feat9": {
+                "title": "Global Mapping",
+                "desc": "Native support for AZERTY and QWERTY layouts across 5 full octaves."
+            },
+            "feat10": {
+                "title": "Multi-region",
+                "desc": "Full internationalization with instant switching between localized interfaces."
+            }
+        },
+        "final": {
+            "title": "Ready to compose?",
+            "description": "Access your library, sync your progress, and join the digital conservatory.",
+            "cta": "Initialize Session",
+            "kofi": "Support Project"
+        }
     },
     "auth": {
         "sidebar": {

@@ -1,169 +1,154 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import {
+    Music,
+    Cloud,
+    Activity,
+    Download,
+    FileText,
+    Cable,
+    Sliders,
+    Trophy,
+    Keyboard,
+    Globe,
+    ArrowRight,
+    Play
+} from 'lucide-react';
+import { Piano } from '../components/Piano/Piano';
 import './Landing.css';
 
 export const Landing: React.FC = () => {
     const { t } = useTranslation();
+    const observerRef = useRef<IntersectionObserver | null>(null);
+    const [demoPianoVisible, setDemoPianoVisible] = React.useState(false);
+
+    useEffect(() => {
+        // Reveal animation on scroll
+        observerRef.current = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+
+                // Specifically track demo piano visibility
+                if (entry.target.classList.contains('piano-wrapper')) {
+                    setDemoPianoVisible(entry.isIntersecting);
+                }
+            });
+        }, { threshold: 0.2 });
+
+        document.querySelectorAll('.reveal, .piano-wrapper').forEach(el => {
+            observerRef.current?.observe(el);
+        });
+
+        return () => observerRef.current?.disconnect();
+    }, []);
+
+    const features = [
+        { id: 1, icon: <Music size={24} />, title: t('landing.features.feat1.title'), desc: t('landing.features.feat1.desc') },
+        { id: 2, icon: <Cloud size={24} />, title: t('landing.features.feat2.title'), desc: t('landing.features.feat2.desc') },
+        { id: 3, icon: <Activity size={24} />, title: t('landing.features.feat3.title'), desc: t('landing.features.feat3.desc') },
+        { id: 4, icon: <Download size={24} />, title: t('landing.features.feat4.title'), desc: t('landing.features.feat4.desc') },
+        { id: 5, icon: <FileText size={24} />, title: t('landing.features.feat5.title'), desc: t('landing.features.feat5.desc') },
+        { id: 6, icon: <Cable size={24} />, title: t('landing.features.feat6.title'), desc: t('landing.features.feat6.desc') },
+        { id: 7, icon: <Sliders size={24} />, title: t('landing.features.feat7.title'), desc: t('landing.features.feat7.desc') },
+        { id: 8, icon: <Trophy size={24} />, title: t('landing.features.feat8.title'), desc: t('landing.features.feat8.desc') },
+        { id: 9, icon: <Keyboard size={24} />, title: t('landing.features.feat9.title'), desc: t('landing.features.feat9.desc') },
+        { id: 10, icon: <Globe size={24} />, title: t('landing.features.feat10.title'), desc: t('landing.features.feat10.desc') },
+    ];
+
     return (
         <main className="landing-main">
-            {/* Hero Section */}
+            {/* 1. Hero Section */}
             <section className="hero-section border-bottom">
-                <div className="hero-grid">
-                    {/* Text Content (Left/Top) */}
-                    <div className="hero-content">
-                        <div className="system-status">
-                            <span>{t('landing.status')}</span>
-                            <span className="divider"></span>
-                            <span>{t('landing.latency')}</span>
-                        </div>
-                        <h2 className="hero-title">
-                            {t('landing.title1')}<br />
-                            {t('landing.title2')}<br />
-                            {t('landing.title3')}
-                        </h2>
-                        <p className="hero-description">
-                            {t('landing.description')}
-                        </p>
+                <div className="section-container hero-grid">
+                    <div className="hero-content reveal">
+                        <div className="hero-tag mono">{t('site.version')} // v2.0.4</div>
+                        <h1 className="hero-title">{t('landing.hero.title')}</h1>
+                        <p className="hero-description">{t('landing.hero.description')}</p>
                         <div className="hero-actions">
-                            <Link to="/app" className="btn-primary-tech">
-                                <span>{t('landing.btnStart')}</span>
-                                <span className="dot"></span>
+                            <Link to="/app" className="btn btn-primary">
+                                {t('landing.hero.cta')} <Play size={16} style={{ marginLeft: '8px' }} />
                             </Link>
-                            <button className="btn-secondary-tech">
-                                <span className="material-symbols-outlined">download</span>
-                                <span>{t('landing.btnManual')}</span>
-                            </button>
                         </div>
-
-                        {/* Technical Metadata Footer */}
-                        <div className="hero-meta">
-                            <div className="meta-grid">
-                                <div className="meta-item">
-                                    <span className="meta-label">{t('landing.metaVersion')}</span>
-                                    2.4.1 Stable
-                                </div>
-                                <div className="meta-item">
-                                    <span className="meta-label">{t('landing.metaBuild')}</span>
-                                    2940-X
-                                </div>
-                                <div className="meta-item">
-                                    <span className="meta-label">{t('landing.metaAudio')}</span>
-                                    96kHz / 24bit
-                                </div>
-                                <div className="meta-item">
-                                    <span className="meta-label">{t('landing.metaMidi')}</span>
-                                    Full Support
+                    </div>
+                    <div className="hero-visual reveal">
+                        <div className="piano-mockup">
+                            <div className="mockup-body">
+                                <div className="mockup-keys">
+                                    {[...Array(12)].map((_, i) => (
+                                        <div key={i} className={`mockup-key ${[1, 3, 6, 8, 10].includes(i % 12) ? 'black' : 'white'}`} />
+                                    ))}
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </section>
 
-                    {/* Visual Content (Right/Bottom) */}
-                    <div className="hero-visual">
-                        <div className="landing-grid-bg"></div>
-                        <div className="visual-wrapper">
-                            <img
-                                alt={t('landing.schematicAlt')}
-                                className="schematic-img"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBykQRsx-mK77vwqZkxZioliFwesGiVUUGPlvndtkku-FPkJmfk4kAaei6u6YDL7SOcaWOXVgu3zKZD7wOSp6hWhQmLdh37LywL4Y6ZyQNz4Z7oWDbBzcLXwr2RAvGyfwosqk3fPV-5DxZJa43fSigGMSI1aa9iWUbMSQde_SGZKdkhbnOcGwNqVsmMlNwbwJKOi9CeEnLEqBH-w7umT0iDEDWiom2-k-w_6ytpn7yrg5U5-yWWza3AVTswSlPgutAL24BVsm5fvTA"
-                            />
-                            <div className="fig-label">FIG 1.2</div>
-                            <div className="scale-label">SCALE: 1:1</div>
-                            <div className="crosshair-h"></div>
-                            <div className="crosshair-v"></div>
-                        </div>
+            {/* 2. Interactive Piano Section */}
+            <section className="interactive-section border-bottom">
+                <div className="scrolling-sheets-bg" />
+                <div className="section-container">
+                    <div className="interactive-header reveal">
+                        <span className="label-pill">{t('landing.try.label')}</span>
+                        <h2 className="hero-title" style={{ fontSize: '3rem', color: 'white' }}>{t('landing.try.title')}</h2>
+                        <p className="hero-description" style={{ color: 'white', margin: '1rem auto' }}>{t('landing.try.description')}</p>
+                    </div>
+                    <div className="piano-wrapper reveal">
+                        <Piano active={demoPianoVisible} />
                     </div>
                 </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="cta-section border-bottom">
-                {/* Image Side */}
-                <div className="cta-visual group hover-effect">
-                    <div className="visual-overlay"></div>
-                    <img
-                        alt={t('landing.keysAlt')}
-                        className="keys-img hover-scale"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuACC8x9v6vnmOXefrwUpnABQDUHxW4OBezN1kA5_3qUHx8dikSmPQmfKAKWpP20CV5cqmorNLsetxkr9MbyUJNmzhdRaMqmvAILXydBiATFpud-jiFd7epz2SZFf5RL2Di5ertG0FvQZT6o5DlQnofOssB5gFNJdhrh4Q27m49r-sFyhlWlKKjFQIjAh7_kaimzhCTvKkRRV_0GLLvg4DlkyVA0Qu5hD2_TYYlXbCH0IIprIQJpzdpvwIBSNzA4ksv3JB7WvV9O2rk"
-                    />
-                    <div className="cam-label">CAM_01: TOP_DOWN</div>
-                </div>
-                {/* Content Side */}
-                <div className="cta-content relative-box">
-                    <div className="decor-grid"></div>
-                    <h2 className="cta-title">
-                        {t('landing.ctaTitle1')}<br />{t('landing.ctaTitle2')}
-                    </h2>
-                    <p className="cta-desc">
-                        {t('landing.ctaDesc')}
-                    </p>
-                    <Link to="/app" className="btn-cta group hover-primary">
-                        <span>{t('landing.btnInitialize')}</span>
-                        <span className="material-symbols-outlined slide-on-hover">arrow_forward</span>
-                    </Link>
-                    <div className="cta-checks">
-                        <div className="check-item">
-                            <span className="material-symbols-outlined">check_circle</span>
-                            <span>{t('landing.checkNoInstall')}</span>
-                        </div>
-                        <div className="check-item">
-                            <span className="material-symbols-outlined">check_circle</span>
-                            <span>{t('landing.checkFreeAccess')}</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Features Grid */}
+            {/* 3. Features Grid */}
             <section className="features-section border-bottom">
-                <div className="features-header">
-                    <div>
-                        <span className="subhead">{t('landing.featureSubhead')}</span>
-                        <h3 className="section-title">{t('landing.featureTitle')}</h3>
+                <div className="section-container">
+                    <div className="reveal" style={{ marginBottom: '4rem' }}>
+                        <span className="text-primary mono" style={{ fontWeight: 700 }}>{t('landing.features.subhead')}</span>
+                        <h2 className="hero-title" style={{ fontSize: '3.5rem' }}>{t('landing.features.title')}</h2>
                     </div>
-                    <div className="status-text hidden-sm">
-                        {t('landing.featureStatus')}<br />
-                        {t('landing.featureModules')}
-                    </div>
-                </div>
-
-                <div className="features-grid">
-                    {/* Feature 1 */}
-                    <div className="feature-card">
-                        <div className="arrow-icon"><span className="material-symbols-outlined">arrow_outward</span></div>
-                        <div className="feature-icon"><span className="material-symbols-outlined">graphic_eq</span></div>
-                        <h4 className="feature-title">{t('landing.feat1Title')}</h4>
-                        <p className="feature-desc">
-                            {t('landing.feat1Desc')}
-                        </p>
-                        <div className="feature-meta">FREQ: 20Hz - 20kHz</div>
-                    </div>
-
-                    {/* Feature 2 */}
-                    <div className="feature-card">
-                        <div className="arrow-icon"><span className="material-symbols-outlined">arrow_outward</span></div>
-                        <div className="feature-icon"><span className="material-symbols-outlined">sync_alt</span></div>
-                        <h4 className="feature-title">{t('landing.feat2Title')}</h4>
-                        <p className="feature-desc">
-                            {t('landing.feat2Desc')}
-                        </p>
-                        <div className="feature-meta">Protocol: WSS/TLS</div>
-                    </div>
-
-                    {/* Feature 3 */}
-                    <div className="feature-card">
-                        <div className="arrow-icon"><span className="material-symbols-outlined">arrow_outward</span></div>
-                        <div className="feature-icon"><span className="material-symbols-outlined">visibility</span></div>
-                        <h4 className="feature-title">{t('landing.feat3Title')}</h4>
-                        <p className="feature-desc">
-                            {t('landing.feat3Desc')}
-                        </p>
-                        <div className="feature-meta">Refresh: 60/120/144 Hz</div>
+                    <div className="features-grid">
+                        {features.map((feature, index) => (
+                            <div
+                                key={feature.id}
+                                className="feature-card reveal"
+                                style={{ transitionDelay: `${index * 50}ms` }}
+                            >
+                                <div className="feature-icon-wrapper">
+                                    {feature.icon}
+                                </div>
+                                <h3 className="feature-title">{feature.title}</h3>
+                                <p className="feature-desc">{feature.desc}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>
 
+            {/* 4. Final CTA Section */}
+            <section className="final-cta-section">
+                <div className="section-container">
+                    <div className="cta-box reveal">
+                        <h2 className="cta-title">{t('landing.final.title')}</h2>
+                        <p className="cta-description">{t('landing.final.description')}</p>
+                        <div className="cta-actions">
+                            <Link to="/app" className="btn btn-primary">
+                                {t('landing.final.cta')} <ArrowRight size={18} style={{ marginLeft: '8px' }} />
+                            </Link>
+                            <a
+                                href="https://ko-fi.com/moussandou"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-outline"
+                            >
+                                {t('landing.final.kofi')}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
     );
 };
