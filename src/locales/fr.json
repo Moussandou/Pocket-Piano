@@ -40,64 +40,64 @@
     },
     "landing": {
         "hero": {
-            "title": "Réponse Tactile Numérique",
-            "subtitle": "Un moteur de piano professionnel reconstruit pour le web moderne.",
-            "description": "Découvrez la précision mécanique et l'échantillonnage haute fidélité dans un environnement purement numérique. Zéro installation, performance sans latence.",
-            "cta": "Démarrer l'Interface"
+            "title": "Un piano professionnel dans votre navigateur",
+            "subtitle": "Un son haute fidélité, sans aucune latence.",
+            "description": "Jouez, enregistrez et partagez vos compositions directement avec votre clavier. Aucune installation requise.",
+            "cta": "Commencer à jouer"
         },
         "try": {
-            "label": "Interaction en Direct",
-            "title": "Essayez maintenant",
-            "description": "Le moteur est actif. Jouez avec votre clavier ou votre souris pour tester la réponse sans latence."
+            "label": "Démo Rapide",
+            "title": "Faites un essai",
+            "description": "Utilisez votre clavier d'ordinateur pour jouer les touches ci-dessous.Ressentez la réactivité instantanée."
         },
         "features": {
-            "subhead": "Capacités Système",
-            "title": "Modules Principaux",
+            "subhead": "Points Forts",
+            "title": "Tout ce dont vous avez besoin",
             "feat1": {
-                "title": "Moteur Audio VST",
-                "desc": "Échantillonnage haute fidélité de pianos de concert, optimisé pour une lecture Wasm sans latence."
+                "title": "Son Premium",
+                "desc": "Échantillons de haute qualité provenant de pianos de concert de classe mondiale."
             },
             "feat2": {
-                "title": "Architecture Cloud",
-                "desc": "Synchronisation multi-appareils transparente. Vos enregistrements et réglages suivent votre identité."
+                "title": "Synchro Cloud",
+                "desc": "Sauvegardez vos enregistrements et accédez-y depuis n'importe quel appareil."
             },
             "feat3": {
-                "title": "Visualisation Live",
-                "desc": "Analyse de fréquence en temps réel et suivi des touches pour un contrôle précis des performances."
+                "title": "Visualiseur",
+                "desc": "Regardez votre musique prendre vie avec une analyse de fréquence en temps réel."
             },
             "feat4": {
-                "title": "Mastering MP3",
-                "desc": "Moteur d'enregistrement intégré avec export MP3 haute qualité."
+                "title": "Enregistrement HD",
+                "desc": "Enregistrez vos performances et exportez-les en MP3 de haute qualité."
             },
             "feat5": {
-                "title": "Partitions Interactives",
-                "desc": "Panneau de partitions complet avec mode de suivi intelligent pour maîtriser toute composition."
+                "title": "Partitions",
+                "desc": "Consultez et suivez des partitions interactives pendant que vous jouez."
             },
             "feat6": {
-                "title": "Protocole MIDI",
-                "desc": "Pont direct pour matériel MIDI externe via l'API WebMIDI. Plug and play."
+                "title": "Support MIDI",
+                "desc": "Connectez votre clavier MIDI physique et jouez directement."
             },
             "feat7": {
-                "title": "Effets Analogiques",
-                "desc": "Modules professionnels de réverbération et de délai inspirés des équipements de studio vintage."
+                "title": "Effets Studio",
+                "desc": "Améliorez votre son avec des effets professionnels de réverbération et d'écho."
             },
             "feat8": {
-                "title": "Analyses de Progrès",
-                "desc": "Suivez votre XP, vos niveaux et vos séries de performances avec des statistiques détaillées."
+                "title": "Statistiques",
+                "desc": "Suivez vos progrès, votre niveau et votre temps de jeu au fil des jours."
             },
             "feat9": {
-                "title": "Mappage Global",
-                "desc": "Support natif des dispositions AZERTY et QWERTY sur 5 octaves complètes."
+                "title": "Claviers AZERTY/QWERTY",
+                "desc": "Fonctionne parfaitement avec toutes les dispositions de touches standards."
             },
             "feat10": {
-                "title": "Multi-région",
-                "desc": "Internationalisation complète avec basculement instantané entre les interfaces localisées."
+                "title": "Multilingue",
+                "desc": "Disponible en plusieurs langues pour les musiciens du monde entier."
             }
         },
         "final": {
-            "title": "Prêt à composer ?",
-            "description": "Accédez à votre bibliothèque, synchronisez vos progrès et rejoignez le conservatoire numérique.",
-            "cta": "Initialiser la Session",
+            "title": "Prêt à jouer ?",
+            "description": "Rejoignez des milliers de musiciens et commencez votre voyage musical aujourd'hui.",
+            "cta": "Lancer le Studio",
             "kofi": "Soutenir le Projet"
         }
     },

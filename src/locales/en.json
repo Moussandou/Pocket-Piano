@@ -40,65 +40,65 @@
     },
     "landing": {
         "hero": {
-            "title": "Digital Tactile Response",
-            "subtitle": "Professional piano engine reconstructed for the modern web.",
-            "description": "Experience mechanical precision and high-fidelity sampling in a pure digital environment. Zero setup, zero latency performance.",
-            "cta": "Start Interface"
+            "title": "Professional Piano in Your Browser",
+            "subtitle": "High-fidelity sound, zero latency.",
+            "description": "Play, record, and share your music using your computer keyboard. No installation or account required to start.",
+            "cta": "Start Playing"
         },
         "try": {
-            "label": "Live Interaction",
-            "title": "Try it now",
-            "description": "The engine is active. Play with your keyboard or mouse to experience the latency-free response."
+            "label": "Quick Demo",
+            "title": "Give it a try",
+            "description": "Use your computer keyboard to play the keys below. Feel the instant response."
         },
         "features": {
-            "subhead": "System Capabilities",
-            "title": "Core Modules",
+            "subhead": "Key Features",
+            "title": "Everything you need",
             "feat1": {
-                "title": "VST Audio Engine",
-                "desc": "High-fidelity sampling from concert grands. optimized for zero-latency Wasm playback."
+                "title": "Premium Sound",
+                "desc": "High-quality samples from world-class concert grand pianos."
             },
             "feat2": {
-                "title": "Cloud Architecture",
-                "desc": "Seamless multi-device synchronization. Your recordings and presets follow your identity."
+                "title": "Cloud Sync",
+                "desc": "Save your recordings and access them from any device."
             },
             "feat3": {
-                "title": "Live Visualization",
-                "desc": "Real-time frequency analysis and key-press tracking for precise performance monitoring."
+                "title": "Visualizer",
+                "desc": "See your music come to life with real-time frequency analysis."
             },
             "feat4": {
-                "title": "MP3 Mastering",
-                "desc": "Integrated recording engine with high-quality MP3 export capabilities."
+                "title": "HD Recording",
+                "desc": "Record your performances and export them as high-quality MP3s."
             },
             "feat5": {
-                "title": "Sheet Music Mode",
-                "desc": "Full sheet panel with interactive follow mode to help you master any composition."
+                "title": "Sheet Music",
+                "desc": "View and follow sheet music while you play any composition."
             },
             "feat6": {
-                "title": "MIDI Protocol",
-                "desc": "Direct bridge for external MIDI hardware via WebMIDI API. Plug and play."
+                "title": "MIDI Support",
+                "desc": "Connect your physical MIDI keyboard and play directly."
             },
             "feat7": {
-                "title": "Analog Effects",
-                "desc": "Professional reverb and delay modules inspired by vintage studio gear."
+                "title": "Studio FX",
+                "desc": "Enhance your sound with professional reverb and delay effects."
             },
             "feat8": {
-                "title": "Progress Analytics",
-                "desc": "Track your XP, levels, and performance streaks with detailed usage statistics."
+                "title": "Statistics",
+                "desc": "Track your progress, levels, and playing time over time."
             },
             "feat9": {
-                "title": "Global Mapping",
-                "desc": "Native support for AZERTY and QWERTY layouts across 5 full octaves."
+                "title": "Custom Layout",
+                "desc": "Works perfectly on both AZERTY and QWERTY keyboards."
             },
             "feat10": {
-                "title": "Multi-region",
-                "desc": "Full internationalization with instant switching between localized interfaces."
+                "title": "Multilingual",
+                "desc": "Available in multiple languages for musicians worldwide."
             }
         },
         "final": {
-            "title": "Ready to compose?",
-            "description": "Access your library, sync your progress, and join the digital conservatory.",
-            "cta": "Initialize Session",
-            "kofi": "Support Project"
+            "title": "Ready to play?",
+            "description": "Join thousands of musicians and start your musical journey today.",
+            "cta": "Launch Studio",
+            "kofi": "Support the Project"
         }
     },
     "auth": {
