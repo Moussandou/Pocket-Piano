@@ -60,7 +60,11 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                     <img
                         alt={t('profile.avatarAlt', { name: user?.displayName || 'User' })}
                         className="profile-avatar-img"
-                        src={user?.photoURL || "https://api.dicebear.com/7.x/shapes/svg?seed=" + (user?.uid || 'guest')}
+                        src={user?.photoURL || `https://api.dicebear.com/7.x/shapes/svg?seed=${user?.uid || 'guest'}`}
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                                `https://api.dicebear.com/7.x/shapes/svg?seed=${user?.uid || 'guest'}`;
+                        }}
                     />
                     <div className="avatar-edit-icon">
                         <span className="material-symbols-outlined text-white text-sm">edit</span>

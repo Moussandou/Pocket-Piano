@@ -23,7 +23,15 @@ export const AuthManager: React.FC = () => {
         <div className="auth-controls">
             {user ? (
                 <div className="user-profile">
-                    <img src={user.photoURL || ''} alt={user.displayName || ''} className="user-avatar" />
+                    <img
+                        src={user.photoURL || `https://api.dicebear.com/7.x/shapes/svg?seed=${user.uid}`}
+                        alt={user.displayName || ''}
+                        className="user-avatar"
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                                `https://api.dicebear.com/7.x/shapes/svg?seed=${user.uid}`;
+                        }}
+                    />
                     <button onClick={logout} className="auth-btn logout" title="Se déconnecter">
                         <LogOut size={16} />
                     </button>
