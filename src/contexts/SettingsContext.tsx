@@ -34,7 +34,7 @@ const DEFAULT_SETTINGS: UserSettings = {
     metronomeBpm: 120,
     metronomeVolume: -6,
     currentInstrument: 'piano',
-    octaves: 4,
+    octaves: 6,
     showKeyLabels: true,
 };
 
@@ -70,7 +70,12 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const saved = localStorage.getItem('piano_settings');
         if (saved) {
             try {
-                return sanitizeSettings(JSON.parse(saved));
+                const parsed = JSON.parse(saved);
+                // Upgrade previous default of 4 octaves to 6 octaves to ensure all playable keys are visible
+                if (parsed && parsed.octaves === 4) {
+                    parsed.octaves = 6;
+                }
+                return sanitizeSettings(parsed);
             } catch {
                 return DEFAULT_SETTINGS;
             }
