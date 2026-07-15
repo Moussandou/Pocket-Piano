@@ -28,6 +28,9 @@ export const Visualizer: React.FC<VisualizerProps> = ({ isLoaded }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const animationRef = useRef<number | null>(null);
     const particlesRef = useRef<PixelParticle[]>([]);
+    
+    // Cache key positions (left, width) by note name to prevent DOM layout thrashing (reflows) in the frame loop
+    const keyLayouts = useRef<Map<string, { left: number; width: number }>>(new Map());
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -37,6 +40,26 @@ export const Visualizer: React.FC<VisualizerProps> = ({ isLoaded }) => {
         if (!ctx) return;
 
         ctx.imageSmoothingEnabled = false;
+
+        // Function to cache key locations. Only runs on mount and resize!
+        const cacheLayouts = () => {
+            const newLayouts = new Map<string, { left: number; width: number }>();
+            const keyEls = document.querySelectorAll('.piano-container .key');
+            const canvasRect = canvas.getBoundingClientRect();
+            if (canvasRect.width === 0) return;
+
+            keyEls.forEach(keyEl => {
+                const note = keyEl.getAttribute('data-note');
+                if (note) {
+                    const rect = keyEl.getBoundingClientRect();
+                    newLayouts.set(note, {
+                        left: (rect.left - canvasRect.left) / canvasRect.width,
+                        width: rect.width / canvasRect.width
+                    });
+                }
+            });
+            keyLayouts.current = newLayouts;
+        };
 
         const resizeObserver = new ResizeObserver((entries) => {
             for (let entry of entries) {
@@ -49,6 +72,10 @@ export const Visualizer: React.FC<VisualizerProps> = ({ isLoaded }) => {
                     
                     const newCtx = canvas.getContext('2d');
                     if (newCtx) newCtx.imageSmoothingEnabled = false;
+
+                    // Recalculate and cache key positions relative to the new canvas size
+                    // Wait a tiny moment for layout to settle, then cache
+                    setTimeout(cacheLayouts, 50);
                 }
             }
         });
@@ -94,48 +121,49 @@ export const Visualizer: React.FC<VisualizerProps> = ({ isLoaded }) => {
                 ctx.fillRect(Math.floor(s.x * w), Math.floor(s.y * h), 1, 1);
             });
 
-            // Find active keys in DOM to map coordinates
+            // Find active keys in DOM. We read class list which does NOT trigger reflow/layout thrashing
             const activeKeyEls = document.querySelectorAll('.piano-container .key.active');
             const hasActiveKeys = activeKeyEls.length > 0;
-            const canvasRect = canvas.getBoundingClientRect();
 
-            // 1. Draw glowing background beams and spawn particles for active keys
+            // 1. Draw glowing background beams and spawn particles for active keys (using pre-cached layouts)
             if (hasActiveKeys) {
                 activeKeyEls.forEach(keyEl => {
-                    const keyRect = keyEl.getBoundingClientRect();
-                    const relativeLeft = (keyRect.left - canvasRect.left) / canvasRect.width;
-                    const relativeWidth = keyRect.width / canvasRect.width;
+                    const note = keyEl.getAttribute('data-note');
+                    if (note) {
+                        const layout = keyLayouts.current.get(note);
+                        if (layout) {
+                            const bx = Math.floor(layout.left * w);
+                            const bWidth = Math.max(2, Math.round(layout.width * w));
 
-                    const bx = Math.floor(relativeLeft * w);
-                    const bWidth = Math.max(2, Math.round(relativeWidth * w));
+                            // Glowing background beams
+                            ctx.fillStyle = hexToRgba(accentColor, isDarkMode ? 0.10 : 0.05);
+                            ctx.fillRect(bx, 0, bWidth, h);
 
-                    // Glowing background beams
-                    ctx.fillStyle = hexToRgba(accentColor, isDarkMode ? 0.10 : 0.05);
-                    ctx.fillRect(bx, 0, bWidth, h);
+                            // Retro vertical dashes inside the beam
+                            ctx.fillStyle = hexToRgba(accentColor, isDarkMode ? 0.25 : 0.12);
+                            const beamYOffset = (frame * 1.5) % 10;
+                            for (let y = h; y > 0; y -= 10) {
+                                ctx.fillRect(bx, Math.round(y - beamYOffset), bWidth, 1);
+                            }
 
-                    // Retro vertical dashes inside the beam
-                    ctx.fillStyle = hexToRgba(accentColor, isDarkMode ? 0.25 : 0.12);
-                    const beamYOffset = (frame * 1.5) % 10;
-                    for (let y = h; y > 0; y -= 10) {
-                        ctx.fillRect(bx, Math.round(y - beamYOffset), bWidth, 1);
-                    }
-
-                    // Spawn floating particles
-                    if (Math.random() > 0.45) {
-                        particlesRef.current.push({
-                            x: bx + Math.random() * bWidth,
-                            y: h - 4,
-                            vx: (Math.random() - 0.5) * 0.8,
-                            vy: -Math.random() * 1.3 - 0.5,
-                            color: accentColor,
-                            life: 1.0,
-                            size: Math.random() > 0.6 ? 2 : 1
-                        });
+                            // Spawn floating particles
+                            if (Math.random() > 0.45) {
+                                particlesRef.current.push({
+                                    x: bx + Math.random() * bWidth,
+                                    y: h - 4,
+                                    vx: (Math.random() - 0.5) * 0.8,
+                                    vy: -Math.random() * 1.3 - 0.5,
+                                    color: accentColor,
+                                    life: 1.0,
+                                    size: Math.random() > 0.6 ? 2 : 1
+                                });
+                            }
+                        }
                     }
                 });
             }
 
-            // 2. Draw 3 layered sine waves (morphing/pulling towards active keys)
+            // 2. Draw 3 layered sine waves (morphing/pulling towards active keys using cached layouts)
             for (let waveIdx = 0; waveIdx < 3; waveIdx++) {
                 ctx.beginPath();
                 const frequency = 0.05 + waveIdx * 0.03; 
@@ -151,23 +179,25 @@ export const Visualizer: React.FC<VisualizerProps> = ({ isLoaded }) => {
                 for (let x = 0; x < w; x += 2) {
                     let y = h * 0.55 + Math.sin(x * frequency + frame * speed) * baseAmplitude;
 
-                    // Morphing: distort wave Y position towards active keys (Gaussian pluck)
+                    // Morphing: distort wave Y position towards active keys (Gaussian pluck using cached positions)
                     if (hasActiveKeys) {
                         activeKeyEls.forEach(keyEl => {
-                            const keyRect = keyEl.getBoundingClientRect();
-                            const relativeCenter = (keyRect.left + keyRect.width / 2 - canvasRect.left) / canvasRect.width;
-                            const relativeWidth = keyRect.width / canvasRect.width;
+                            const note = keyEl.getAttribute('data-note');
+                            if (note) {
+                                const layout = keyLayouts.current.get(note);
+                                if (layout) {
+                                    const cx = (layout.left + layout.width / 2) * w;
+                                    const kw = layout.width * w;
 
-                            const cx = relativeCenter * w;
-                            const kw = relativeWidth * w;
-
-                            const dx = x - cx;
-                            const sigma = kw * 0.8;
-                            const influence = Math.exp(-(dx * dx) / (2 * sigma * sigma));
-                            
-                            // Pull the wave upwards at the active key's X coordinate
-                            const pullAmount = influence * (h * 0.45 + waveIdx * 5);
-                            y -= pullAmount;
+                                    const dx = x - cx;
+                                    const sigma = kw * 0.8;
+                                    const influence = Math.exp(-(dx * dx) / (2 * sigma * sigma));
+                                    
+                                    // Pull the wave upwards at the active key's X coordinate
+                                    const pullAmount = influence * (h * 0.45 + waveIdx * 5);
+                                    y -= pullAmount;
+                                }
+                            }
                         });
                     }
 

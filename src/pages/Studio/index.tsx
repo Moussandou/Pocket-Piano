@@ -8,13 +8,13 @@ import { useSheetFollow } from '../../hooks/useSheetFollow';
 import { useAuth } from '../../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Piano as PianoIcon, Moon, Sun, X, Play, Square, RotateCcw, Pencil, FolderOpen, Check, FilePlus, FileText } from 'lucide-react';
+import { Piano as PianoIcon, Moon, Sun, X, Play, Square, RotateCcw, Pencil, FolderOpen, Check, FilePlus, FileText, Sparkles, HelpCircle } from 'lucide-react';
 import { StudioToolbar } from './StudioToolbar';
 import { SoundSettings } from './SoundSettings';
 import { Visualizer } from './Visualizer';
 import { Onboarding } from '../../components/Onboarding/Onboarding';
 import { sheetRepository } from '../../infra/repositories/sheetRepository';
-import { getLabelForNote } from '../../domain/constants';
+import { getLabelForNote, KEYBOARD_MAP } from '../../domain/constants';
 import { formatDuration } from '../../utils/formatters';
 import { tokenLabel } from '../../domain/sheetParser';
 import { AuthManager } from '../../infra/AuthManager';
@@ -48,6 +48,9 @@ export const Studio: React.FC = () => {
     const [sheetInput, setSheetInput] = useState('');
     const [showPicker, setShowPicker] = useState(false);
     const [deskScrollOffset, setDeskScrollOffset] = useState(0);
+    const [autoplayMode, setAutoplayMode] = useState(false);
+    const [autoplayActiveNotes, setAutoplayActiveNotes] = useState<Set<string>>(new Set());
+    const [showHelpModal, setShowHelpModal] = useState(false);
 
     // Sync input text when sheetText changes externally
     useEffect(() => {
@@ -114,6 +117,69 @@ export const Studio: React.FC = () => {
             historyScrollRef.current.scrollLeft = historyScrollRef.current.scrollWidth;
         }
     }, [typedHistory]);
+
+    // Autoplay logic for playing sheet music automatically
+    useEffect(() => {
+        if (!autoplayMode || !sheetFollow.isActive || sheetFollow.isComplete) {
+            setAutoplayActiveNotes(new Set());
+            return;
+        }
+
+        const token = sheetFollow.tokens[sheetFollow.cursor];
+        if (!token) return;
+
+        const beatMs = (60 / settings.metronomeBpm) * 1000;
+        let duration = beatMs;
+
+        if (token.type === 'pause') {
+            switch (token.duration) {
+                case 'short': duration = beatMs * 0.25; break;
+                case 'medium': duration = beatMs * 0.5; break;
+                case 'long': duration = beatMs * 1.0; break;
+                case 'extended': duration = beatMs * 2.0; break;
+            }
+        } else if (token.type === 'note' && token.speed) {
+            switch (token.speed) {
+                case 'fastest': duration = beatMs * 0.25; break;
+                case 'quick': duration = beatMs * 0.5; break;
+                case 'normal': duration = beatMs; break;
+            }
+        }
+
+        if (token.type === 'note' || token.type === 'chord') {
+            const keysToPlay = token.type === 'note' ? [token.key] : token.keys;
+            const notesToPlay = keysToPlay.map(k => KEYBOARD_MAP[k]).filter(Boolean);
+
+            // Play notes in engine
+            notesToPlay.forEach(n => audioEngine.playNote(n));
+            setAutoplayActiveNotes(new Set(notesToPlay));
+
+            const releaseTimeout = setTimeout(() => {
+                notesToPlay.forEach(n => audioEngine.releaseNote(n));
+                setAutoplayActiveNotes(new Set());
+            }, duration * 0.7);
+
+            const advanceTimeout = setTimeout(() => {
+                keysToPlay.forEach(k => {
+                    sheetFollow.validateKey(k);
+                });
+            }, duration);
+
+            return () => {
+                clearTimeout(releaseTimeout);
+                clearTimeout(advanceTimeout);
+            };
+        } else {
+            // Pause
+            const advanceTimeout = setTimeout(() => {
+                sheetFollow.validateKey('');
+            }, duration);
+
+            return () => {
+                clearTimeout(advanceTimeout);
+            };
+        }
+    }, [autoplayMode, sheetFollow.isActive, sheetFollow.cursor, sheetFollow.isComplete, settings.metronomeBpm, sheetFollow.tokens, sheetFollow.validateKey]);
 
     // Recording timer
     useEffect(() => {
@@ -229,7 +295,7 @@ export const Studio: React.FC = () => {
             </header>
 
             <main className="studio-stage">
-                <Visualizer isLoaded={isLoaded} />
+                {settings.enableVisualizer && <Visualizer isLoaded={isLoaded} />}
             </main>
 
             <section className="studio-piano" data-onboarding="piano">
@@ -242,17 +308,30 @@ export const Studio: React.FC = () => {
                                     <Play size={15} fill="currentColor" />
                                 </button>
                             ) : (
-                                <button className="desk-control-btn stop" onClick={sheetFollow.stop} title={t('sheet.stop')}>
+                                <button className="desk-control-btn stop" onClick={() => { sheetFollow.stop(); setAutoplayMode(false); }} title={t('sheet.stop')}>
                                     <Square size={15} fill="currentColor" />
                                 </button>
                             )}
                             <button className="desk-control-btn" onClick={sheetFollow.restart} title={t('sheet.restart')}>
                                 <RotateCcw size={14} />
                             </button>
-                            <button className="desk-control-btn" onClick={() => { setDeskEditMode(true); sheetFollow.stop(); }} title={t('sheet.edit')}>
+                            <button 
+                                className={`desk-control-btn autoplay ${autoplayMode ? 'active' : ''}`} 
+                                onClick={() => {
+                                    const nextMode = !autoplayMode;
+                                    setAutoplayMode(nextMode);
+                                    if (nextMode && !sheetFollow.isActive) {
+                                        sheetFollow.start();
+                                    }
+                                }} 
+                                title={t('sheet.autoplay')}
+                            >
+                                <Sparkles size={14} />
+                            </button>
+                            <button className="desk-control-btn" onClick={() => { setDeskEditMode(true); sheetFollow.stop(); setAutoplayMode(false); }} title={t('sheet.edit')}>
                                 <Pencil size={14} />
                             </button>
-                            <button className="desk-control-btn danger" onClick={() => { sheetFollow.reset(); setDeskEditMode(true); }} title={t('sheet.newSheet')}>
+                            <button className="desk-control-btn danger" onClick={() => { sheetFollow.reset(); setDeskEditMode(true); setAutoplayMode(false); }} title={t('sheet.newSheet')}>
                                 <FilePlus size={14} />
                             </button>
                         </div>
@@ -276,6 +355,15 @@ export const Studio: React.FC = () => {
                                     >
                                         <FolderOpen size={13} />
                                         <span>{t('sheet.loadSaved')}</span>
+                                    </button>
+
+                                    <button
+                                        className="desk-editor-btn-sm help-btn"
+                                        onClick={() => setShowHelpModal(true)}
+                                        title={t('sheet.helpTitle')}
+                                        style={{ width: '32px', padding: 0, justifyContent: 'center' }}
+                                    >
+                                        <HelpCircle size={13} />
                                     </button>
                                     
                                     {showPicker && (
@@ -441,6 +529,7 @@ export const Studio: React.FC = () => {
                         whiteKeyCount={whiteKeyCount}
                         onNotePlayed={handleNotePress}
                         onNoteReleased={handleNoteRelease}
+                        forcedActiveNotes={autoplayMode ? autoplayActiveNotes : undefined}
                     />
                 </div>
             </section>
@@ -470,6 +559,64 @@ export const Studio: React.FC = () => {
                             <X size={18} />
                         </button>
                         <RecordingGallery />
+                    </div>
+                </div>
+            )}
+
+            {showHelpModal && (
+                <div className="sheet-help-modal-backdrop" onClick={() => setShowHelpModal(false)}>
+                    <div className="sheet-help-modal" onClick={e => e.stopPropagation()}>
+                        <div className="sheet-help-header">
+                            <h3>{t('sheet.helpTitle')}</h3>
+                            <button className="close-btn" onClick={() => setShowHelpModal(false)}>
+                                <X size={16} />
+                            </button>
+                        </div>
+                        <div className="sheet-help-body custom-scrollbar">
+                            <p className="sheet-help-intro">{t('sheet.helpIntro')}</p>
+                            <div className="sheet-help-table">
+                                <div className="table-header">
+                                    <span>{t('sheet.syntax')}</span>
+                                    <span>{t('sheet.meaning')}</span>
+                                </div>
+                                <div className="table-row">
+                                    <code>[asdf]</code>
+                                    <span>{t('sheet.syntaxChord')}</span>
+                                </div>
+                                <div className="table-row">
+                                    <code>[a s d f]</code>
+                                    <span>{t('sheet.syntaxArpeggio')}</span>
+                                </div>
+                                <div className="table-row">
+                                    <code>asdf</code>
+                                    <span>{t('sheet.syntaxQuick')}</span>
+                                </div>
+                                <div className="table-row">
+                                    <code>a s d f</code>
+                                    <span>{t('sheet.syntaxNormal')}</span>
+                                </div>
+                                <div className="table-row">
+                                    <code>as|df</code>
+                                    <span>{t('sheet.syntaxPauseShort')}</span>
+                                </div>
+                                <div className="table-row">
+                                    <code>as| df</code>
+                                    <span>{t('sheet.syntaxPauseMedium')}</span>
+                                </div>
+                                <div className="table-row">
+                                    <code>as | df</code>
+                                    <span>{t('sheet.syntaxPauseLong')}</span>
+                                </div>
+                                <div className="table-row">
+                                    <code>as| |df</code>
+                                    <span>{t('sheet.syntaxPauseLongest')}</span>
+                                </div>
+                                <div className="table-row">
+                                    <code>{t('sheet.paragraphBreak')}</code>
+                                    <span>{t('sheet.syntaxParagraph')}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}

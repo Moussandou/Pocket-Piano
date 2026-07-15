@@ -12,8 +12,8 @@
  */
 
 export type SheetToken =
-    | { type: 'note'; key: string }
-    | { type: 'chord'; keys: string[] }
+    | { type: 'note'; key: string; speed?: 'normal' | 'quick' | 'fastest' }
+    | { type: 'chord'; keys: string[]; speed?: 'normal' }
     | { type: 'pause'; duration: 'short' | 'medium' | 'long' | 'extended' }
 
 export function parseSheet(raw: string): SheetToken[] {
@@ -62,7 +62,7 @@ function parseLine(line: string, tokens: SheetToken[]): void {
                 } else {
                     // [a s d f] → fast sequence (individual notes, no pauses)
                     for (const k of keys) {
-                        tokens.push({ type: 'note', key: k });
+                        tokens.push({ type: 'note', key: k, speed: 'fastest' });
                     }
                 }
             }
@@ -110,7 +110,12 @@ function parseLine(line: string, tokens: SheetToken[]): void {
             i++;
         } else {
             // Regular note character
-            tokens.push({ type: 'note', key: ch });
+            const isNextNote = i + 1 < line.length && line[i + 1] !== ' ' && line[i + 1] !== '|' && line[i + 1] !== '[' && line[i + 1] !== ']';
+            const prevToken = tokens[tokens.length - 1];
+            const isPrevQuick = prevToken && prevToken.type === 'note' && prevToken.speed === 'quick';
+            const speed = (isNextNote || isPrevQuick) ? 'quick' : 'normal';
+
+            tokens.push({ type: 'note', key: ch, speed });
             i++;
         }
     }

@@ -879,6 +879,16 @@
     background: color-mix(in srgb, var(--danger) 20%, #23252d);
 }
 
+.desk-control-btn.autoplay.active {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 15%, #23252d);
+    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.desk-control-btn.autoplay.active:hover {
+    background: color-mix(in srgb, var(--accent) 25%, #23252d);
+}
+
 .desk-control-btn.danger:hover {
     color: var(--danger);
     border-color: rgba(239, 68, 68, 0.3);
@@ -1156,4 +1166,158 @@
     image-rendering: pixelated;
     image-rendering: crisp-edges;
     image-rendering: -moz-crisp-edges;
+}
+
+/* Sheet Syntax Help Modal */
+.sheet-help-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+}
+
+.sheet-help-modal {
+    background: #1a1c23;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 600px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.sheet-help-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sheet-help-header h3 {
+    margin: 0;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--text);
+}
+
+.sheet-help-header .close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.15s;
+}
+
+.sheet-help-header .close-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+}
+
+.sheet-help-body {
+    padding: var(--space-6);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.sheet-help-intro {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    margin-top: 0;
+    margin-bottom: var(--space-6);
+}
+
+.sheet-help-table {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sheet-help-table .table-header {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    background: #23252d;
+    padding: var(--space-2) var(--space-4);
+    font-weight: 600;
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.sheet-help-table .table-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    background: #1e2028;
+    padding: var(--space-4);
+    align-items: center;
+    font-size: var(--text-sm);
+}
+
+.sheet-help-table .table-row:nth-child(even) {
+    background: #1c1e25;
+}
+
+.sheet-help-table .table-row code {
+    background: #282a36;
+    color: var(--accent);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    font-family: monospace;
+    font-weight: 600;
+    width: fit-content;
+    font-size: var(--text-xs);
+}
+
+/* Light theme overrides */
+[data-theme='light'] .sheet-help-modal {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+[data-theme='light'] .sheet-help-header {
+    border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+[data-theme='light'] .sheet-help-table {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.05);
+}
+[data-theme='light'] .sheet-help-table .table-header {
+    background: #f4f5f6;
+    color: var(--text-secondary);
+}
+[data-theme='light'] .sheet-help-table .table-row {
+    background: #ffffff;
+    color: var(--text);
+}
+[data-theme='light'] .sheet-help-table .table-row:nth-child(even) {
+    background: #fafbfc;
+}
+[data-theme='light'] .sheet-help-table .table-row code {
+    background: #f0f1f2;
 }

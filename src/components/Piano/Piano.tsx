@@ -16,6 +16,7 @@ interface KeyProps {
 const PianoKey = React.memo<KeyProps>(({ note, isBlack, label, active, onPress, onRelease }) => {
     return (
         <div
+            data-note={note}
             className={`key ${isBlack ? 'black' : 'white'} ${active ? 'active' : ''}`}
             onMouseDown={() => onPress(note)}
             onMouseUp={() => onRelease(note)}
@@ -37,6 +38,7 @@ interface PianoProps {
     endOctave?: number;
     showLabels?: boolean;
     whiteKeyCount?: number;
+    forcedActiveNotes?: Set<string>;
 }
 
 export const Piano = React.memo<PianoProps>(({
@@ -46,7 +48,8 @@ export const Piano = React.memo<PianoProps>(({
     startOctave = 2,
     endOctave = 6,
     showLabels = true,
-    whiteKeyCount
+    whiteKeyCount,
+    forcedActiveNotes
 }) => {
     // ... existing code ...
     const activeKeysRef = useRef<Set<string>>(new Set());
@@ -136,6 +139,7 @@ export const Piano = React.memo<PianoProps>(({
     }, [active, pressNote, releaseNote, releaseAll]);
 
     const whiteKeys = whiteKeyCount ?? notes.filter(n => !n.includes('#')).length;
+    const activeKeys = forcedActiveNotes ?? activeKeysRef.current;
 
     return (
         <div
@@ -148,7 +152,7 @@ export const Piano = React.memo<PianoProps>(({
                     note={note}
                     isBlack={note.includes('#')}
                     label={showLabels ? getLabelForNote(note) : undefined}
-                    active={activeKeysRef.current.has(note)}
+                    active={activeKeys.has(note)}
                     onPress={pressNote}
                     onRelease={releaseNote}
                 />

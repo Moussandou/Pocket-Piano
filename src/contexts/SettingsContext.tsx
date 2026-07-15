@@ -17,6 +17,7 @@ export interface UserSettings {
     currentInstrument: string;
     octaves: number;
     showKeyLabels: boolean;
+    enableVisualizer: boolean;
 }
 
 const safeNum = (val: unknown, fallback: number): number =>
@@ -36,6 +37,7 @@ const DEFAULT_SETTINGS: UserSettings = {
     currentInstrument: 'piano',
     octaves: 6,
     showKeyLabels: true,
+    enableVisualizer: true,
 };
 
 const sanitizeSettings = (s: any): UserSettings => {
@@ -54,6 +56,7 @@ const sanitizeSettings = (s: any): UserSettings => {
         currentInstrument: typeof merged.currentInstrument === 'string' ? merged.currentInstrument : DEFAULT_SETTINGS.currentInstrument,
         octaves: Math.min(6, Math.max(2, safeNum(merged.octaves, DEFAULT_SETTINGS.octaves))),
         showKeyLabels: merged.showKeyLabels !== false,
+        enableVisualizer: merged.enableVisualizer !== false,
     };
 };
 

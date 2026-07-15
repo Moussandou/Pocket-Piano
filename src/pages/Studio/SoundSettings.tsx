@@ -172,6 +172,18 @@ export const SoundSettings: React.FC<SoundSettingsProps> = ({
                         </button>
                     </div>
 
+                    <div className="setting-row inline">
+                        <label>{t('studio.enableVisualizer')}</label>
+                        <button
+                            className={`switch ${settings.enableVisualizer ? 'on' : ''}`}
+                            onClick={() => updateSetting('enableVisualizer', !settings.enableVisualizer)}
+                            role="switch"
+                            aria-checked={settings.enableVisualizer}
+                        >
+                            <span className="switch-thumb" />
+                        </button>
+                    </div>
+
                     <div className="setting-row">
                         <div className="setting-row-header">
                             <label>{t('studio.keyColor')}</label>
