@@ -40,6 +40,7 @@ class AudioEngine {
     private sustainMultiplier: number = 1;
     private volumeDb: number = 0;
     private recorder: Tone.Recorder | null = null;
+    private analyser: Tone.Analyser | null = null;
     private isRecordingAudio: boolean = false;
 
     public async init(instrumentName: string = 'piano'): Promise<void> {
@@ -70,6 +71,11 @@ class AudioEngine {
                         decay: 2.5,
                         wet: 0.3
                     }).toDestination();
+                }
+
+                if (!this.analyser) {
+                    this.analyser = new Tone.Analyser('fft', 256);
+                    this.reverb.connect(this.analyser);
                 }
 
                 // Tap the end of the chain into a recorder for MP3 export
@@ -314,6 +320,13 @@ class AudioEngine {
         }
 
         return new Blob(mp3Data as any[], { type: 'audio/mp3' });
+    }
+
+    public getAnalyserData(): Float32Array {
+        if (!this.analyser) {
+            return new Float32Array(0);
+        }
+        return this.analyser.getValue() as Float32Array;
     }
 }
 

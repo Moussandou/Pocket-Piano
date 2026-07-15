@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import { Piano as PianoIcon, Moon, Sun, X, Play, Square, RotateCcw, Pencil, FolderOpen, Check, FilePlus, FileText } from 'lucide-react';
 import { StudioToolbar } from './StudioToolbar';
 import { SoundSettings } from './SoundSettings';
+import { Visualizer } from './Visualizer';
 import { Onboarding } from '../../components/Onboarding/Onboarding';
 import { sheetRepository } from '../../infra/repositories/sheetRepository';
 import { getLabelForNote } from '../../domain/constants';
@@ -227,7 +228,9 @@ export const Studio: React.FC = () => {
                 </div>
             </header>
 
-            <main className="studio-stage" />
+            <main className="studio-stage">
+                <Visualizer isLoaded={isLoaded} />
+            </main>
 
             <section className="studio-piano" data-onboarding="piano">
                 <div className="music-desk">
