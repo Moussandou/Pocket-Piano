@@ -13,7 +13,7 @@ interface KeyProps {
     onRelease: (note: string) => void;
 }
 
-const PianoKey: React.FC<KeyProps> = ({ note, isBlack, label, active, onPress, onRelease }) => {
+const PianoKey = React.memo<KeyProps>(({ note, isBlack, label, active, onPress, onRelease }) => {
     return (
         <div
             className={`key ${isBlack ? 'black' : 'white'} ${active ? 'active' : ''}`}
@@ -26,7 +26,8 @@ const PianoKey: React.FC<KeyProps> = ({ note, isBlack, label, active, onPress, o
             {label && <span className="key-label">{label}</span>}
         </div>
     );
-};
+});
+PianoKey.displayName = 'PianoKey';
 
 interface PianoProps {
     onNotePlayed?: (note: string) => void;
@@ -38,7 +39,7 @@ interface PianoProps {
     whiteKeyCount?: number;
 }
 
-export const Piano: React.FC<PianoProps> = ({
+export const Piano = React.memo<PianoProps>(({
     onNotePlayed,
     onNoteReleased,
     active = true,
@@ -154,4 +155,5 @@ export const Piano: React.FC<PianoProps> = ({
             ))}
         </div>
     );
-};
+});
+Piano.displayName = 'Piano';

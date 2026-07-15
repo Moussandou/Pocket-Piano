@@ -141,6 +141,14 @@ export const Studio: React.FC = () => {
         }
     }, [recordNote, isLoaded, settings.currentInstrument]);
 
+    const handleNotePress = useCallback((note: string) => {
+        handleNoteEvent(note, 'press');
+    }, [handleNoteEvent]);
+
+    const handleNoteRelease = useCallback((note: string) => {
+        handleNoteEvent(note, 'release');
+    }, [handleNoteEvent]);
+
     // Reload instrument when user switches (only if engine is already loaded)
     useEffect(() => {
         if (isLoaded) {
@@ -366,7 +374,7 @@ export const Studio: React.FC = () => {
                                                     isCurrent={i === sheetFollow.cursor}
                                                     isStartMarker={i === sheetFollow.startCursor}
                                                     onClick={() => {
-                                                        if (!sheetFollow.isActive) sheetFollow.onSetStartPosition(i);
+                                                        if (!sheetFollow.isActive) sheetFollow.setStartPosition(i);
                                                     }}
                                                 />
                                             ))}
@@ -418,8 +426,8 @@ export const Studio: React.FC = () => {
                         endOctave={endOctave}
                         showLabels={settings.showKeyLabels}
                         whiteKeyCount={whiteKeyCount}
-                        onNotePlayed={(note) => handleNoteEvent(note, 'press')}
-                        onNoteReleased={(note) => handleNoteEvent(note, 'release')}
+                        onNotePlayed={handleNotePress}
+                        onNoteReleased={handleNoteRelease}
                     />
                 </div>
             </section>
@@ -465,7 +473,7 @@ interface DeskSheetTokenElementProps {
     onClick: () => void;
 }
 
-const DeskSheetTokenElement: React.FC<DeskSheetTokenElementProps> = ({
+const DeskSheetTokenElement = React.memo<DeskSheetTokenElementProps>(({
     token,
     index,
     result,
@@ -526,4 +534,5 @@ const DeskSheetTokenElement: React.FC<DeskSheetTokenElementProps> = ({
             {isStartMarker && <span className="start-indicator" />}
         </button>
     );
-};
+});
+DeskSheetTokenElement.displayName = 'DeskSheetTokenElement';
