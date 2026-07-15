@@ -181,6 +181,13 @@ export const Studio: React.FC = () => {
         }
     }, [autoplayMode, sheetFollow.isActive, sheetFollow.cursor, sheetFollow.isComplete, settings.metronomeBpm, sheetFollow.tokens, sheetFollow.validateKey]);
 
+    // Turn off autoplay mode when sheet is completed
+    useEffect(() => {
+        if (sheetFollow.isComplete) {
+            setAutoplayMode(false);
+        }
+    }, [sheetFollow.isComplete]);
+
     // Recording timer
     useEffect(() => {
         let interval: ReturnType<typeof setInterval>;
@@ -207,14 +214,14 @@ export const Studio: React.FC = () => {
                     return next.length > 50 ? next.slice(next.length - 50) : next;
                 });
 
-                if (sheetFollowRef.current.isActive) {
+                if (sheetFollowRef.current.isActive && !autoplayMode) {
                     sheetFollowRef.current.validateKey(label);
                 }
             }
         } else {
             recordNote(note, 0, 'UP');
         }
-    }, [recordNote, isLoaded, settings.currentInstrument]);
+    }, [recordNote, isLoaded, settings.currentInstrument, autoplayMode]);
 
     const handleNotePress = useCallback((note: string) => {
         handleNoteEvent(note, 'press');
@@ -328,6 +335,9 @@ export const Studio: React.FC = () => {
                             >
                                 <Sparkles size={14} />
                             </button>
+                            <button className="desk-control-btn" onClick={() => setShowHelpModal(true)} title={t('sheet.helpTitle')}>
+                                <HelpCircle size={14} />
+                            </button>
                             <button className="desk-control-btn" onClick={() => { setDeskEditMode(true); sheetFollow.stop(); setAutoplayMode(false); }} title={t('sheet.edit')}>
                                 <Pencil size={14} />
                             </button>
@@ -355,15 +365,6 @@ export const Studio: React.FC = () => {
                                     >
                                         <FolderOpen size={13} />
                                         <span>{t('sheet.loadSaved')}</span>
-                                    </button>
-
-                                    <button
-                                        className="desk-editor-btn-sm help-btn"
-                                        onClick={() => setShowHelpModal(true)}
-                                        title={t('sheet.helpTitle')}
-                                        style={{ width: '32px', padding: 0, justifyContent: 'center' }}
-                                    >
-                                        <HelpCircle size={13} />
                                     </button>
                                     
                                     {showPicker && (
