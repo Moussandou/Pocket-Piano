@@ -133,16 +133,16 @@ export const Studio: React.FC = () => {
 
         if (token.type === 'pause') {
             switch (token.duration) {
-                case 'short': duration = beatMs * 0.25; break;
-                case 'medium': duration = beatMs * 0.5; break;
-                case 'long': duration = beatMs * 1.0; break;
-                case 'extended': duration = beatMs * 2.0; break;
+                case 'short': duration = beatMs * 0.3; break;
+                case 'medium': duration = beatMs * 0.6; break;
+                case 'long': duration = beatMs * 1.2; break;
+                case 'extended': duration = beatMs * 2.4; break;
             }
         } else if (token.type === 'note' && token.speed) {
             switch (token.speed) {
-                case 'fastest': duration = beatMs * 0.25; break;
-                case 'quick': duration = beatMs * 0.5; break;
-                case 'normal': duration = beatMs; break;
+                case 'fastest': duration = beatMs * 0.3; break;
+                case 'quick': duration = beatMs * 0.6; break;
+                case 'normal': duration = beatMs * 1.2; break;
             }
         }
 
