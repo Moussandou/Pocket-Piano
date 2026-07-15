@@ -251,21 +251,26 @@
     background: rgba(140, 130, 100, 0.22);
 }
 
+.music-desk-history-scroll {
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: center; /* Centers inline children when they fit */
+    z-index: 2;
+    padding: 0 var(--space-4);
+}
+
 .music-desk-history {
     font-family: 'Space Mono', monospace;
     font-size: var(--text-2xl);
     font-weight: 700;
     color: #1a1815; /* Dark ink */
     letter-spacing: 0.22em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: clip;
-    flex: 1;
-    text-align: center;
-    z-index: 2;
-    padding: 0 var(--space-4);
+    display: inline-block;
     /* Make text vertically align nicely with staff lines */
     line-height: 80px;
+    vertical-align: middle;
 }
 
 .music-desk-history.placeholder {

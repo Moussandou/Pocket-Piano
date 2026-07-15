@@ -32,6 +32,7 @@ export const Studio: React.FC = () => {
     const sheetFollowRef = useRef(sheetFollow);
     sheetFollowRef.current = sheetFollow;
     const deskTrackRef = useRef<HTMLDivElement>(null);
+    const historyScrollRef = useRef<HTMLDivElement>(null);
     const { user } = useAuth();
 
     const [showGallery, setShowGallery] = useState(false);
@@ -105,6 +106,13 @@ export const Studio: React.FC = () => {
         window.addEventListener('resize', updateOffset);
         return () => window.removeEventListener('resize', updateOffset);
     }, [sheetFollow.cursor]);
+
+    // Auto-scroll the free play typing history to the right
+    useEffect(() => {
+        if (historyScrollRef.current) {
+            historyScrollRef.current.scrollLeft = historyScrollRef.current.scrollWidth;
+        }
+    }, [typedHistory]);
 
     // Recording timer
     useEffect(() => {
@@ -405,8 +413,10 @@ export const Studio: React.FC = () => {
                                 <div className="music-staff-line" />
                                 <div className="music-staff-line" />
                             </div>
-                            <div className={`music-desk-history ${!typedHistory ? 'placeholder' : ''}`}>
-                                {typedHistory || t('studio.typePlaceholder')}
+                            <div className="music-desk-history-scroll" ref={historyScrollRef}>
+                                <span className={`music-desk-history ${!typedHistory ? 'placeholder' : ''}`}>
+                                    {typedHistory || t('studio.typePlaceholder')}
+                                </span>
                             </div>
                             {typedHistory && (
                                 <button
