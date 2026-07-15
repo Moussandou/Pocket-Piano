@@ -12,15 +12,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0d59f2]"></div>
+            <div className="loader-overlay" style={{ position: 'relative', flex: 1, minHeight: '40vh' }}>
+                <div className="spinner"></div>
             </div>
         );
     }
 
     if (!user) {
-        // Redirect to landing page but save the attempted location
-        return <Navigate to="/" state={{ from: location }} replace />;
+        return <Navigate to="/auth" state={{ from: location }} replace />;
     }
 
     return <>{children}</>;

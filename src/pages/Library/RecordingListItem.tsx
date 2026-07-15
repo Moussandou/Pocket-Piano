@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Timestamp } from 'firebase/firestore';
+import { Play, Square, Heart, Download, Trash2 } from 'lucide-react';
 import type { Recording } from '../../domain/models';
 
 interface RecordingListItemProps {
@@ -25,11 +26,9 @@ export const RecordingListItem: React.FC<RecordingListItemProps> = ({
     const { t } = useTranslation();
 
     return (
-        <div className={`list-item ${isPlaying ? 'active-card' : ''}`}>
-            <button className="list-play-btn" onClick={(e) => onPlay(rec, e)}>
-                <span className="material-symbols-outlined">
-                    {isPlaying ? 'stop' : 'play_arrow'}
-                </span>
+        <div className={`list-item ${isPlaying ? 'playing' : ''}`}>
+            <button className="btn-card-action" onClick={(e) => onPlay(rec, e)} title={isPlaying ? t('gallery.stop') : t('gallery.play')}>
+                {isPlaying ? <Square size={14} fill="currentColor" /> : <Play size={14} />}
             </button>
             <div className="list-info">
                 <span className="list-title">{rec.name || t('library.untitled')}</span>
@@ -41,25 +40,25 @@ export const RecordingListItem: React.FC<RecordingListItemProps> = ({
                     ) : ''}
                 </span>
             </div>
-            <span className="list-meta">{rec.notes?.length || 0} notes</span>
+            <span className="list-meta">{rec.notes?.length || 0} {t('library.notes').toLowerCase()}</span>
             <span className="list-meta">{formatDuration(rec.duration || 0)}</span>
             <div className="list-actions">
                 <button
                     className={`btn-card-action ${rec.favorite ? 'active' : ''}`}
                     onClick={(e) => rec.id && onToggleFavorite(rec.id, !!rec.favorite, e)}
+                    title={t('library.favorites')}
                 >
-                    <span className="material-symbols-outlined">
-                        {rec.favorite ? 'favorite' : 'favorite_border'}
-                    </span>
+                    <Heart size={14} fill={rec.favorite ? 'currentColor' : 'none'} />
                 </button>
-                <button className="btn-card-action" onClick={(e) => onDownload(rec, e)}>
-                    <span className="material-symbols-outlined">download</span>
+                <button className="btn-card-action" onClick={(e) => onDownload(rec, e)} title={t('library.download')}>
+                    <Download size={14} />
                 </button>
                 <button
                     className="btn-card-action danger"
                     onClick={(e) => rec.id && onDelete(rec.id, e)}
+                    title={t('library.deleteTitle')}
                 >
-                    <span className="material-symbols-outlined">delete</span>
+                    <Trash2 size={14} />
                 </button>
             </div>
         </div>

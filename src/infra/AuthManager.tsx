@@ -4,8 +4,10 @@ import { signOut } from 'firebase/auth';
 import { LogIn, LogOut } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export const AuthManager: React.FC = () => {
+    const { t } = useTranslation();
     const { user, loading } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -32,13 +34,13 @@ export const AuthManager: React.FC = () => {
                                 `https://api.dicebear.com/7.x/shapes/svg?seed=${user.uid}`;
                         }}
                     />
-                    <button onClick={logout} className="auth-btn logout" title="Se déconnecter">
+                    <button onClick={logout} className="auth-btn logout" title={t('common.signOut')}>
                         <LogOut size={16} />
                     </button>
                 </div>
             ) : (
                 <button onClick={login} className="auth-btn login">
-                    <LogIn size={16} /> Connexion
+                    <LogIn size={16} /> {t('common.signIn')}
                 </button>
             )}
         </div>

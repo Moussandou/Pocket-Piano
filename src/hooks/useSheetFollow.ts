@@ -8,12 +8,6 @@ export interface SheetFollowStats {
     wrong: number;
     total: number;
     accuracy: number;
-    /** Rhythm consistency 0-100 — lower variance in timing = higher rhythm */
-    rhythm: number;
-    /** Difficulty 1-5 based on token count, chord density, speed */
-    difficulty: number;
-    /** Overall rating 0-1000 combining all metrics */
-    rating: number;
     /** Duration in ms from first note to completion */
     durationMs: number;
 }
@@ -65,18 +59,11 @@ export function useSheetFollow() {
         const total = correct + wrong;
         const accuracy = playable > 0 ? Math.min(100, Math.round((correct / playable) * 100)) : 0;
 
-        const rhythm = computeRhythm(noteTimestamps.current);
-        const difficulty = computeDifficulty(tokens, noteTokens);
-
         const durationMs = noteTimestamps.current.length > 0
             ? noteTimestamps.current[noteTimestamps.current.length - 1] - startTimeRef.current
             : 0;
 
-        const rawScore = (accuracy * 0.6 + rhythm * 0.4);
-        const diffMultiplier = 0.6 + (difficulty * 0.1);
-        const rating = Math.round(rawScore * diffMultiplier * 10);
-
-        return { correct, wrong, total, accuracy, rhythm, difficulty, rating, durationMs };
+        return { correct, wrong, total, accuracy, durationMs };
     }, [results, tokens, noteTokens]);
 
     const loadSheet = useCallback((text: string) => {
@@ -244,62 +231,4 @@ export function useSheetFollow() {
         validateKey,
         reset,
     };
-}
-
-/**
- * Compute rhythm consistency score (0-100).
- * Measures how consistent the intervals between key presses are.
- * Perfect rhythm = low variance = 100.
- */
-function computeRhythm(timestamps: number[]): number {
-    if (timestamps.length < 3) return 100;
-
-    const intervals: number[] = [];
-    for (let i = 1; i < timestamps.length; i++) {
-        intervals.push(timestamps[i] - timestamps[i - 1]);
-    }
-
-    const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
-    if (mean === 0) return 100;
-
-    const variance = intervals.reduce((sum, v) => sum + (v - mean) ** 2, 0) / intervals.length;
-    const cv = Math.sqrt(variance) / mean;
-
-    // cv = 0 → perfect rhythm (100), cv >= 1 → poor rhythm (0)
-    return Math.round(Math.max(0, Math.min(100, (1 - cv) * 100)));
-}
-
-/**
- * Compute difficulty level 1-5.
- * Based on: token count, chord ratio, unique notes used.
- */
-function computeDifficulty(_allTokens: SheetToken[], noteTokens: SheetToken[]): number {
-    const totalNotes = noteTokens.length;
-    if (totalNotes === 0) return 1;
-
-    const chordCount = noteTokens.filter(t => t.type === 'chord').length;
-    const chordRatio = chordCount / totalNotes;
-
-    const uniqueKeys = new Set<string>();
-    for (const t of noteTokens) {
-        if (t.type === 'note') uniqueKeys.add(t.key);
-        if (t.type === 'chord') t.keys.forEach(k => uniqueKeys.add(k));
-    }
-
-    let score = 1;
-
-    // Length factor
-    if (totalNotes > 10) score += 0.5;
-    if (totalNotes > 25) score += 0.5;
-    if (totalNotes > 50) score += 0.5;
-
-    // Chord factor
-    if (chordRatio > 0.1) score += 0.5;
-    if (chordRatio > 0.3) score += 0.5;
-
-    // Variety factor
-    if (uniqueKeys.size > 5) score += 0.5;
-    if (uniqueKeys.size > 10) score += 0.5;
-
-    return Math.min(5, Math.max(1, Math.round(score)));
 }

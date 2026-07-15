@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Timestamp } from 'firebase/firestore';
+import { Play, Square, Heart, Download, Trash2, Music } from 'lucide-react';
 import type { Recording } from '../../domain/models';
 
 interface RecordingCardProps {
@@ -24,9 +25,15 @@ export const RecordingCard: React.FC<RecordingCardProps> = ({
 }) => {
     const { t } = useTranslation();
 
+    const dateLabel = rec.timestamp
+        ? (rec.timestamp instanceof Timestamp
+            ? rec.timestamp.toDate().toLocaleDateString()
+            : new Date(rec.timestamp).toLocaleDateString())
+        : t('library.dateUnknown');
+
     return (
-        <article className={`sheet-card hover-effect ${isPlaying ? 'active-card' : ''}`}>
-            <div className="sheet-preview">
+        <article className={`recording-tile ${isPlaying ? 'playing' : ''}`}>
+            <div className="tile-preview" onClick={(e) => onPlay(rec, e)}>
                 <div className="note-mini-vis">
                     {rec.notes.slice(0, 40).map((n, i) => (
                         <div
@@ -38,61 +45,35 @@ export const RecordingCard: React.FC<RecordingCardProps> = ({
                             }}
                         />
                     ))}
-                    {rec.notes.length === 0 && (
-                        <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#9ca3af' }}>music_note</span>
-                    )}
+                    {rec.notes.length === 0 && <Music size={36} className="tile-empty-icon" />}
                 </div>
-                <div className="preview-overlay">
-                    <button className="play-btn" onClick={(e) => onPlay(rec, e)}>
-                        <span className="material-symbols-outlined text-black">
-                            {isPlaying ? 'stop' : 'play_arrow'}
-                        </span>
-                    </button>
+                <div className="tile-play">
+                    {isPlaying ? <Square size={18} fill="currentColor" /> : <Play size={18} />}
                 </div>
             </div>
-            <div className="sheet-info">
-                <div className="sheet-titles" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                        <h3 className="sheet-title">{rec.name || t('library.untitled')}</h3>
-                        <p className="sheet-composer">
-                            {rec.timestamp ? (
-                                rec.timestamp instanceof Timestamp
-                                    ? rec.timestamp.toDate().toLocaleDateString()
-                                    : new Date(rec.timestamp).toLocaleDateString()
-                            ) : t('library.dateUnknown')}
-                        </p>
-                    </div>
-                    <div className="card-actions">
-                        <button
-                            className={`btn-card-action ${rec.favorite ? 'active' : ''}`}
-                            onClick={(e) => rec.id && onToggleFavorite(rec.id, !!rec.favorite, e)}
-                            title="Favorite"
-                        >
-                            <span className="material-symbols-outlined">
-                                {rec.favorite ? 'favorite' : 'favorite_border'}
-                            </span>
-                        </button>
-                        <button className="btn-card-action" onClick={(e) => onDownload(rec, e)} title="Download">
-                            <span className="material-symbols-outlined">download</span>
-                        </button>
-                        <button
-                            className="btn-card-action danger"
-                            onClick={(e) => rec.id && onDelete(rec.id, e)}
-                            title={t('library.deleteTitle')}
-                        >
-                            <span className="material-symbols-outlined">delete</span>
-                        </button>
-                    </div>
+            <div className="tile-body">
+                <div className="tile-titles">
+                    <h3>{rec.name || t('library.untitled')}</h3>
+                    <p>{dateLabel} · {rec.notes?.length || 0} {t('library.notes').toLowerCase()} · {formatDuration(rec.duration || 0)}</p>
                 </div>
-                <div className="sheet-meta">
-                    <div className="meta-col">
-                        <span className="meta-label">{t('library.notes')}</span>
-                        <span className="meta-val">{rec.notes?.length || 0}</span>
-                    </div>
-                    <div className="meta-col border-left">
-                        <span className="meta-label">{t('library.duration')}</span>
-                        <span className="meta-val">{formatDuration(rec.duration || 0)}</span>
-                    </div>
+                <div className="tile-actions">
+                    <button
+                        className={`btn-card-action ${rec.favorite ? 'active' : ''}`}
+                        onClick={(e) => rec.id && onToggleFavorite(rec.id, !!rec.favorite, e)}
+                        title={t('library.favorites')}
+                    >
+                        <Heart size={14} fill={rec.favorite ? 'currentColor' : 'none'} />
+                    </button>
+                    <button className="btn-card-action" onClick={(e) => onDownload(rec, e)} title={t('library.download')}>
+                        <Download size={14} />
+                    </button>
+                    <button
+                        className="btn-card-action danger"
+                        onClick={(e) => rec.id && onDelete(rec.id, e)}
+                        title={t('library.deleteTitle')}
+                    >
+                        <Trash2 size={14} />
+                    </button>
                 </div>
             </div>
         </article>

@@ -1,101 +1,108 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Timer, Circle, Square, ListMusic, Music, SlidersHorizontal, HelpCircle } from 'lucide-react';
 import { formatTime } from '../../utils/formatters';
 
 interface StudioToolbarProps {
     isRecording: boolean;
     recordingTime: number;
     onToggleRecord: () => void;
-    onOpenGallery: () => void;
-    showHelp: boolean;
-    onToggleHelp: () => void;
+    showGallery: boolean;
+    onToggleGallery: () => void;
+    showSheet: boolean;
+    onToggleSheet: () => void;
+    showSettings: boolean;
+    onToggleSettings: () => void;
+    onHelp: () => void;
     metronome: {
         isActive: boolean;
         toggle: () => void;
         bpm: number;
         setBpm: (bpm: number) => void;
     };
-    displayMode: 'notes' | 'keys';
-    onToggleDisplayMode: () => void;
 }
 
 export const StudioToolbar: React.FC<StudioToolbarProps> = ({
     isRecording,
     recordingTime,
     onToggleRecord,
-    onOpenGallery,
-    showHelp,
-    onToggleHelp,
+    showGallery,
+    onToggleGallery,
+    showSheet,
+    onToggleSheet,
+    showSettings,
+    onToggleSettings,
+    onHelp,
     metronome,
-    displayMode,
-    onToggleDisplayMode,
 }) => {
     const { t } = useTranslation();
 
     return (
-        <aside className="sidebar-right">
-            <div className="tool-group">
-                <div className="metronome-control">
-                    <button
-                        className={`btn-tool ${metronome.isActive ? 'active' : ''}`}
-                        onClick={metronome.toggle}
-                        title={t('studio.metronome')}
-                    >
-                        <span className="material-symbols-outlined">timer</span>
-                    </button>
-                    {metronome.isActive && (
-                        <input
-                            type="number"
-                            className="bpm-input"
-                            value={metronome.bpm}
-                            onChange={(e) => metronome.setBpm(parseInt(e.target.value) || 120)}
-                            min="30"
-                            max="300"
-                        />
-                    )}
-                </div>
+        <div className="studio-toolbar">
+            <button
+                className={`tool-btn record ${isRecording ? 'is-recording' : ''}`}
+                onClick={onToggleRecord}
+                title={isRecording ? t('studio.stopRecording') : t('studio.record')}
+                data-onboarding="record"
+            >
+                {isRecording ? <Square size={15} fill="currentColor" /> : <Circle size={15} fill="currentColor" />}
+                <span>{isRecording ? formatTime(recordingTime) : t('studio.record')}</span>
+            </button>
 
-                <div className="record-btn-wrapper">
-                    <button
-                        className={`btn-record-prominent ${isRecording ? 'is-recording' : ''}`}
-                        onClick={onToggleRecord}
-                        title={isRecording ? t('studio.stopRecording') : t('studio.startRecording')}
-                    >
-                        <span className="material-symbols-outlined">{isRecording ? 'stop' : 'fiber_manual_record'}</span>
-                    </button>
-                    {isRecording && (
-                        <span className="record-timer">{formatTime(recordingTime)}</span>
-                    )}
-                </div>
-
+            <div className={`metronome-group ${metronome.isActive ? 'active' : ''}`}>
                 <button
-                    className="btn-tool"
-                    onClick={onOpenGallery}
-                    title={t('studio.gallery')}
+                    className={`tool-btn ${metronome.isActive ? 'active' : ''}`}
+                    onClick={metronome.toggle}
+                    title={t('studio.metronome')}
                 >
-                    <span className="material-symbols-outlined">library_music</span>
+                    <Timer size={15} />
+                    <span>{t('studio.metronome')}</span>
                 </button>
+                {metronome.isActive && (
+                    <input
+                        type="number"
+                        className="bpm-input"
+                        value={metronome.bpm}
+                        onChange={(e) => metronome.setBpm(parseInt(e.target.value) || 120)}
+                        min="30"
+                        max="300"
+                        title={t('studio.bpm')}
+                    />
+                )}
             </div>
 
-            <div className="tool-group bottom">
-                <button
-                    className={`btn-tool ${displayMode === 'notes' ? 'active' : ''}`}
-                    onClick={onToggleDisplayMode}
-                    title={t('studio.viewMode')}
-                >
-                    <span className="material-symbols-outlined">
-                        {displayMode === 'notes' ? 'music_note' : 'keyboard'}
-                    </span>
-                </button>
+            <button
+                className={`tool-btn ${showSheet ? 'active' : ''}`}
+                onClick={onToggleSheet}
+                title={t('sheet.title')}
+                data-onboarding="sheet"
+            >
+                <Music size={15} />
+                <span>{t('sheet.title')}</span>
+            </button>
 
-                <button
-                    className={`btn-tool ${showHelp ? 'active' : ''}`}
-                    onClick={onToggleHelp}
-                    title={t('studio.help')}
-                >
-                    <span className="material-symbols-outlined">{showHelp ? 'close' : 'help_outline'}</span>
-                </button>
-            </div>
-        </aside>
+            <button
+                className={`tool-btn ${showGallery ? 'active' : ''}`}
+                onClick={onToggleGallery}
+                title={t('studio.recordings')}
+            >
+                <ListMusic size={15} />
+                <span>{t('studio.recordings')}</span>
+            </button>
+
+            <div className="toolbar-divider" />
+
+            <button
+                className={`tool-btn icon-only ${showSettings ? 'active' : ''}`}
+                onClick={onToggleSettings}
+                title={t('studio.soundSettings')}
+            >
+                <SlidersHorizontal size={15} />
+            </button>
+
+            <button className="tool-btn icon-only" onClick={onHelp} title={t('studio.help')}>
+                <HelpCircle size={15} />
+            </button>
+        </div>
     );
 };

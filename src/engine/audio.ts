@@ -72,6 +72,12 @@ class AudioEngine {
                     }).toDestination();
                 }
 
+                // Tap the end of the chain into a recorder for MP3 export
+                if (!this.recorder) {
+                    this.recorder = new Tone.Recorder();
+                    this.reverb.connect(this.recorder);
+                }
+
                 if (!this.delay) {
                     this.delay = new Tone.FeedbackDelay({
                         delayTime: "8n",
@@ -134,7 +140,15 @@ class AudioEngine {
 
     public async playNote(note: string, velocity: number = 0.8) {
         if (!this.isLoaded) {
-            await this.init();
+            await this.init(this.currentInstrument);
+        }
+        if (Tone.context.state !== 'running') {
+            try {
+                await Tone.start();
+                await Tone.context.resume();
+            } catch (e) {
+                console.error("AudioEngine: failed to resume context", e);
+            }
         }
         if (!this.sampler) return;
 

@@ -1,372 +1,216 @@
 {
-    "site": {
-        "version": "ÉTAT DU SYSTÈME : ACTIF"
-    },
     "common": {
-        "units": {
-            "db": "dB",
-            "percent": "%",
-            "st": "st",
-            "hours": "h",
-            "minutes": "m"
-        },
-        "daysShort": [
-            "L",
-            "M",
-            "M",
-            "J",
-            "V",
-            "S",
-            "D"
-        ]
+        "toggleTheme": "Changer de thème",
+        "toggleLanguage": "Changer de langue",
+        "close": "Fermer",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "signIn": "Connexion",
+        "signOut": "Se déconnecter"
     },
     "nav": {
         "library": "Bibliothèque",
-        "profile": "Profil",
-        "landing": "Accueil",
-        "studio": "Studio",
-        "playNow": "Jouer"
+        "account": "Compte"
     },
     "footer": {
-        "legal": "Mentions Légales & RGPD",
-        "credits": "Crédits",
-        "portfolio": "Portfolio",
-        "kofi": "Ko-fi",
-        "brandText": "Tous les systèmes sont opérationnels.",
-        "copyright": "© 2024 Audio Industries Ltd.",
-        "privacy": "Confidentialité",
-        "terms": "Conditions",
-        "status": "Statut Système"
-    },
-    "landing": {
-        "hero": {
-            "title": "Un piano professionnel dans votre navigateur",
-            "subtitle": "Un son haute fidélité, sans aucune latence.",
-            "description": "Jouez, enregistrez et partagez vos compositions directement avec votre clavier. Aucune installation requise.",
-            "cta": "Commencer à jouer"
-        },
-        "try": {
-            "label": "Démo Rapide",
-            "title": "Faites un essai",
-            "description": "Utilisez votre clavier d'ordinateur pour jouer les touches ci-dessous.Ressentez la réactivité instantanée."
-        },
-        "features": {
-            "subhead": "Points Forts",
-            "title": "Tout ce dont vous avez besoin",
-            "feat1": {
-                "title": "Son Premium",
-                "desc": "Échantillons de haute qualité provenant de pianos de concert de classe mondiale."
-            },
-            "feat2": {
-                "title": "Synchro Cloud",
-                "desc": "Sauvegardez vos enregistrements et accédez-y depuis n'importe quel appareil."
-            },
-            "feat3": {
-                "title": "Visualiseur",
-                "desc": "Regardez votre musique prendre vie avec une analyse de fréquence en temps réel."
-            },
-            "feat4": {
-                "title": "Enregistrement HD",
-                "desc": "Enregistrez vos performances et exportez-les en MP3 de haute qualité."
-            },
-            "feat5": {
-                "title": "Partitions",
-                "desc": "Consultez et suivez des partitions interactives pendant que vous jouez."
-            },
-            "feat6": {
-                "title": "Support MIDI",
-                "desc": "Connectez votre clavier MIDI physique et jouez directement."
-            },
-            "feat7": {
-                "title": "Effets Studio",
-                "desc": "Améliorez votre son avec des effets professionnels de réverbération et d'écho."
-            },
-            "feat8": {
-                "title": "Statistiques",
-                "desc": "Suivez vos progrès, votre niveau et votre temps de jeu au fil des jours."
-            },
-            "feat9": {
-                "title": "Claviers AZERTY/QWERTY",
-                "desc": "Fonctionne parfaitement avec toutes les dispositions de touches standards."
-            },
-            "feat10": {
-                "title": "Multilingue",
-                "desc": "Disponible en plusieurs langues pour les musiciens du monde entier."
-            }
-        },
-        "final": {
-            "title": "Prêt à jouer ?",
-            "description": "Rejoignez des milliers de musiciens et commencez votre voyage musical aujourd'hui.",
-            "cta": "Lancer le Studio",
-            "kofi": "Soutenir le Projet"
-        }
+        "legal": "Mentions légales",
+        "credits": "Crédits"
     },
     "auth": {
-        "sidebar": {
-            "status": "STATUT SYSTÈME : ACTIF",
-            "version": "Build v{{version}}",
-            "description": "Moteur de station de travail audio numérique de qualité professionnelle. Synthèse haute fidélité et synchronisation cloud.",
-            "signal": "SIGNAL",
-            "encryption": "SÉCURITÉ",
-            "encValue": "CHIFFRÉ",
-            "latency": "STATUT",
-            "connected": "CONNECTÉ",
-            "platform": "Plateforme",
-            "env": "Env",
-            "build": "Build"
-        },
-        "header": {
-            "titleLogin": "ACCÈS_IDENTITÉ",
-            "titleRegister": "CRÉER_IDENTITÉ",
-            "protocol": "PROTOCOLE : AUTH_SÉCURISÉE",
-            "node": "NŒUD : PAR-01",
-            "descLogin": "Entrez vos identifiants pour établir une session sécurisée avec la bibliothèque centrale.",
-            "descRegister": "Initialisez un nouveau nœud d'identité pour commencer vos compositions synchronisées.",
-            "gateway": "PASSERELLE D'AUTHENTIFICATION",
-            "directProtocol": "PROTOCOLE DIRECT"
-        },
-        "form": {
-            "emailLabel": "IDENTIFIANT_EMAIL",
-            "emailPlaceholder": "utilisateur@reseau.local",
-            "passwordLabel": "CLÉ_SÉCURITÉ",
-            "submitting": "TRAITEMENT...",
-            "submitLogin": "EXÉCUTER_CONNEXION",
-            "submitRegister": "EXÉCUTER_INSCRIPTION",
-            "recovery": "RÉCUPÉRER_CLÉ",
-            "switchLogin": "ACCÉDER_NŒUD_EXISTANT",
-            "switchRegister": "INITIALISER_NOUVEAU_NŒUD"
-        },
+        "titleLogin": "Bon retour",
+        "titleRegister": "Créer votre compte",
+        "descLogin": "Connectez-vous pour retrouver vos enregistrements et partitions sur tous vos appareils.",
+        "descRegister": "Sauvegardez vos enregistrements et partitions dans le cloud.",
+        "orEmail": "ou par email",
+        "emailLabel": "Email",
+        "emailPlaceholder": "vous@exemple.com",
+        "passwordLabel": "Mot de passe",
+        "submitting": "Patientez…",
+        "submitLogin": "Se connecter",
+        "submitRegister": "Créer le compte",
+        "forgotPassword": "Mot de passe oublié ?",
+        "switchLogin": "Déjà un compte ? Se connecter",
+        "switchRegister": "Pas de compte ? En créer un",
+        "resetSent": "Email de réinitialisation envoyé. Vérifiez votre boîte de réception.",
         "error": {
-            "emailInUse": "ERREUR : Identité déjà enregistrée sur le réseau.",
-            "invalidCredentials": "ERREUR : Identifiants de sécurité rejetés.",
-            "weakPassword": "ERREUR : Complexité de la clé de sécurité insuffisante.",
-            "generic": "ERREUR : Échec du protocole d'authentification.",
-            "google": "ERREUR : Délai d'attente de la passerelle Google dépassé.",
-            "discord": "ERREUR : Nœud Discord injoignable."
+            "emailInUse": "Cet email est déjà enregistré.",
+            "invalidCredentials": "Email ou mot de passe incorrect.",
+            "weakPassword": "Mot de passe trop faible (6 caractères minimum).",
+            "generic": "Une erreur est survenue. Réessayez.",
+            "google": "Échec de la connexion Google.",
+            "discord": "Échec de la connexion Discord.",
+            "resetNoEmail": "Renseignez d'abord votre email ci-dessus."
         }
     },
     "gallery": {
-        "loading": "Chargement de la galerie...",
-        "notLoggedIn": "Connectez-vous pour sauvegarder vos morceaux",
-        "title": "Mes Enregistrements",
-        "empty": "Aucun enregistrement trouvé",
-        "confirmDelete": "Voulez-vous vraiment supprimer cet enregistrement ?",
-        "play": "Jouer",
+        "loading": "Chargement…",
+        "notLoggedIn": "Connectez-vous pour sauvegarder et réécouter vos enregistrements",
+        "title": "Mes enregistrements",
+        "empty": "Aucun enregistrement",
+        "confirmDelete": "Supprimer cet enregistrement ?",
+        "play": "Écouter",
+        "stop": "Stop",
         "delete": "Supprimer"
     },
     "recording": {
         "saveTitle": "Sauvegarder l'enregistrement",
-        "notConnected": "Non connecté(e)",
-        "cloudNotice": "Cet enregistrement sera téléchargé sur votre appareil. Connectez-vous pour le sauvegarder dans le cloud et le retrouver sur tous vos appareils.",
-        "defaultName": "Mon Morceau",
-        "nameLabel": "Nom du morceau",
-        "namePlaceholder": "Entrez le nom du morceau...",
-        "cancel": "Annuler",
+        "notConnected": "Non connecté",
+        "cloudNotice": "Connectez-vous pour sauvegarder cet enregistrement dans votre bibliothèque. Vous pouvez quand même l'exporter en MP3.",
+        "defaultName": "Mon morceau",
+        "nameLabel": "Nom",
+        "namePlaceholder": "Entrez un nom…",
+        "cancel": "Abandonner",
         "save": "Sauvegarder",
-        "loginButton": "Se connecter pour synchroniser"
-    },
-    "profile": {
-        "title": "Profil Utilisateur",
-        "guestProfile": "Profil Invité",
-        "signOut": "Se déconnecter",
-        "signIn": "Se connecter",
-        "avatarAlt": "Avatar de profil de {{name}}",
-        "config": "Config",
-        "statusOnline": "En ligne actuellement",
-        "statusOffline": "Hors ligne",
-        "emailLabel": "Email :",
-        "notSignedIn": "Non connecté(e)",
-        "planLabel": "Offre :",
-        "planValue": "Rang Pro",
-        "stats": {
-            "title": "Analyses d'utilisation",
-            "playtime": "Temps de jeu total",
-            "recordings": "Notes à vie",
-            "sessions": "Sessions",
-            "skillLevel": "Niveau",
-            "skillPro": "PRO",
-            "skillMid": "MILIEU",
-            "skillNew": "NOUVEAU",
-            "performanceAnalytics": "Analyses de Performance",
-            "weekly": "Hebdomadaire",
-            "monthly": "Mensuel",
-            "yearly": "Annuel",
-            "dynamicRange": "Gamme Dynamique",
-            "avg": "moy",
-            "lastSession": "Dernière Session",
-            "minutesDuration": "{{count}} minutes de durée",
-            "notesCaptured": "{{count}} notes capturées",
-            "noSessions": "Aucune session enregistrée pour le moment.",
-            "viewAnalysis": "Voir l'analyse"
-        },
-        "settings": {
-            "title": "Configuration Système",
-            "audio": {
-                "title": "Moteur Audio",
-                "buffer": "Taille du Buffer",
-                "sampleRate": "Taux d'échantillonnage",
-                "volume": "Volume Principal",
-                "silence": "Silence",
-                "peak": "Crête",
-                "transpose": "Transposition Globale",
-                "semitones": "Demi-tons",
-                "octMinus": "Oct -",
-                "transposeReset": "Réinitialiser",
-                "octPlus": "Oct +",
-                "autoSustain": "Sustain Auto",
-                "performanceMode": "Mode Performance"
-            },
-            "midi": {
-                "title": "Interface MIDI",
-                "device": "Appareil d'entrée",
-                "status": "Statut du Signal",
-                "active": "ACTIF",
-                "searching": "RECHERCHE...",
-                "channel": "Canal d'entrée",
-                "omni": "Omni",
-                "velocityCurve": "Courbe de Vélocité",
-                "linearHard": "Linéaire (Dur)",
-                "localControl": "Contrôle Local",
-                "off": "Désactivé"
-            },
-            "hardware": {
-                "title": "Autorisation Matérielle",
-                "status": "Statut de liaison",
-                "authorized": "AUTORISÉ",
-                "notAuthorized": "NON_AUTORISÉ",
-                "notSupported": "Accélération matérielle non supportée sur ce nœud."
-            }
-        },
-        "privacy": "Protocole de Confidentialité",
-        "terms": "Conditions d'utilisation",
-        "systemStatus": "Statut Système :",
-        "statusStable": "Stable"
-    },
-    "library": {
-        "confirmDelete": "Voulez-vous vraiment supprimer cet enregistrement ?",
-        "allRecordings": "Tous les enregistrements",
-        "favorites": "Favoris",
-        "proPlan": "Offre Pro",
-        "proDesc": "Débloquez des partitions illimitées et le stockage cloud.",
-        "upgrade": "Améliorer",
-        "title": "Mes Enregistrements",
-        "subtitle": "Gérez et organisez vos sessions de piano personnelles.",
-        "newRecording": "Nouvel Enregistrement",
-        "loading": "Chargement de vos enregistrements...",
-        "signToSee": "Connectez-vous pour voir vos enregistrements sauvegardés.",
-        "noRecordings": "Vous n'avez pas encore d'enregistrements. Allez au Studio pour en créer un !",
-        "noFavorites": "Aucun favori pour le moment.",
-        "noResults": "Aucun résultat trouvé.",
-        "noSheets": "Aucune partition sauvegardée.",
-        "untitled": "Enregistrement sans titre",
-        "dateUnknown": "Date inconnue",
-        "deleteTitle": "Supprimer l'enregistrement",
-        "notes": "Notes",
-        "duration": "Durée",
-        "showingCount": "Affichage de {{count}} éléments",
-        "searchPlaceholder": "Rechercher...",
-        "collections": "Collections",
-        "recordings": "Enregistrements",
-        "sheets": "Partitions",
-        "sheetsTitle": "Mes Partitions",
-        "sheetsSubtitle": "Vos partitions sauvegardées.",
-        "filter": "Filtrer",
-        "allItems": "Tout"
+        "loginButton": "Se connecter",
+        "exportMp3": "Exporter en MP3"
     },
     "studio": {
-        "controls": "Commandes Studio",
-        "sessionId": "ID SESSION : ",
-        "masterGain": "Gain Principal",
+        "metronome": "Métronome",
+        "bpm": "BPM",
+        "record": "Enregistrer",
+        "stopRecording": "Arrêter l'enregistrement",
+        "recordings": "Enregistrements",
+        "help": "Aide",
+        "soundSettings": "Réglages",
+        "sound": "Son",
+        "effects": "Effets",
+        "keyboard": "Clavier",
+        "volume": "Volume",
         "sustain": "Sustain",
         "transpose": "Transposition",
-        "pianoAccent": "Accent Piano",
-        "default": "Défaut",
-        "custom": "Personnalisé",
-        "engineProfile": "Profil Moteur",
-        "waveform": "FORME D'ONDE",
-        "grandPiano": "PIANO À QUEUE",
-        "authMode": "MODE AUTH",
-        "secure": "SÉCURISÉ",
-        "midiInput": "Entrée MIDI : ",
-        "active": "Active",
-        "waiting": "En attente...",
-        "activeKeys": "Touches Actives",
-        "score": "SCORE",
-        "multiplier": "MULT",
-        "history": "Historique",
-        "viewMode": "Changer le mode de vue",
-        "resetSettings": "Réinitialiser les paramètres",
-        "resetConfirm": "Êtes-vous sûr de vouloir réinitialiser tous les paramètres par défaut ?",
-        "engineStatus": "État Moteur",
-        "metronome": "Métronome",
-        "stopRecording": "Arrêter l'enregistrement",
-        "record": "Enregistrer",
-        "library": "Bibliothèque",
-        "help": "Aide",
-        "reverb": "Réverb",
+        "instrument": "Instrument",
+        "grandPiano": "Piano à queue",
+        "marimba": "Marimba",
+        "reverb": "Réverbération",
         "delay": "Délai",
         "feedback": "Feedback",
-        "sessionRecap": "Récapitulatif de Session",
-        "stats": {
-            "totalNotes": "TOTAL NOTES",
-            "duration": "DURÉE",
-            "maxCombo": "MULTIPLICATEUR MAX",
-            "finalScore": "SCORE FINAL",
-            "avgVelocity": "VELOCITY MOY."
-        },
-        "units": {
-            "db": "dB",
-            "percent": "%",
-            "st": "st"
+        "octaves": "Octaves",
+        "keyLabels": "Étiquettes des touches",
+        "keyColor": "Couleur des touches",
+        "typePlaceholder": "Tapez des touches pour jouer...",
+        "resetSettings": "Réinitialiser les réglages",
+        "resetConfirm": "Réinitialiser tous les réglages par défaut ?"
+    },
+    "sheet": {
+        "title": "Partition",
+        "loadSaved": "Ouvrir une partition sauvegardée",
+        "save": "Sauvegarder",
+        "saveBtn": "Sauvegarder",
+        "edit": "Modifier",
+        "sheetName": "Nom de la partition…",
+        "noSavedSheets": "Aucune partition sauvegardée",
+        "placeholder": "Collez votre partition ici…\nEx : asdf [gh] j|k l",
+        "load": "Charger la partition",
+        "start": "Jouer",
+        "stop": "Stop",
+        "restart": "Recommencer",
+        "newSheet": "Nouvelle partition",
+        "results": {
+            "title": "Session terminée",
+            "accuracy": "Précision",
+            "time": "Temps",
+            "notesCorrect": "{{correct}}/{{total}} notes correctes",
+            "replay": "Rejouer"
         }
+    },
+    "onboarding": {
+        "keyboardHint": "Votre clavier d'ordinateur joue les notes — essayez Q, S, D, F. Maintenez Maj pour les dièses.",
+        "recordHint": "Enregistrez vos sessions ici, puis réécoutez-les ou exportez-les en MP3.",
+        "sheetHint": "Entraînez-vous avec des partitions guidées : chargez-en une et jouez les touches indiquées.",
+        "next": "Suivant",
+        "skip": "Passer",
+        "done": "Compris"
+    },
+    "library": {
+        "pageTitle": "Bibliothèque",
+        "pageSubtitle": "Vos enregistrements et partitions.",
+        "searchPlaceholder": "Rechercher…",
+        "favorites": "Favoris",
+        "gridView": "Vue grille",
+        "listView": "Vue liste",
+        "recordings": "Enregistrements",
+        "sheets": "Partitions",
+        "loading": "Chargement…",
+        "noRecordings": "Aucun enregistrement. Rendez-vous sur le piano pour en créer un.",
+        "noFavorites": "Aucun favori pour l'instant.",
+        "noResults": "Aucun résultat.",
+        "noSheets": "Aucune partition sauvegardée.",
+        "newSheet": "Nouvelle partition",
+        "untitled": "Sans titre",
+        "dateUnknown": "Date inconnue",
+        "deleteTitle": "Supprimer",
+        "notes": "Notes",
+        "duration": "Durée",
+        "download": "Télécharger les notes (JSON)",
+        "confirmDelete": "Supprimer cet élément ?"
+    },
+    "account": {
+        "title": "Compte",
+        "identity": "Profil",
+        "noName": "Définir un nom d'affichage",
+        "preferences": "Préférences",
+        "theme": "Thème",
+        "themeLight": "Clair",
+        "themeDark": "Sombre",
+        "language": "Langue",
+        "resetSettings": "Réinitialiser tous les réglages",
+        "reset": "Réinitialiser",
+        "management": "Compte",
+        "signOut": "Se déconnecter",
+        "deleteAccount": "Supprimer le compte",
+        "deleteHint": "Supprime définitivement votre compte. Vos enregistrements et partitions restent en base sauf suppression préalable.",
+        "delete": "Supprimer",
+        "deleteConfirm": "Supprimer définitivement votre compte ?",
+        "deleteRecentLogin": "Par sécurité, reconnectez-vous puis réessayez.",
+        "deleteError": "Impossible de supprimer le compte. Réessayez."
     },
     "credits": {
         "title": "Crédits",
-        "subhead": "Origine du Projet",
+        "subhead": "Projet",
         "concept": {
             "title": "Concept & Développement",
-            "lead": "Architecte Principal & Dev :",
-            "desc": "Développé avec une passion pour l'ingénierie sonore et les interfaces industrielles minimalistes."
+            "lead": "Design & développement :",
+            "desc": "Conçu avec une passion pour le son et les interfaces minimalistes."
         },
         "design": {
-            "title": "Inspiration Design",
-            "desc": "Le design visuel de Pocket Piano tire son inspiration des interfaces techniques de précision, du brutalisme numérique et des équipements de studio vintage."
+            "title": "Design",
+            "desc": "Pocket Piano vise une interface calme et concentrée où l'instrument est le héros."
         },
         "tech": {
-            "title": "Stack Technique",
+            "title": "Technologie",
             "core": "Cœur :",
             "audio": "Audio :",
             "infra": "Infrastructure :",
-            "styling": "Styling :",
-            "dev": "Développement :"
+            "styling": "Styles :",
+            "dev": "Outillage :"
         },
-        "build": "BUILD REV. 2.4.1 / AUDIO_ENGINE_v4"
+        "build": "Pocket Piano"
     },
     "legal": {
-        "title": "Mentions Légales & RGPD",
+        "title": "Mentions légales & RGPD",
         "subhead": "Conformité & Données",
         "mentions": {
-            "title": "1. Mentions Légales",
+            "title": "1. Mentions légales",
             "editor": "Éditeur du site :",
-            "editorDesc": "Pocket Piano est un projet expérimental développé par Audio Industries Ltd.",
+            "editorDesc": "Pocket Piano est un projet indépendant.",
             "director": "Directeur de la publication :",
             "hosting": "Hébergement :",
             "hostingDesc": "Le site est hébergé par Firebase (Google Cloud Platform)"
         },
         "privacy": {
-            "title": "2. Politique de Confidentialité (RGPD)",
-            "desc": "Conformément au Règlement Général sur la Protection des Données (RGPD), nous vous informons que Pocket Piano collecte des données minimales nécessaires au fonctionnement du service.",
+            "title": "2. Politique de confidentialité (RGPD)",
+            "desc": "Conformément au Règlement Général sur la Protection des Données (RGPD), Pocket Piano ne collecte que les données nécessaires au fonctionnement du service.",
             "dataCollected": "Données collectées :",
-            "email": "Adresse email (via Google Authentication pour la synchronisation du profil).",
-            "stats": "Statistiques d'utilisation anonymisées (notes jouées, temps de session) pour améliorer l'expérience utilisateur.",
+            "email": "Adresse email (via l'authentification, pour la synchronisation du compte).",
+            "stats": "Vos enregistrements, partitions et réglages sauvegardés.",
             "purposes": "Finalités :",
-            "purposesDesc": "Les données sont utilisées exclusivement pour permettre la sauvegarde de vos réglages, de vos enregistrements et l'affichage de vos statistiques personnelles. Aucune donnée n'est cédée à des tiers.",
+            "purposesDesc": "Les données servent exclusivement à synchroniser vos réglages, enregistrements et partitions entre vos appareils. Aucune donnée n'est partagée avec des tiers.",
             "rights": "Vos droits :",
-            "rightsDesc": "Vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Vous pouvez exercer ces droits en nous contactant à l'adresse email de support indiquée en bas de page."
+            "rightsDesc": "Vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Vous pouvez supprimer votre compte à tout moment depuis la page Compte."
         },
         "intellectual": {
-            "title": "3. Propriété Intellectuelle",
-            "desc": "L'ensemble des éléments constituant ce site (structure, design, logos, sons) est la propriété exclusive de ses créateurs, sauf mention contraire."
+            "title": "3. Propriété intellectuelle",
+            "desc": "Tous les éléments constituant ce site (structure, design, logos, sons) sont la propriété exclusive de leurs créateurs, sauf mention contraire."
         }
     }
 }

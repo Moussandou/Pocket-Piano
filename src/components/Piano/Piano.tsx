@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useRef, useCallback } from 'react';
 import { resolveNoteFromEvent, getLabelForNote } from '../../domain/constants';
 import { audioEngine } from '../../engine/audio';
+import './Piano.css';
 
 interface KeyProps {
     note: string;
@@ -22,7 +23,7 @@ const PianoKey: React.FC<KeyProps> = ({ note, isBlack, label, active, onPress, o
             onTouchStart={(e) => { e.preventDefault(); onPress(note); }}
             onTouchEnd={(e) => { e.preventDefault(); onRelease(note); }}
         >
-            <span className="key-label">{label || note}</span>
+            {label && <span className="key-label">{label}</span>}
         </div>
     );
 };
@@ -33,6 +34,8 @@ interface PianoProps {
     active?: boolean;
     startOctave?: number;
     endOctave?: number;
+    showLabels?: boolean;
+    whiteKeyCount?: number;
 }
 
 export const Piano: React.FC<PianoProps> = ({
@@ -40,7 +43,9 @@ export const Piano: React.FC<PianoProps> = ({
     onNoteReleased,
     active = true,
     startOctave = 2,
-    endOctave = 6
+    endOctave = 6,
+    showLabels = true,
+    whiteKeyCount
 }) => {
     // ... existing code ...
     const activeKeysRef = useRef<Set<string>>(new Set());
@@ -129,18 +134,19 @@ export const Piano: React.FC<PianoProps> = ({
         };
     }, [active, pressNote, releaseNote, releaseAll]);
 
-    const getKeyLabel = (note: string) => {
-        return getLabelForNote(note);
-    };
+    const whiteKeys = whiteKeyCount ?? notes.filter(n => !n.includes('#')).length;
 
     return (
-        <div className="piano-container">
+        <div
+            className="piano-container"
+            style={{ '--white-keys': whiteKeys } as React.CSSProperties}
+        >
             {notes.map(note => (
                 <PianoKey
                     key={note}
                     note={note}
                     isBlack={note.includes('#')}
-                    label={getKeyLabel(note)}
+                    label={showLabels ? getLabelForNote(note) : undefined}
                     active={activeKeysRef.current.has(note)}
                     onPress={pressNote}
                     onRelease={releaseNote}
