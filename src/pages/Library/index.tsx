@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Search, Heart, LayoutGrid, List, Play, Trash2, Music, Plus } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import { usePlayback } from '../../hooks/usePlayback';
 import { recordingRepository } from '../../infra/repositories/recordingRepository';
 import { sheetRepository } from '../../infra/repositories/sheetRepository';
 import { formatDuration } from '../../utils/formatters';
@@ -26,7 +25,6 @@ export const Library: React.FC = () => {
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
     const [favoritesOnly, setFavoritesOnly] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const { playingId, playRecording: startPlayback } = usePlayback();
     const { user } = useAuth();
     const navigate = useNavigate();
 
@@ -56,7 +54,8 @@ export const Library: React.FC = () => {
 
     const playRecording = (recording: Recording, e: React.MouseEvent) => {
         e.stopPropagation();
-        startPlayback(recording);
+        sessionStorage.setItem('pocket-piano-play-recording', JSON.stringify(recording));
+        navigate('/');
     };
 
     const removeRecording = async (id: string, e: React.MouseEvent) => {
@@ -109,6 +108,11 @@ export const Library: React.FC = () => {
         navigate('/');
     };
 
+    const handleNewSheet = () => {
+        sessionStorage.setItem('pocket-piano-open-sheet-editor', 'true');
+        navigate('/');
+    };
+
     const filteredRecordings = recordings.filter(rec => {
         if (favoritesOnly && !rec.favorite) return false;
         if (searchQuery) {
@@ -155,24 +159,22 @@ export const Library: React.FC = () => {
                     >
                         <Heart size={15} fill={favoritesOnly ? 'currentColor' : 'none'} />
                     </button>
-                    {activeTab === 'recordings' && (
-                        <>
-                            <button
-                                className={`btn-icon-ghost ${viewMode === 'grid' ? 'active' : ''}`}
-                                onClick={() => setViewMode('grid')}
-                                title={t('library.gridView')}
-                            >
-                                <LayoutGrid size={15} />
-                            </button>
-                            <button
-                                className={`btn-icon-ghost ${viewMode === 'list' ? 'active' : ''}`}
-                                onClick={() => setViewMode('list')}
-                                title={t('library.listView')}
-                            >
-                                <List size={15} />
-                            </button>
-                        </>
-                    )}
+                    <>
+                        <button
+                            className={`btn-icon-ghost ${viewMode === 'grid' ? 'active' : ''}`}
+                            onClick={() => setViewMode('grid')}
+                            title={t('library.gridView')}
+                        >
+                            <LayoutGrid size={15} />
+                        </button>
+                        <button
+                            className={`btn-icon-ghost ${viewMode === 'list' ? 'active' : ''}`}
+                            onClick={() => setViewMode('list')}
+                            title={t('library.listView')}
+                        >
+                            <List size={15} />
+                        </button>
+                    </>
                 </div>
             </div>
 
@@ -202,7 +204,7 @@ export const Library: React.FC = () => {
                             <RecordingCard
                                 key={rec.id}
                                 recording={rec}
-                                isPlaying={playingId === rec.id}
+                                isPlaying={false}
                                 onPlay={playRecording}
                                 onToggleFavorite={toggleFavorite}
                                 onDownload={downloadNotes}
@@ -217,7 +219,7 @@ export const Library: React.FC = () => {
                             <RecordingListItem
                                 key={rec.id}
                                 recording={rec}
-                                isPlaying={playingId === rec.id}
+                                isPlaying={false}
                                 onPlay={playRecording}
                                 onToggleFavorite={toggleFavorite}
                                 onDownload={downloadNotes}
@@ -232,9 +234,9 @@ export const Library: React.FC = () => {
             {activeTab === 'sheets' && (
                 sheetsLoading ? (
                     <p className="library-empty">{t('library.loading')}</p>
-                ) : (
+                ) : viewMode === 'grid' ? (
                     <div className="library-grid">
-                        <button className="sheet-card new-sheet" onClick={() => navigate('/')}>
+                        <button className="sheet-card new-sheet" onClick={handleNewSheet}>
                             <Plus size={22} />
                             <span>{t('library.newSheet')}</span>
                         </button>
@@ -266,6 +268,49 @@ export const Library: React.FC = () => {
                                         title={t('gallery.delete')}
                                     >
                                         <Trash2 size={15} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                        {filteredSheets.length === 0 && (
+                            <p className="library-empty">{t('library.noSheets')}</p>
+                        )}
+                    </div>
+                ) : (
+                    <div className="library-list">
+                        <button className="sheet-list-item new-sheet" onClick={handleNewSheet}>
+                            <Plus size={16} />
+                            <span>{t('library.newSheet')}</span>
+                        </button>
+                        {filteredSheets.map(sheet => (
+                            <div key={sheet.id} className="sheet-list-item" onClick={() => loadSheetInStudio(sheet)}>
+                                <div className="list-info">
+                                    <span className="list-title">{sheet.name}</span>
+                                    <span className="list-date" style={{ fontFamily: 'inherit', color: 'var(--text-tertiary)' }}>
+                                        {sheet.content.slice(0, 80)}…
+                                    </span>
+                                </div>
+                                <div className="list-actions" onClick={e => e.stopPropagation()}>
+                                    <button
+                                        className={`btn-card-action ${sheet.favorite ? 'active' : ''}`}
+                                        onClick={(e) => toggleSheetFavorite(sheet.id!, sheet.favorite || false, e)}
+                                        title={t('library.favorites')}
+                                    >
+                                        <Heart size={14} fill={sheet.favorite ? 'currentColor' : 'none'} />
+                                    </button>
+                                    <button
+                                        className="btn-card-action"
+                                        onClick={() => loadSheetInStudio(sheet)}
+                                        title={t('gallery.play')}
+                                    >
+                                        <Play size={14} />
+                                    </button>
+                                    <button
+                                        className="btn-card-action danger"
+                                        onClick={(e) => removeSheet(sheet.id!, e)}
+                                        title={t('gallery.delete')}
+                                    >
+                                        <Trash2 size={14} />
                                     </button>
                                 </div>
                             </div>

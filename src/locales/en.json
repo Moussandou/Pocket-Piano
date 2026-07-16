@@ -158,7 +158,8 @@
         "notes": "Notes",
         "duration": "Duration",
         "download": "Download notes (JSON)",
-        "confirmDelete": "Delete this item?"
+        "confirmDelete": "Delete this item?",
+        "playback": "Now playing"
     },
     "account": {
         "title": "Account",

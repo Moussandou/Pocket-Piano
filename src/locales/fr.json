@@ -158,7 +158,8 @@
         "notes": "Notes",
         "duration": "Durée",
         "download": "Télécharger les notes (JSON)",
-        "confirmDelete": "Supprimer cet élément ?"
+        "confirmDelete": "Supprimer cet élément ?",
+        "playback": "Lecture en cours"
     },
     "account": {
         "title": "Compte",

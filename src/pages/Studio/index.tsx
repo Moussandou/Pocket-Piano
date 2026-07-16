@@ -8,7 +8,7 @@ import { useSheetFollow } from '../../hooks/useSheetFollow';
 import { useAuth } from '../../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Piano as PianoIcon, Moon, Sun, X, Play, Square, RotateCcw, Pencil, FolderOpen, Check, FilePlus, FileText, Sparkles, HelpCircle } from 'lucide-react';
+import { Piano as PianoIcon, Moon, Sun, X, Play, Pause, Square, RotateCcw, Pencil, FolderOpen, Check, FilePlus, FileText, Sparkles, HelpCircle } from 'lucide-react';
 import { StudioToolbar } from './StudioToolbar';
 import { SoundSettings } from './SoundSettings';
 import { Visualizer } from './Visualizer';
@@ -20,7 +20,7 @@ import { tokenLabel } from '../../domain/sheetParser';
 import { AuthManager } from '../../infra/AuthManager';
 import { RecordingGallery } from '../../components/Gallery/RecordingGallery';
 import { SaveRecordingModal } from '../../components/Modals/SaveRecordingModal';
-import type { Sheet } from '../../domain/models';
+import type { Sheet, Recording, RecordedNote } from '../../domain/models';
 import './Studio.css';
 
 export const Studio: React.FC = () => {
@@ -52,6 +52,113 @@ export const Studio: React.FC = () => {
     const [autoplayActiveNotes, setAutoplayActiveNotes] = useState<Set<string>>(new Set());
     const [showHelpModal, setShowHelpModal] = useState(false);
 
+    // Recording playback states
+    const [playbackRecording, setPlaybackRecording] = useState<Recording | null>(null);
+    const [playbackActiveNotes, setPlaybackActiveNotes] = useState<Set<string>>(new Set());
+    const [playbackProgress, setPlaybackProgress] = useState(0);
+    const [isPlaybackPlaying, setIsPlaybackPlaying] = useState(false);
+    
+    const playbackTimeouts = useRef<ReturnType<typeof setTimeout>[]>([]);
+    const playbackStartTime = useRef<number | null>(null);
+    const playbackPausedAt = useRef<number>(0);
+    const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+
+    const stopRecordingPlayback = useCallback(() => {
+        playbackTimeouts.current.forEach(clearTimeout);
+        playbackTimeouts.current = [];
+        if (progressInterval.current) {
+            clearInterval(progressInterval.current);
+            progressInterval.current = null;
+        }
+        setPlaybackActiveNotes(new Set());
+        setIsPlaybackPlaying(false);
+        setPlaybackProgress(0);
+        playbackStartTime.current = null;
+        playbackPausedAt.current = 0;
+    }, []);
+
+    const startRecordingPlayback = useCallback(async (recording: Recording, startFromMs: number = 0) => {
+        playbackTimeouts.current.forEach(clearTimeout);
+        playbackTimeouts.current = [];
+        if (progressInterval.current) {
+            clearInterval(progressInterval.current);
+        }
+
+        if (!audioEngine.getReadyStatus()) {
+            await audioEngine.init(settings.currentInstrument);
+        }
+        await audioEngine.resumeContext();
+
+        setIsPlaybackPlaying(true);
+        setPlaybackProgress(startFromMs);
+        const now = Date.now();
+        playbackStartTime.current = now - startFromMs;
+
+        // Start progress timer
+        progressInterval.current = setInterval(() => {
+            if (playbackStartTime.current !== null) {
+                const elapsed = Date.now() - playbackStartTime.current;
+                const total = recording.duration || 0;
+                if (elapsed >= total) {
+                    stopRecordingPlayback();
+                } else {
+                    setPlaybackProgress(elapsed);
+                }
+            }
+        }, 30);
+
+        // Schedule only notes that are in the future
+        recording.notes.forEach((note: RecordedNote) => {
+            const noteTime = note.time;
+            const duration = note.duration || 200;
+
+            // Schedule attack
+            if (noteTime >= startFromMs) {
+                const tAttack = setTimeout(() => {
+                    audioEngine.playNote(note.note, note.velocity);
+                    setPlaybackActiveNotes(prev => {
+                        const next = new Set(prev);
+                        next.add(note.note);
+                        return next;
+                    });
+                }, noteTime - startFromMs);
+                playbackTimeouts.current.push(tAttack);
+            }
+
+            // Schedule release
+            if (noteTime + duration >= startFromMs) {
+                const tRelease = setTimeout(() => {
+                    audioEngine.releaseNote(note.note);
+                    setPlaybackActiveNotes(prev => {
+                        const next = new Set(prev);
+                        next.delete(note.note);
+                        return next;
+                    });
+                }, (noteTime + duration) - startFromMs);
+                playbackTimeouts.current.push(tRelease);
+            }
+        });
+    }, [settings.currentInstrument, stopRecordingPlayback]);
+
+    const pauseRecordingPlayback = useCallback(() => {
+        playbackTimeouts.current.forEach(clearTimeout);
+        playbackTimeouts.current = [];
+        if (progressInterval.current) {
+            clearInterval(progressInterval.current);
+            progressInterval.current = null;
+        }
+        setIsPlaybackPlaying(false);
+        if (playbackStartTime.current !== null) {
+            playbackPausedAt.current = Date.now() - playbackStartTime.current;
+        }
+        setPlaybackActiveNotes(new Set());
+    }, []);
+
+    const closeRecordingPlayback = useCallback(() => {
+        stopRecordingPlayback();
+        setPlaybackRecording(null);
+    }, [stopRecordingPlayback]);
+
     // Sync input text when sheetText changes externally
     useEffect(() => {
         setSheetInput(sheetFollow.sheetText);
@@ -79,7 +186,40 @@ export const Studio: React.FC = () => {
             sheetFollowRef.current.loadSheet(pending);
             setShowSheetPanel(true);
         }
+
+        const openEditor = sessionStorage.getItem('pocket-piano-open-sheet-editor');
+        if (openEditor) {
+            sessionStorage.removeItem('pocket-piano-open-sheet-editor');
+            setShowSheetPanel(true);
+            setDeskEditMode(true);
+        }
+
+        const playbackPending = sessionStorage.getItem('pocket-piano-play-recording');
+        if (playbackPending) {
+            sessionStorage.removeItem('pocket-piano-play-recording');
+            try {
+                const rec = JSON.parse(playbackPending) as Recording;
+                setPlaybackRecording(rec);
+            } catch (e) {
+                console.error("Failed to parse recording for playback", e);
+            }
+        }
     }, []);
+
+    // Auto-play the loaded recording
+    useEffect(() => {
+        if (playbackRecording) {
+            // Stop sheet follower and autoplay so they don't clash
+            sheetFollow.stop();
+            setAutoplayMode(false);
+            
+            // Start playing the recording
+            startRecordingPlayback(playbackRecording, 0);
+        }
+        return () => {
+            stopRecordingPlayback();
+        };
+    }, [playbackRecording, startRecordingPlayback, stopRecordingPlayback]);
 
     // Sync settings with audio engine
     useEffect(() => {
@@ -90,6 +230,17 @@ export const Studio: React.FC = () => {
         audioEngine.setDelay(settings.delay);
         audioEngine.setFeedback(settings.feedback);
     }, [settings]);
+
+    // Preload active instrument in background on mount/change
+    useEffect(() => {
+        setIsLoaded(false);
+        audioEngine.init(settings.currentInstrument).then(() => {
+            setIsLoaded(true);
+        }).catch(err => {
+            console.warn("AudioEngine: Background preloading failed/suspended", err);
+            setIsLoaded(true);
+        });
+    }, [settings.currentInstrument]);
 
     // Auto-scroll the music stand sheet track to the active note (smooth transform-based slide)
     useLayoutEffect(() => {
@@ -200,10 +351,6 @@ export const Studio: React.FC = () => {
     }, [isRecording]);
 
     const handleNoteEvent = useCallback((note: string, type: 'press' | 'release', velocity: number = 0.8) => {
-        if (!isLoaded && type === 'press') {
-            audioEngine.init(settings.currentInstrument).then(() => setIsLoaded(true));
-        }
-
         if (type === 'press') {
             recordNote(note, velocity, 'DOWN');
 
@@ -221,7 +368,7 @@ export const Studio: React.FC = () => {
         } else {
             recordNote(note, 0, 'UP');
         }
-    }, [recordNote, isLoaded, settings.currentInstrument, autoplayMode]);
+    }, [recordNote, autoplayMode]);
 
     const handleNotePress = useCallback((note: string) => {
         handleNoteEvent(note, 'press');
@@ -303,6 +450,44 @@ export const Studio: React.FC = () => {
 
             <main className="studio-stage">
                 {settings.enableVisualizer && <Visualizer isLoaded={isLoaded} />}
+
+                {playbackRecording && (
+                    <div className="playback-panel glass">
+                        <div className="playback-panel-info">
+                            <span className="playback-badge">{t('library.playback')}</span>
+                            <span className="playback-title">{playbackRecording.name}</span>
+                        </div>
+                        <div className="playback-panel-controls">
+                            {isPlaybackPlaying ? (
+                                <button className="playback-btn" onClick={pauseRecordingPlayback} title="Pause">
+                                    <Pause size={14} fill="currentColor" />
+                                </button>
+                            ) : (
+                                <button className="playback-btn" onClick={() => startRecordingPlayback(playbackRecording, playbackPausedAt.current)} title="Play">
+                                    <Play size={14} fill="currentColor" />
+                                </button>
+                            )}
+                            <button className="playback-btn" onClick={stopRecordingPlayback} title="Restart">
+                                <RotateCcw size={14} />
+                            </button>
+                            
+                            <div className="playback-progress-container">
+                                <span className="playback-time">{formatDuration(playbackProgress)}</span>
+                                <div className="playback-progress-bar-bg">
+                                    <div 
+                                        className="playback-progress-bar-fill" 
+                                        style={{ width: `${(playbackProgress / (playbackRecording.duration || 1)) * 100}%` }}
+                                    />
+                                </div>
+                                <span className="playback-time">{formatDuration(playbackRecording.duration || 0)}</span>
+                            </div>
+
+                            <button className="playback-btn close" onClick={closeRecordingPlayback} title="Close">
+                                <X size={14} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </main>
 
             <section className="studio-piano" data-onboarding="piano">
@@ -530,7 +715,7 @@ export const Studio: React.FC = () => {
                         whiteKeyCount={whiteKeyCount}
                         onNotePlayed={handleNotePress}
                         onNoteReleased={handleNoteRelease}
-                        forcedActiveNotes={autoplayMode ? autoplayActiveNotes : undefined}
+                        forcedActiveNotes={playbackRecording ? playbackActiveNotes : (autoplayMode ? autoplayActiveNotes : undefined)}
                     />
                 </div>
             </section>

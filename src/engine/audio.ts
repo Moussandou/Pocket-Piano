@@ -60,11 +60,6 @@ class AudioEngine {
 
         this.loadingPromise = (async () => {
             try {
-                await Tone.start();
-                if (Tone.context.state !== 'running') {
-                    await Tone.context.resume();
-                }
-
                 // Initialize effects if needed
                 if (!this.reverb) {
                     this.reverb = new Tone.Reverb({
@@ -144,10 +139,7 @@ class AudioEngine {
         return this.init(name);
     }
 
-    public async playNote(note: string, velocity: number = 0.8) {
-        if (!this.isLoaded) {
-            await this.init(this.currentInstrument);
-        }
+    public async resumeContext() {
         if (Tone.context.state !== 'running') {
             try {
                 await Tone.start();
@@ -156,6 +148,13 @@ class AudioEngine {
                 console.error("AudioEngine: failed to resume context", e);
             }
         }
+    }
+
+    public async playNote(note: string, velocity: number = 0.8) {
+        if (!this.isLoaded) {
+            await this.init(this.currentInstrument);
+        }
+        await this.resumeContext();
         if (!this.sampler) return;
 
         const transposedNote = Tone.Frequency(note).transpose(this.transposeOffset).toNote();
